@@ -1,0 +1,511 @@
+nohup: ignoring input
+Starting the process...
+Today: 05-Dec-2025
+Is holiday? False
+nifty_instruments.csv is already updated today. Skipping updateInstrument.py.
+trading.db not found. Initializing database...
+Database initialized successfully at /home/harshilkhatri2808/uat/tradeJenie/Trading.db
+Starting user logins and trade genie...
+Logging in user: HDK
+[INFO] Kite login URL: https://kite.zerodha.com/connect/login?api_key=0iqi9qsbesglr968&v=3
+[INFO] Successful Login with Request Token: eSAcXisaF01V3jNRBjKnEwehGgIBt7CQ
+[INFO] Token saved to file: access_token.json
+[✅] Access token generated and saved successfully for HDK.
+Logging in user: JPK
+[INFO] Kite login URL: https://kite.zerodha.com/connect/login?api_key=2e52tukxaqo0xave&v=3
+[INFO] Successful Login with Request Token: 6eeSiRyalEOYRDiOVTbBmQxBjuPfccF9
+[INFO] Token saved to file: access_token.json
+[✅] Access token generated and saved successfully for JPK.
+Logging in user: PMK
+[INFO] Kite login URL: https://kite.zerodha.com/connect/login?api_key=afpr40trjunagy0k&v=3
+[INFO] Successful Login with Request Token: CJwFI27fpGV7qo2RJ79CXrhudgtTLSw6
+[INFO] Token saved to file: access_token.json
+[✅] Access token generated and saved successfully for PMK.
+Starting trade genie for user: HDK
+Starting trade genie for user: JPK
+Starting trade genie for user: PMK
+ℹ️ Profile: Parag Manubhai Khatri | Current Time: 2025-12-05 15:01:00
+ℹ️ Profile: Harshil Divyakant Khatri | Current Time: 2025-12-05 15:01:00
+ℹ️ Profile: Jinal Parag Khatri | Current Time: 2025-12-05 15:01:00
+Database initialized successfully at /home/harshilkhatri2808/uat/tradeJenie/Trading.db
+🚫 HDK GCP - UAT  |  HDK_RLY_H-FULL_H01_W  | TRADE mode is OFF SIMULATED_ORDER will be tracked
+Database initialized successfully at /home/harshilkhatri2808/uat/tradeJenie/Trading.db
+🚫 HDK GCP - UAT  |  HDK_RLY_H-M100_T30_W  | TRADE mode is OFF SIMULATED_ORDER will be tracked
+Database initialized successfully at /home/harshilkhatri2808/uat/tradeJenie/Trading.db
+🚫 PMK GCP - UAT  |  PMK_RLY_H-M100_H01_W  | TRADE mode is OFF SIMULATED_ORDER will be tracked
+✅ Broker position matches for Open Position or exceeds DB qty: 75 for NIFTY25D1625800PE
+✅30minute | Loaded open position from DB: {'Signal': 'BUY', 'SpotEntry': 26046.05, 'OptionSymbol': 'NIFTY25D1625800PE', 'Strike': 25800, 'Expiry': '2025-12-16', 'OptionSellPrice': 42.35, 'EntryTime': '2025-12-05 09:45:17', 'qty': 75, 'Interval': '30minute', 'RealTrade': 'no', 'EntryReason': 'ROLLOVER', 'ExpiryType': 'NEXT_WEEK', 'Strategy': 'RAILWAY_TRACK', 'Key': 'HDK_RLY_H-M100_T30_W', 'user_id': 1, 'hedge_option_symbol': 'NIFTY25D1625600PE', 'hedge_strike': 25600, 'hedge_option_buy_price': 20.15, 'hedge_qty': 75, 'hedge_entry_time': '2025-12-05 09:45:17'}
+➡️ HDK GCP - UAT  |  HDK_RLY_H-M100_T30_W  |  30minute Loaded open position: {'Signal': 'BUY', 'SpotEntry': 26046.05, 'OptionSymbol': 'NIFTY25D1625800PE', 'Strike': 25800, 'Expiry': '2025-12-16', 'OptionSellPrice': 42.35, 'EntryTime': '2025-12-05 09:45:17', 'qty': 75, 'Interval': '30minute', 'RealTrade': 'no', 'EntryReason': 'ROLLOVER', 'ExpiryType': 'NEXT_WEEK', 'Strategy': 'RAILWAY_TRACK', 'Key': 'HDK_RLY_H-M100_T30_W', 'user_id': 1, 'hedge_option_symbol': 'NIFTY25D1625600PE', 'hedge_strike': 25600, 'hedge_option_buy_price': 20.15, 'hedge_qty': 75, 'hedge_entry_time': '2025-12-05 09:45:17'}
+✅ Broker position matches for Open Position or exceeds DB qty: 150 for NIFTY25D1625900PE
+✅60minute | Loaded open position from DB: {'Signal': 'BUY', 'SpotEntry': 26142.8, 'OptionSymbol': 'NIFTY25D1625900PE', 'Strike': 25900, 'Expiry': '2025-12-16', 'OptionSellPrice': 53.1, 'EntryTime': '2025-12-05 11:15:14', 'qty': 75, 'Interval': '60minute', 'RealTrade': 'no', 'EntryReason': 'SIGNAL_GENERATED', 'ExpiryType': 'NEXT_WEEK', 'Strategy': 'RAILWAY_TRACK', 'Key': 'HDK_RLY_H-FULL_H01_W', 'user_id': 1, 'hedge_option_symbol': 'NIFTY25D1625800PE', 'hedge_strike': 25800, 'hedge_option_buy_price': 35.95, 'hedge_qty': 75, 'hedge_entry_time': '2025-12-05 11:15:14'}
+➡️ HDK GCP - UAT  |  HDK_RLY_H-FULL_H01_W  |  60minute Loaded open position: {'Signal': 'BUY', 'SpotEntry': 26142.8, 'OptionSymbol': 'NIFTY25D1625900PE', 'Strike': 25900, 'Expiry': '2025-12-16', 'OptionSellPrice': 53.1, 'EntryTime': '2025-12-05 11:15:14', 'qty': 75, 'Interval': '60minute', 'RealTrade': 'no', 'EntryReason': 'SIGNAL_GENERATED', 'ExpiryType': 'NEXT_WEEK', 'Strategy': 'RAILWAY_TRACK', 'Key': 'HDK_RLY_H-FULL_H01_W', 'user_id': 1, 'hedge_option_symbol': 'NIFTY25D1625800PE', 'hedge_strike': 25800, 'hedge_option_buy_price': 35.95, 'hedge_qty': 75, 'hedge_entry_time': '2025-12-05 11:15:14'}
+✅ Broker position matches for Open Position or exceeds DB qty: 75 for NIFTY25D1625800PE
+✅60minute | Loaded open position from DB: {'Signal': 'BUY', 'SpotEntry': 26142.8, 'OptionSymbol': 'NIFTY25D1625800PE', 'Strike': 25800, 'Expiry': '2025-12-16', 'OptionSellPrice': 36.1, 'EntryTime': '2025-12-05 11:15:14', 'qty': 75, 'Interval': '60minute', 'RealTrade': 'no', 'EntryReason': 'SIGNAL_GENERATED', 'ExpiryType': 'NEXT_WEEK', 'Strategy': 'RAILWAY_TRACK', 'Key': 'PMK_RLY_H-M100_H01_W', 'user_id': 3, 'hedge_option_symbol': 'NIFTY25D1625700PE', 'hedge_strike': 25700, 'hedge_option_buy_price': 24.9, 'hedge_qty': 75, 'hedge_entry_time': '2025-12-05 11:15:14'}
+➡️ PMK GCP - UAT  |  PMK_RLY_H-M100_H01_W  |  60minute Loaded open position: {'Signal': 'BUY', 'SpotEntry': 26142.8, 'OptionSymbol': 'NIFTY25D1625800PE', 'Strike': 25800, 'Expiry': '2025-12-16', 'OptionSellPrice': 36.1, 'EntryTime': '2025-12-05 11:15:14', 'qty': 75, 'Interval': '60minute', 'RealTrade': 'no', 'EntryReason': 'SIGNAL_GENERATED', 'ExpiryType': 'NEXT_WEEK', 'Strategy': 'RAILWAY_TRACK', 'Key': 'PMK_RLY_H-M100_H01_W', 'user_id': 3, 'hedge_option_symbol': 'NIFTY25D1625700PE', 'hedge_strike': 25700, 'hedge_option_buy_price': 24.9, 'hedge_qty': 75, 'hedge_entry_time': '2025-12-05 11:15:14'}
+🕵️‍♀️ HDK GCP - UAT  |  HDK_RLY_H-M100_T30_W  |  30minute Candles available: 129 / Required: 20
+RAILWAY_TRACK | Candle time 2025-12-05 14:45 | Close: 26171.85 | Buy: False | Sell: False | Trend: 1 | Current Time: 2025-12-05 15:01:04
+🕵️‍♀️ HDK GCP - UAT  |  HDK_RLY_H-FULL_H01_W  |  60minute Candles available: 69 / Required: 20
+RAILWAY_TRACK | Candle time 2025-12-05 14:15 | Close: 26173.65 | Buy: False | Sell: False | Trend: 1 | Current Time: 2025-12-05 15:01:04
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:01:04: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹30.65 | Chg % -27.63 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:01:04: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹44.35 | Chg % -16.48 | Qty: 75
+🕵️‍♀️ PMK GCP - UAT  |  PMK_RLY_H-M100_H01_W  |  60minute Candles available: 69 / Required: 20
+RAILWAY_TRACK | Candle time 2025-12-05 14:15 | Close: 26173.65 | Buy: False | Sell: False | Trend: 1 | Current Time: 2025-12-05 15:01:04
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:01:05: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹30.70 | Chg % -14.96 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:01:14: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.95 | Chg % -17.23 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:01:16: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹30.25 | Chg % -28.57 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:01:16: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹30.25 | Chg % -16.2 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:01:26: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹30.60 | Chg % -27.74 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:01:27: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹44.45 | Chg % -16.29 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:01:27: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹30.80 | Chg % -14.68 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:01:37: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹44.40 | Chg % -16.38 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:01:41: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹30.80 | Chg % -27.27 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:01:42: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹30.80 | Chg % -14.68 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:01:48: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹44.80 | Chg % -15.63 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:01:50: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹30.85 | Chg % -27.15 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:01:54: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹31.10 | Chg % -13.85 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:02:01: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹45.30 | Chg % -14.69 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:02:02: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹31.15 | Chg % -13.71 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:02:04: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹31.15 | Chg % -26.45 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:02:14: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹44.95 | Chg % -15.35 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:02:16: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹30.95 | Chg % -14.27 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:02:19: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹31.05 | Chg % -26.68 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:02:24: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹45.00 | Chg % -15.25 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:02:27: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹31.15 | Chg % -26.45 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:02:31: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹31.15 | Chg % -13.71 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:02:32: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹45.05 | Chg % -15.16 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:02:43: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹31.05 | Chg % -26.68 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:02:43: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹44.95 | Chg % -15.35 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:02:45: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹31.05 | Chg % -13.99 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:02:53: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹45.55 | Chg % -14.22 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:02:53: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹31.30 | Chg % -26.09 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:02:58: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹31.30 | Chg % -13.3 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:03:02: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹31.25 | Chg % -26.21 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:03:05: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹44.70 | Chg % -15.82 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:03:08: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹30.80 | Chg % -14.68 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:03:10: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹30.80 | Chg % -27.27 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:03:12: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹44.55 | Chg % -16.1 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:03:18: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹30.85 | Chg % -14.54 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:03:22: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹44.40 | Chg % -16.38 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:03:24: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹30.60 | Chg % -27.74 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:03:31: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹30.15 | Chg % -16.48 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:03:38: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.95 | Chg % -17.23 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:03:40: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹30.05 | Chg % -29.04 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:03:41: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹30.00 | Chg % -16.9 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:03:49: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.50 | Chg % -18.08 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:03:51: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.85 | Chg % -17.31 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:03:55: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.50 | Chg % -30.34 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:03:58: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.55 | Chg % -19.87 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:04:06: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.05 | Chg % -18.93 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:04:06: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.70 | Chg % -17.73 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:04:09: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.65 | Chg % -29.99 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:04:14: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.90 | Chg % -19.21 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:04:15: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.60 | Chg % -18.01 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:04:19: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.30 | Chg % -30.81 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:04:27: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.30 | Chg % -30.81 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:04:29: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.55 | Chg % -19.87 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:04:30: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.30 | Chg % -18.84 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:04:39: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.30 | Chg % -30.81 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:04:40: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.70 | Chg % -19.59 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:04:42: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.40 | Chg % -18.56 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:04:49: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.75 | Chg % -19.49 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:04:50: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.45 | Chg % -18.42 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:04:51: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.45 | Chg % -30.46 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:04:57: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.50 | Chg % -19.96 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:05:04: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.65 | Chg % -29.99 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:05:05: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.65 | Chg % -17.87 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:05:10: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.85 | Chg % -19.3 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:05:13: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.60 | Chg % -30.11 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:05:20: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.50 | Chg % -18.28 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:05:23: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.50 | Chg % -30.34 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:05:25: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.95 | Chg % -19.11 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:05:33: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.55 | Chg % -18.14 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:05:37: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.50 | Chg % -30.34 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:05:38: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.95 | Chg % -19.11 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:05:47: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.60 | Chg % -19.77 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:05:47: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.40 | Chg % -18.56 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:05:51: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.35 | Chg % -30.7 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:05:55: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.45 | Chg % -18.42 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:05:58: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.85 | Chg % -19.3 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:06:07: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.40 | Chg % -30.58 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:06:07: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.60 | Chg % -19.77 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:06:07: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.40 | Chg % -18.56 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:06:16: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.60 | Chg % -30.11 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:06:17: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.65 | Chg % -19.68 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:06:20: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.60 | Chg % -18.01 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:06:29: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.00 | Chg % -20.9 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:06:31: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹28.90 | Chg % -31.76 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:06:34: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.00 | Chg % -19.67 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:06:39: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.00 | Chg % -20.9 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:06:42: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.15 | Chg % -19.25 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:06:43: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.15 | Chg % -31.17 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:06:50: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.20 | Chg % -20.53 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:06:56: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.35 | Chg % -30.7 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:06:57: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.45 | Chg % -18.42 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:06:58: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.60 | Chg % -19.77 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:07:05: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.25 | Chg % -18.98 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:07:08: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.00 | Chg % -31.52 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:07:08: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹41.90 | Chg % -21.09 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:07:14: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.15 | Chg % -19.25 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:07:17: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.05 | Chg % -20.81 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:07:19: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹28.95 | Chg % -31.64 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:07:23: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.20 | Chg % -19.11 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:07:25: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.40 | Chg % -20.15 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:07:33: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.25 | Chg % -30.93 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:07:34: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.25 | Chg % -18.98 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:07:38: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹41.90 | Chg % -21.09 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:07:41: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.20 | Chg % -19.11 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:07:43: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.35 | Chg % -30.7 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:07:49: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.35 | Chg % -20.24 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:07:53: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.40 | Chg % -18.56 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:07:58: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.35 | Chg % -30.7 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:08:04: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.00 | Chg % -19.02 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:08:05: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.75 | Chg % -29.75 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:08:09: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.70 | Chg % -17.73 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:08:12: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.50 | Chg % -18.08 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:08:19: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.80 | Chg % -29.63 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:08:20: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.20 | Chg % -18.64 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:08:21: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.85 | Chg % -17.31 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:08:31: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.80 | Chg % -17.45 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:08:34: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.75 | Chg % -29.75 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:08:35: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.15 | Chg % -18.74 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:08:47: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.85 | Chg % -17.31 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:08:49: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.40 | Chg % -18.27 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:08:49: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.80 | Chg % -29.63 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:08:55: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.90 | Chg % -17.17 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:08:57: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹30.00 | Chg % -29.16 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:09:04: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.60 | Chg % -17.89 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:09:06: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.95 | Chg % -17.04 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:09:09: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹30.00 | Chg % -29.16 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:09:13: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.60 | Chg % -17.89 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:09:16: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.95 | Chg % -17.04 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:09:22: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.85 | Chg % -29.52 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:09:26: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.20 | Chg % -18.64 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:09:30: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.70 | Chg % -17.73 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:09:31: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.50 | Chg % -30.34 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:09:42: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.20 | Chg % -18.64 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:09:43: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.70 | Chg % -29.87 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:09:46: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.70 | Chg % -17.73 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:09:52: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.10 | Chg % -18.83 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:09:54: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.65 | Chg % -29.99 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:09:59: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.75 | Chg % -17.59 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:10:08: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.80 | Chg % -29.63 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:10:08: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.05 | Chg % -18.93 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:10:08: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.80 | Chg % -17.45 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:10:21: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.80 | Chg % -29.63 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:10:22: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.80 | Chg % -17.45 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:10:24: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.00 | Chg % -19.02 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:10:32: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.20 | Chg % -18.64 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:10:33: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.75 | Chg % -29.75 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:10:36: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.70 | Chg % -17.73 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:10:41: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.00 | Chg % -19.02 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:10:44: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.80 | Chg % -17.45 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:10:49: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.70 | Chg % -29.87 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:10:56: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.10 | Chg % -18.83 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:10:56: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.70 | Chg % -29.87 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:10:59: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.80 | Chg % -17.45 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:11:06: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.05 | Chg % -18.93 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:11:09: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.90 | Chg % -29.4 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:11:15: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.80 | Chg % -17.45 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:11:16: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.10 | Chg % -18.83 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:11:21: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.75 | Chg % -29.75 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:11:25: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.95 | Chg % -17.04 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:11:28: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹30.05 | Chg % -29.04 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:11:30: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.55 | Chg % -17.98 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:11:39: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹30.15 | Chg % -16.48 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:11:40: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹30.15 | Chg % -28.81 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:11:46: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.75 | Chg % -17.61 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:11:47: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹30.25 | Chg % -16.2 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:11:51: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹30.30 | Chg % -28.45 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:11:55: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.55 | Chg % -17.98 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:11:59: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹30.10 | Chg % -16.62 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:12:00: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹30.10 | Chg % -28.93 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:12:05: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.30 | Chg % -18.46 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:12:12: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.90 | Chg % -17.17 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:12:13: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.90 | Chg % -29.4 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:12:18: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.25 | Chg % -18.55 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:12:21: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.80 | Chg % -29.63 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:12:25: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.80 | Chg % -17.45 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:12:29: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.00 | Chg % -19.02 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:12:34: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.55 | Chg % -30.22 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:12:36: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.50 | Chg % -18.28 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:12:38: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.75 | Chg % -19.49 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:12:42: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.35 | Chg % -30.7 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:12:48: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.75 | Chg % -19.49 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:12:51: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.45 | Chg % -18.42 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:12:57: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.50 | Chg % -30.34 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:13:02: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.00 | Chg % -19.02 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:13:04: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.70 | Chg % -29.87 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:13:05: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.70 | Chg % -17.73 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:13:09: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.00 | Chg % -19.02 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:13:12: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.80 | Chg % -29.63 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:13:19: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.15 | Chg % -18.74 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:13:19: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.90 | Chg % -17.17 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:13:23: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.90 | Chg % -29.4 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:13:32: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.25 | Chg % -18.55 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:13:34: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.80 | Chg % -29.63 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:13:35: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.90 | Chg % -17.17 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:13:45: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.90 | Chg % -17.17 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:13:45: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.50 | Chg % -18.08 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:13:49: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.90 | Chg % -29.4 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:13:54: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.95 | Chg % -17.04 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:13:57: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.55 | Chg % -17.98 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:14:05: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.45 | Chg % -18.17 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:14:05: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹30.00 | Chg % -29.16 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:14:06: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹30.00 | Chg % -16.9 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:14:14: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹30.00 | Chg % -29.16 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:14:17: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.90 | Chg % -17.17 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:14:19: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.45 | Chg % -18.17 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:14:22: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹30.05 | Chg % -29.04 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:14:24: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.90 | Chg % -17.17 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:14:31: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.00 | Chg % -19.02 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:14:34: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.80 | Chg % -29.63 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:14:35: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.80 | Chg % -17.45 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:14:43: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.80 | Chg % -17.45 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:14:44: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.25 | Chg % -18.55 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:14:46: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.80 | Chg % -29.63 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:14:52: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.25 | Chg % -18.55 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:14:53: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.85 | Chg % -17.31 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:15:00: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.80 | Chg % -29.63 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:15:01: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.30 | Chg % -18.46 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:15:05: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹30.05 | Chg % -16.76 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:15:09: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹30.05 | Chg % -29.04 | Qty: 75
+🕵️‍♀️ PMK GCP - UAT  |  PMK_RLY_H-M100_H01_W  |  60minute Candles available: 69 / Required: 20
+RAILWAY_TRACK | Candle time 2025-12-05 14:15 | Close: 26188.4 | Buy: False | Sell: False | Trend: 1 | Current Time: 2025-12-05 15:15:14
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:15:14: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.75 | Chg % -17.59 | Qty: 75
+🕵️‍♀️ HDK GCP - UAT  |  HDK_RLY_H-FULL_H01_W  |  60minute Candles available: 69 / Required: 20
+RAILWAY_TRACK | Candle time 2025-12-05 14:15 | Close: 26188.4 | Buy: False | Sell: False | Trend: 1 | Current Time: 2025-12-05 15:15:17
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:15:17: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.15 | Chg % -18.74 | Qty: 75
+🕵️‍♀️ HDK GCP - UAT  |  HDK_RLY_H-M100_T30_W  |  30minute Candles available: 129 / Required: 20
+RAILWAY_TRACK | Candle time 2025-12-05 14:45 | Close: 26188.4 | Buy: False | Sell: False | Trend: 1 | Current Time: 2025-12-05 15:15:20
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:15:21: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.85 | Chg % -29.52 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:15:30: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.95 | Chg % -17.04 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:15:31: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹30.00 | Chg % -29.16 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:15:33: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.50 | Chg % -18.08 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:15:41: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹30.20 | Chg % -28.69 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:15:41: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹30.20 | Chg % -16.34 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:15:47: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.65 | Chg % -17.8 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:15:49: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹30.10 | Chg % -16.62 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:15:52: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹30.00 | Chg % -29.16 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:15:56: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.50 | Chg % -18.08 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:15:58: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.95 | Chg % -17.04 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:16:06: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.85 | Chg % -29.52 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:16:06: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.50 | Chg % -18.08 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:16:10: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.80 | Chg % -17.45 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:16:13: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.25 | Chg % -18.55 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:16:15: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.75 | Chg % -29.75 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:16:25: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.95 | Chg % -17.04 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:16:25: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.95 | Chg % -29.28 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:16:29: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.10 | Chg % -18.83 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:16:33: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹28.95 | Chg % -19.81 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:16:36: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹28.80 | Chg % -32.0 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:16:44: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.10 | Chg % -20.72 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:16:44: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹28.60 | Chg % -32.47 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:16:48: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹28.50 | Chg % -21.05 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:16:56: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹28.40 | Chg % -32.94 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:16:56: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹41.35 | Chg % -22.13 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:17:02: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹28.45 | Chg % -21.19 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:17:04: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹28.20 | Chg % -33.41 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:17:07: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹41.10 | Chg % -22.6 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:17:09: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹28.00 | Chg % -22.44 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:17:13: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹28.10 | Chg % -33.65 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:17:17: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹28.10 | Chg % -22.16 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:17:20: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹40.90 | Chg % -22.98 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:17:26: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹28.30 | Chg % -33.18 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:17:29: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹28.35 | Chg % -21.47 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:17:35: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹41.40 | Chg % -22.03 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:17:36: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹28.35 | Chg % -33.06 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:17:44: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹28.50 | Chg % -21.05 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:17:49: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹41.40 | Chg % -22.03 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:17:50: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹28.65 | Chg % -32.35 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:17:54: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹28.95 | Chg % -19.81 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:18:03: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.45 | Chg % -20.06 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:18:04: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.25 | Chg % -30.93 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:18:08: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹28.90 | Chg % -19.94 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:18:17: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹28.80 | Chg % -32.0 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:18:18: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹41.90 | Chg % -21.09 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:18:18: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹28.85 | Chg % -20.08 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:18:27: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹28.60 | Chg % -20.78 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:18:28: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹41.80 | Chg % -21.28 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:18:33: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹28.75 | Chg % -32.11 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:18:39: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹41.65 | Chg % -21.56 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:18:42: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹28.70 | Chg % -20.5 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:18:44: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹28.70 | Chg % -32.23 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:18:50: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹28.70 | Chg % -20.5 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:18:51: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹28.70 | Chg % -32.23 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:18:53: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹41.75 | Chg % -21.37 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:19:04: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹28.70 | Chg % -20.5 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:19:07: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹28.70 | Chg % -32.23 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:19:08: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹41.95 | Chg % -21.0 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:19:15: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹28.60 | Chg % -20.78 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:19:17: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹28.60 | Chg % -32.47 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:19:23: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹41.95 | Chg % -21.0 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:19:25: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹28.65 | Chg % -20.64 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:19:27: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹28.65 | Chg % -32.35 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:19:32: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.00 | Chg % -20.9 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:19:37: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹28.65 | Chg % -20.64 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:19:40: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹28.55 | Chg % -32.59 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:19:45: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹41.70 | Chg % -21.47 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:19:50: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹28.80 | Chg % -20.22 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:19:53: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹28.90 | Chg % -31.76 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:19:54: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.40 | Chg % -20.15 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:20:01: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.20 | Chg % -31.05 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:20:03: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.50 | Chg % -19.96 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:20:03: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.00 | Chg % -19.67 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:20:14: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.15 | Chg % -19.25 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:20:17: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.30 | Chg % -30.81 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:20:19: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.85 | Chg % -19.3 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:20:30: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.50 | Chg % -18.28 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:20:30: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.50 | Chg % -30.34 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:20:31: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.00 | Chg % -19.02 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:20:39: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.20 | Chg % -31.05 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:20:45: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.75 | Chg % -19.49 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:20:45: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.20 | Chg % -19.11 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:20:52: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.05 | Chg % -31.4 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:20:58: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.65 | Chg % -19.68 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:21:00: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹28.90 | Chg % -19.94 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:21:03: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.20 | Chg % -31.05 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:21:08: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.20 | Chg % -19.11 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:21:09: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.85 | Chg % -19.3 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:21:12: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.30 | Chg % -30.81 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:21:19: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.60 | Chg % -19.77 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:21:21: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.20 | Chg % -19.11 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:21:22: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.00 | Chg % -31.52 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:21:29: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹28.80 | Chg % -20.22 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:21:31: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹28.80 | Chg % -32.0 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:21:35: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹41.85 | Chg % -21.19 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:21:44: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.20 | Chg % -31.05 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:21:45: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.20 | Chg % -19.11 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:21:47: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.60 | Chg % -19.77 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:21:55: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.40 | Chg % -20.15 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:21:55: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.05 | Chg % -19.53 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:22:00: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.00 | Chg % -31.52 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:22:07: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.05 | Chg % -19.53 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:22:08: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.50 | Chg % -19.96 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:22:10: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.10 | Chg % -31.29 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:22:15: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.60 | Chg % -19.77 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:22:17: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.00 | Chg % -31.52 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:22:20: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.00 | Chg % -19.67 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:22:25: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.10 | Chg % -31.29 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:22:25: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.45 | Chg % -20.06 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:22:33: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.05 | Chg % -31.4 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:22:35: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.05 | Chg % -19.53 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:22:41: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.45 | Chg % -20.06 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:22:46: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.05 | Chg % -31.4 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:22:50: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.05 | Chg % -19.53 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:22:50: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.55 | Chg % -19.87 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:23:01: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.25 | Chg % -30.93 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:23:03: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹43.05 | Chg % -18.93 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:23:06: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.60 | Chg % -18.01 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:23:10: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.60 | Chg % -30.11 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:23:14: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.90 | Chg % -19.21 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:23:17: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.30 | Chg % -18.84 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:23:23: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.50 | Chg % -30.34 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:23:27: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.75 | Chg % -19.49 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:23:28: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.40 | Chg % -18.56 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:23:36: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.40 | Chg % -30.58 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:23:40: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.45 | Chg % -18.42 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:23:40: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.70 | Chg % -19.59 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:23:49: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.20 | Chg % -19.11 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:23:50: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.55 | Chg % -19.87 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:23:51: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.20 | Chg % -31.05 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:23:57: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.25 | Chg % -18.98 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:24:00: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.10 | Chg % -31.29 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:24:05: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.55 | Chg % -19.87 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:24:11: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.35 | Chg % -18.7 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:24:13: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.30 | Chg % -30.81 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:24:16: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.70 | Chg % -19.59 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:24:22: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.05 | Chg % -19.53 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:24:24: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.05 | Chg % -31.4 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:24:30: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.20 | Chg % -19.11 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:24:32: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.60 | Chg % -19.77 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:24:37: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.00 | Chg % -31.52 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:24:37: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.00 | Chg % -19.67 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:24:40: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹41.90 | Chg % -21.09 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:24:46: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹28.85 | Chg % -31.88 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:24:48: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹28.70 | Chg % -20.5 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:24:53: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.00 | Chg % -20.9 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:24:59: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹28.85 | Chg % -20.08 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:24:59: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹28.85 | Chg % -31.88 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:25:02: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.40 | Chg % -20.15 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:25:10: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹28.95 | Chg % -31.64 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:25:13: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.15 | Chg % -19.25 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:25:17: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.70 | Chg % -19.59 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:25:19: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.35 | Chg % -30.7 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:25:25: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.60 | Chg % -19.77 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:25:27: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.30 | Chg % -18.84 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:25:29: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.30 | Chg % -30.81 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:25:35: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.15 | Chg % -19.25 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:25:37: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.15 | Chg % -20.62 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:25:38: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.10 | Chg % -31.29 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:25:46: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹28.90 | Chg % -19.94 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:25:49: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.00 | Chg % -31.52 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:25:52: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.20 | Chg % -20.53 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:25:59: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹28.90 | Chg % -31.76 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:26:01: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹28.90 | Chg % -19.94 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:26:08: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹41.95 | Chg % -21.0 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:26:09: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹28.65 | Chg % -32.35 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:26:10: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹28.60 | Chg % -20.78 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:26:15: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹41.60 | Chg % -21.66 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:26:17: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹28.55 | Chg % -20.91 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:26:22: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹28.45 | Chg % -32.82 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:26:26: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹41.60 | Chg % -21.66 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:26:33: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹28.50 | Chg % -21.05 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:26:35: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹28.55 | Chg % -32.59 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:26:36: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹41.40 | Chg % -22.03 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:26:43: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹41.15 | Chg % -22.5 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:26:45: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹28.35 | Chg % -21.47 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:26:49: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹28.80 | Chg % -32.0 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:26:52: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹28.80 | Chg % -20.22 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:26:59: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹41.80 | Chg % -21.28 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:27:00: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹29.00 | Chg % -31.52 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:27:02: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹28.80 | Chg % -20.22 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:27:13: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹28.85 | Chg % -31.88 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:27:14: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹41.90 | Chg % -21.09 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:27:17: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹28.80 | Chg % -20.22 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:27:27: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹41.65 | Chg % -21.56 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:27:28: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹28.65 | Chg % -20.64 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:27:29: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹28.65 | Chg % -32.35 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:27:36: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹41.60 | Chg % -21.66 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:27:40: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹28.55 | Chg % -20.91 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:27:43: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹28.55 | Chg % -32.59 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:27:45: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹41.75 | Chg % -21.37 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:27:49: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹28.55 | Chg % -20.91 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:27:51: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹28.60 | Chg % -32.47 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:28:00: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹41.75 | Chg % -21.37 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:28:02: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹28.60 | Chg % -20.78 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:28:05: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹28.55 | Chg % -32.59 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:28:08: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹41.75 | Chg % -21.37 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:28:15: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹28.80 | Chg % -20.22 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:28:18: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹28.70 | Chg % -32.23 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:28:22: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.10 | Chg % -20.72 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:28:26: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹28.80 | Chg % -32.0 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:28:29: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹28.85 | Chg % -20.08 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:28:34: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹28.75 | Chg % -32.11 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:28:37: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.30 | Chg % -20.34 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:28:39: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹28.80 | Chg % -20.22 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:28:42: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹28.85 | Chg % -31.88 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:28:50: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹28.80 | Chg % -20.22 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:28:52: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.20 | Chg % -20.53 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:28:58: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹28.80 | Chg % -32.0 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:29:05: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹28.75 | Chg % -20.36 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:29:06: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.20 | Chg % -20.53 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:29:11: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹28.65 | Chg % -32.35 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:29:13: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹28.60 | Chg % -20.78 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:29:19: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.00 | Chg % -20.9 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:29:23: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹28.75 | Chg % -20.36 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:29:26: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹28.70 | Chg % -32.23 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:29:27: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.00 | Chg % -20.9 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:29:32: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹28.75 | Chg % -20.36 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:29:37: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹28.50 | Chg % -32.7 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:29:40: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.55 | Chg % -19.87 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:29:42: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹28.95 | Chg % -19.81 | Qty: 75
+HDK | RAILWAY_TRACK  |  30minute position at 2025-12-05 15:29:49: BUY | NIFTY25D1625800PE | Entry LTP: ₹42.35 | Current LTP: ₹28.85 | Chg % -31.88 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:29:50: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.30 | Chg % -20.34 | Qty: 75
+PMK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:29:52: BUY | NIFTY25D1625800PE | Entry LTP: ₹36.10 | Current LTP: ₹29.00 | Chg % -19.67 | Qty: 75
+HDK | RAILWAY_TRACK  |  60minute position at 2025-12-05 15:29:59: BUY | NIFTY25D1625900PE | Entry LTP: ₹53.10 | Current LTP: ₹42.30 | Chg % -20.34 | Qty: 75
+HDK GCP - UAT  |  HDK_RLY_H-M100_T30_W  |  30minute Market is closed. Checking if market will open within 60 minutes...
+HDK GCP - UAT  |  HDK_RLY_H-M100_T30_W  |  30minute Market will not open within 60 minutes. Stopping program.
+PMK GCP - UAT  |  PMK_RLY_H-M100_H01_W  |  60minute Market is closed. Checking if market will open within 60 minutes...
+PMK GCP - UAT  |  PMK_RLY_H-M100_H01_W  |  60minute Market will not open within 60 minutes. Stopping program.
+HDK GCP - UAT  |  HDK_RLY_H-FULL_H01_W  |  60minute Market is closed. Checking if market will open within 60 minutes...
+HDK GCP - UAT  |  HDK_RLY_H-FULL_H01_W  |  60minute Market will not open within 60 minutes. Stopping program.
