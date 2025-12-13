@@ -132,17 +132,17 @@ def init_db():
                 USER_ID INTEGER,
                 KEY TEXT UNIQUE,
                 INTERVAL TEXT,
-                QTY TEXT,
+                LOT TEXT,
                 NEAREST_LTP INTEGER,
                 INTRADAY TEXT,
                 NEW_TRADE TEXT,
-                TRADE TEXT,
+                REAL_TRADE TEXT,
                 EXPIRY TEXT,
                 STRATEGY TEXT,
                 CRT_DT TEXT,
                 LST_UPDT_DT TEXT,
-                ROLLOVER TEXT,
-                FULL_HEDGE_ROLLOVER TEXT,
+                HEDGE_TYPE TEXT,
+                HEDGE_ROLLOVER_TYPE TEXT,
                 FOREIGN KEY(USER_ID) REFERENCES user_dtls(id)
             )
         """)
@@ -184,15 +184,15 @@ def save_trade_config(new_config):
         # Insert new record
         sql = """
             INSERT INTO trade_config (
-                USER_ID, KEY, INTERVAL, QTY, NEAREST_LTP, INTRADAY, NEW_TRADE, TRADE,
-                EXPIRY, STRATEGY, CRT_DT, LST_UPDT_DT, ROLLOVER, FULL_HEDGE_ROLLOVER
+                USER_ID, KEY, INTERVAL, LOT, NEAREST_LTP, INTRADAY, NEW_TRADE, REAL_TRADE,
+                EXPIRY, STRATEGY, CRT_DT, LST_UPDT_DT, HEDGE_TYPE, HEDGE_ROLLOVER_TYPE
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
         params = (
             new_config.get("USER_ID"),
             new_config.get("KEY"),
             new_config.get("INTERVAL"),
-            new_config.get("QTY"),
+            new_config.get("LOT"),
             new_config.get("NEAREST_LTP"),
             new_config.get("INTRADAY"),
             new_config.get("NEW_TRADE"),
@@ -201,8 +201,8 @@ def save_trade_config(new_config):
             new_config.get("STRATEGY"),
             datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
             datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-            new_config.get("ROLLOVER"),
-            new_config.get("FULL_HEDGE_ROLLOVER")
+            new_config.get("HEDGE_TYPE"),
+            new_config.get("HEDGE_ROLLOVER_TYPE")
         )
         c.execute(sql, params)
         conn.commit()
@@ -220,12 +220,12 @@ def get_trade_configs(user_id):
         conn = sqlite3.connect(DB_FILE)  # change to your DB
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT USER_ID, KEY, STRATEGY, INTERVAL, QTY, NEAREST_LTP, INTRADAY, NEW_TRADE,
-                TRADE, EXPIRY, ROLLOVER, FULL_HEDGE_ROLLOVER
+            SELECT USER_ID, KEY, STRATEGY, INTERVAL, LOT, NEAREST_LTP, INTRADAY, NEW_TRADE,
+                REAL_TRADE, EXPIRY, HEDGE_TYPE, HEDGE_ROLLOVER_TYPE
             FROM trade_config 
             WHERE USER_ID = ?
-			GROUP by USER_ID, KEY, STRATEGY, INTERVAL, QTY, NEAREST_LTP, INTRADAY, NEW_TRADE,
-                TRADE, EXPIRY, ROLLOVER, FULL_HEDGE_ROLLOVER
+			GROUP by USER_ID, KEY, STRATEGY, INTERVAL, LOT, NEAREST_LTP, INTRADAY, NEW_TRADE,
+                REAL_TRADE, EXPIRY, HEDGE_TYPE, HEDGE_ROLLOVER_TYPE
         """, (user_id,))
 
         rows = cursor.fetchall()
@@ -234,20 +234,20 @@ def get_trade_configs(user_id):
         configs = {}
         for row in rows:
             (
-                USER_ID, KEY, STRATEGY, INTERVAL, QTY, NEAREST_LTP, INTRADAY, NEW_TRADE,
-                TRADE, EXPIRY, ROLLOVER, FULL_HEDGE_ROLLOVER
+                USER_ID, KEY, STRATEGY, INTERVAL, LOT, NEAREST_LTP, INTRADAY, NEW_TRADE,
+                REAL_TRADE, EXPIRY, HEDGE_TYPE, HEDGE_ROLLOVER_TYPE
             ) = row
 
             config_dict = {
                 "INTERVAL": INTERVAL,
-                "QTY": QTY,
+                "LOT": LOT,
                 "NEAREST_LTP": NEAREST_LTP,
                 "INTRADAY": INTRADAY,
                 "NEW_TRADE": NEW_TRADE,
-                "TRADE": TRADE,
+                "REAL_TRADE": REAL_TRADE,
                 "EXPIRY": EXPIRY,
-                "ROLLOVER": bool(ROLLOVER),
-                "FULL_HEDGE_ROLLOVER": FULL_HEDGE_ROLLOVER,
+                "HEDGE_TYPE": HEDGE_TYPE,
+                "HEDGE_ROLLOVER_TYPE": HEDGE_ROLLOVER_TYPE,
                 "STRATEGY": STRATEGY
             }
             configs[KEY] = config_dict
@@ -321,6 +321,69 @@ def wait_until_next_candle(config):
         print(f"⏳{config['INTERVAL']} Waiting {max(2, int(wait_sec))} seconds until next candle at {next_candle_time.strftime('%Y-%m-%d %H:%M:%S')}")
         logging.info(f"⏳{config['INTERVAL']} Waiting {max(2, int(wait_sec))} seconds until next candle at {next_candle_time.strftime('%Y-%m-%d %H:%M:%S')}")
     time.sleep(max(2, int(wait_sec)))
+
+
+def get_lot_size(config, instruments_df):
+    """
+    Return lot_size from instruments_df according to config['EXPIRY'].
+    Filters by OPTION_SYMBOL, SEGMENT, and expiry type.
+    """
+    try:
+        df = instruments_df.copy()
+        today = pd.Timestamp.today().normalize()
+        
+        if config['EXPIRY'] == "NEXT_WEEK":
+            days = 7
+        elif config['EXPIRY'] == "NEXT_TO_NEXT_WEEK":
+            days = 14
+        else:
+            days = 0
+        
+        df_filtered = df[
+            (df['name'] == OPTION_SYMBOL) &
+            (df['segment'] == SEGMENT)
+        ].copy()
+        
+        if df_filtered.empty:
+            logging.warning(f"⚠️ No instruments found for {OPTION_SYMBOL}")
+            return None
+        
+        df_filtered['expiry'] = pd.to_datetime(df_filtered['expiry'])
+        
+        if config['EXPIRY'] == "LAST":
+            if today.day <= 15:
+                month_ref = today
+            else:
+                month_ref = (today + pd.DateOffset(months=1)).replace(day=1)
+            next_month = month_ref.replace(day=28) + timedelta(days=4)
+            last_day_of_month = next_month - timedelta(days=next_month.day)
+            last_tuesday = last_day_of_month - timedelta(days=(last_day_of_month.weekday() - 1) % 7)
+            target_expiry = last_tuesday
+        else:
+            days_until_tuesday = (1 - today.weekday() + 7) % 7
+            this_week_tuesday = today + timedelta(days=days_until_tuesday)
+            target_expiry = this_week_tuesday + timedelta(days=days)
+        
+        week_start = target_expiry - timedelta(days=target_expiry.weekday())
+        week_end = week_start + timedelta(days=6)
+        
+        target_options = df_filtered[
+            (df_filtered['expiry'] >= week_start) & (df_filtered['expiry'] <= week_end)
+        ]
+        
+        if target_options.empty:
+            logging.warning(f"⚠️ No options found for expiry type {config['EXPIRY']}")
+            return None
+        
+        lot_size = int(target_options.iloc[0]['lot_size'])
+        logging.info(f"✅ Lot size retrieved: {lot_size} for expiry {config['EXPIRY']}")
+        return lot_size
+        
+    except Exception as e:
+        print(f"❌ Error getting lot size: {e}")
+        logging.error(f"❌ Error getting lot size: {e}")
+        return None
+
 
 def get_optimal_option(signal, spot, nearest_price, instruments_df, config, user):
     
@@ -458,7 +521,7 @@ def save_open_position(trade, config, tradeGenie_id):
         params = (
             trade["Signal"], trade["SpotEntry"], trade['OptionSymbol'], trade["Strike"],
             trade["Expiry"], trade["OptionSellPrice"], trade["EntryTime"], trade["qty"],
-            trade.get("Interval", config['INTERVAL']), trade.get("RealTrade", config['TRADE']),
+            trade.get("Interval", config['INTERVAL']), trade.get("RealTrade", config['REAL_TRADE']),
             trade.get("EntryReason","MANUAL_ENTRY"), trade.get("ExpiryType",config['EXPIRY']), trade.get("Strategy",config['STRATEGY']), trade.get("Key","NA"), 
             tradeGenie_id, trade.get("hedge_option_symbol"), trade.get("hedge_strike"), trade.get("hedge_option_buy_price"), trade.get("hedge_qty"), 
             trade.get("hedge_entry_time")
@@ -550,7 +613,7 @@ def record_trade(trade, config, tradeGenie_id):
         trade["Signal"], trade["SpotEntry"], trade['OptionSymbol'], trade["Strike"],
         trade["Expiry"], trade["OptionSellPrice"], trade["EntryTime"],
         trade["SpotExit"], trade["OptionBuyPrice"], trade["ExitTime"], trade["PnL"], trade["qty"],
-        trade.get("Interval", config['INTERVAL']), trade.get("RealTrade", config['TRADE']),
+        trade.get("Interval", config['INTERVAL']), trade.get("RealTrade", config['REAL_TRADE']),
         trade.get("EntryReason","MANUAL_ENTRY"), trade.get("ExitReason","MANUAL_EXIT"), 
         trade.get("ExpiryType",config['EXPIRY']), trade.get("Strategy",config['STRATEGY']), trade.get("Key","NA"), tradeGenie_id,
         trade.get("hedge_option_symbol"), trade.get("hedge_strike"), trade.get("hedge_option_buy_price"), trade.get("hedge_qty"),
@@ -675,43 +738,80 @@ def will_market_open_within_minutes(minutes=60):
     return minutes_until_open <= minutes
 
 def close_position_and_no_new_trade(trade, position, close, ts, config, user, key):
-    now = datetime.datetime.now()
-    trade.update({
-        "SpotExit": close,
-        "ExitTime": ts,
-        "OptionBuyPrice": get_quotes(trade['OptionSymbol'], user),
-    })
-    trade["PnL"] = trade["OptionSellPrice"] - trade["OptionBuyPrice"]
-    trade["qty"] = trade.get("qty", config['QTY'])
-    print(f"📥 {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} Exiting BUY: Buying back {trade['OptionSymbol']} | Qty: {trade['qty']}")
-    logging.info(f"📥INTERVAL {config['INTERVAL']} | Exiting BUY: Buying back {trade['OptionSymbol']} | Qty: {trade['qty']}")
-    
-    order_id ,avg_price,qty = place_option_hybrid_order(trade["OptionSymbol"], trade["qty"], "BUY", config, user)
-    hedge_order_id , hedge_avg_price, hedge_qty = place_option_hybrid_order(trade["hedge_option_symbol"], trade["qty"], "SELL", config, user)
+    if config['HEDGE_TYPE'] != "NH":
+        now = datetime.datetime.now()
+        trade.update({
+            "SpotExit": close,
+            "ExitTime": ts,
+            "OptionBuyPrice": get_quotes(trade['OptionSymbol'], user),
+        })
+        trade["PnL"] = trade["OptionSellPrice"] - trade["OptionBuyPrice"]
+        trade["qty"] = trade.get("qty", config['QTY'])
+        print(f"📥 {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} Exiting BUY: Buying back {trade['OptionSymbol']} | Qty: {trade['qty']}")
+        logging.info(f"📥INTERVAL {config['INTERVAL']} | Exiting BUY: Buying back {trade['OptionSymbol']} | Qty: {trade['qty']}")
+        
+        order_id ,avg_price,qty = place_option_hybrid_order(trade["OptionSymbol"], trade["qty"], "BUY", config, user)
+        hedge_order_id , hedge_avg_price, hedge_qty = place_option_hybrid_order(trade["hedge_option_symbol"], trade["qty"], "SELL", config, user)
 
-    logging.info(f"order_id : {order_id} | opt_symbol : {trade['OptionSymbol']} avg_price : {avg_price} | qty : {qty}")
-    logging.info(f"📥INTERVAL {config['INTERVAL']} | Exiting BUY: Buying back {trade['OptionSymbol']} | Qty: {trade['qty']}")
-    if hedge_avg_price is None:
-        hedge_avg_price = get_quotes(trade["hedge_option_symbol"], user) or 0.0
-        hedge_qty = config['QTY']
-    if avg_price is None:
-        avg_price = get_quotes(trade["OptionSymbol"], user) or 0.0
-        qty = config['QTY']
-    trade.update({
-        "OptionBuyPrice": avg_price,
-        "ExitTime": current_time,
-        "PnL": trade["OptionSellPrice"] - avg_price,
-        "qty": qty,
-        "ExitReason": "SIGNAL_GENERATED",
-        "hedge_option_sell_price": hedge_avg_price,
-        "hedge_exit_time": current_time,
-        "hedge_pnl": hedge_avg_price - trade["hedge_option_buy_price"] ,
-        "total_pnl": (trade["OptionSellPrice"] - avg_price) + hedge_avg_price - (trade["hedge_option_buy_price"])
-    })
-    record_trade(trade, config, user['id'])
-    delete_open_position(trade["OptionSymbol"], config, trade, user['id'])
-    send_telegram_message(f"📤 {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} Exit BUY\n{trade['OptionSymbol']} @ ₹{trade['OptionBuyPrice']:.2f}. Hedge Exit Symbol {trade['hedge_option_symbol']} | @ ₹{trade['hedge_option_sell_price']:.2f} | profit per quantity :{trade['total_pnl']}",user['telegram_chat_id'], user['telegram_token'])
-    return {}, None
+        logging.info(f"order_id : {order_id} | opt_symbol : {trade['OptionSymbol']} avg_price : {avg_price} | qty : {qty}")
+        logging.info(f"📥INTERVAL {config['INTERVAL']} | Exiting BUY: Buying back {trade['OptionSymbol']} | Qty: {trade['qty']}")
+        if hedge_avg_price is None:
+            hedge_avg_price = get_quotes(trade["hedge_option_symbol"], user) or 0.0
+            hedge_qty = config['QTY']
+        if avg_price is None:
+            avg_price = get_quotes(trade["OptionSymbol"], user) or 0.0
+            qty = config['QTY']
+        trade.update({
+            "OptionBuyPrice": avg_price,
+            "ExitTime": current_time,
+            "PnL": trade["OptionSellPrice"] - avg_price,
+            "qty": qty,
+            "ExitReason": "SIGNAL_GENERATED",
+            "hedge_option_sell_price": hedge_avg_price,
+            "hedge_exit_time": current_time,
+            "hedge_pnl": hedge_avg_price - trade["hedge_option_buy_price"] ,
+            "total_pnl": (trade["OptionSellPrice"] - avg_price) + hedge_avg_price - (trade["hedge_option_buy_price"])
+        })
+        record_trade(trade, config, user['id'])
+        delete_open_position(trade["OptionSymbol"], config, trade, user['id'])
+        send_telegram_message(f"📤 {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} Exit BUY\n{trade['OptionSymbol']} @ ₹{trade['OptionBuyPrice']:.2f}. Hedge Exit Symbol {trade['hedge_option_symbol']} | @ ₹{trade['hedge_option_sell_price']:.2f} | profit per quantity :{trade['total_pnl']}",user['telegram_chat_id'], user['telegram_token'])
+        return {}, None
+    else:
+        now = datetime.datetime.now()
+        trade.update({
+            "SpotExit": close,
+            "ExitTime": ts,
+            "OptionBuyPrice": get_quotes(trade['OptionSymbol'], user),
+        })
+        trade["PnL"] = trade["OptionSellPrice"] - trade["OptionBuyPrice"]
+        trade["qty"] = trade.get("qty", config['QTY'])
+        print(f"📥 {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} Exiting BUY: Buying back {trade['OptionSymbol']} | Qty: {trade['qty']}")
+        logging.info(f"📥INTERVAL {config['INTERVAL']} | Exiting BUY: Buying back {trade['OptionSymbol']} | Qty: {trade['qty']}")
+        
+        order_id ,avg_price,qty = place_option_hybrid_order(trade["OptionSymbol"], trade["qty"], "BUY", config, user)
+        
+        logging.info(f"order_id : {order_id} | opt_symbol : {trade['OptionSymbol']} avg_price : {avg_price} | qty : {qty}")
+        logging.info(f"📥INTERVAL {config['INTERVAL']} | Exiting BUY: Buying back {trade['OptionSymbol']} | Qty: {trade['qty']}")
+        
+        if avg_price is None:
+            avg_price = get_quotes(trade["OptionSymbol"], user) or 0.0
+            qty = config['QTY']
+        trade.update({
+            "OptionBuyPrice": avg_price,
+            "ExitTime": current_time,
+            "PnL": trade["OptionSellPrice"] - avg_price,
+            "qty": qty,
+            "ExitReason": "SIGNAL_GENERATED",
+            "hedge_option_sell_price": 0.0,
+            "hedge_exit_time": "-",
+            "hedge_pnl": 0.0,
+            "total_pnl": trade["OptionSellPrice"] - avg_price
+        })
+        record_trade(trade, config, user['id'])
+        delete_open_position(trade["OptionSymbol"], config, trade, user['id'])
+        send_telegram_message(f"📤 {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} Exit BUY\n{trade['OptionSymbol']} @ ₹{trade['OptionBuyPrice']:.2f}. | profit per quantity :{trade['total_pnl']}",user['telegram_chat_id'], user['telegram_token'])
+        return {}, None
+
 
 def who_tried(user):
     current_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')

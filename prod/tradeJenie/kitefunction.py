@@ -106,7 +106,7 @@ def get_avgprice_from_positions(tradingsymbol, user):
 def place_aggressive_limit_order(tradingsymbol, qty, ordertype, config, user, timeout=5):
     
     print(config)
-    if config['TRADE'].lower() != "yes":
+    if config['REAL_TRADE'].lower() != "yes":
         return "SIMULATED_ORDER", None, 0
 
     kite = get_kite_client(user)
@@ -213,7 +213,7 @@ def get_historical_order(order_id, user):
         return []
 
 def place_option_market_order(tradingsymbol, qty, ordertype, config, user):
-    if config['TRADE'].lower() != "yes":
+    if config['REAL_TRADE'].lower() != "yes":
         return "SIMULATED_ORDER", None, 0
 
     kite = get_kite_client(user)
