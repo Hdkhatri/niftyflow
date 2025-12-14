@@ -177,8 +177,9 @@ def live_trading(instruments_df, config, key, user):
                     strike = result[1]
                     if(config['HEDGE_TYPE'] == "H-P10" ):
                         hedge_result = get_optimal_option("BUY", close, HEDGE_NEAREST_LTP, instruments_df, config, user)
-                    elif(config['HEDGE_TYPE'] == "H-M100" ):
+                    elif(config['HEDGE_TYPE'] == "H-M100" or config['HEDGE_TYPE'] == "H-M200" ):
                         hedge_result = get_hedge_option("BUY", close, strike, instruments_df, config, user)
+                    
                     
                     if result is None or result[0] is None or hedge_result is None or hedge_result[0] is None:
                         logging.error(f"❌INTERVAL {config['INTERVAL']} | {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']}: No suitable option found for BUY signal.")
@@ -273,7 +274,7 @@ def live_trading(instruments_df, config, key, user):
                     strike = result[1]
                     if(config['HEDGE_TYPE'] == "H-P10" ):
                         hedge_result = get_optimal_option("SELL", close, HEDGE_NEAREST_LTP, instruments_df, config, user)
-                    elif(config['HEDGE_TYPE'] == "H-M100" ):
+                    elif(config['HEDGE_TYPE'] == "H-M100" or config['HEDGE_TYPE'] == "H-M200" ):
                         hedge_result = get_hedge_option("SELL", close, strike, instruments_df, config, user)
                     
                     if result is None or result[0] is None or hedge_result is None or hedge_result[0] is None:
@@ -423,7 +424,7 @@ def live_trading(instruments_df, config, key, user):
                                         
                                         if(config['HEDGE_TYPE'] == "H-P10" ):
                                             hedge_result = get_optimal_option(signal, close, HEDGE_NEAREST_LTP, instruments_df, config, user)
-                                        elif(config['HEDGE_TYPE'] == "H-M100" ):
+                                        elif(config['HEDGE_TYPE'] == "H-M100" or config['HEDGE_TYPE'] == "H-M200" ):
                                             hedge_result = get_hedge_option(signal, close, strike, instruments_df, config, user)
                                         
                                         
@@ -450,7 +451,7 @@ def live_trading(instruments_df, config, key, user):
                                     
                                     if(config['HEDGE_TYPE'] == "H-P10" ):
                                         hedge_result = get_optimal_option(signal, close, HEDGE_NEAREST_LTP, instruments_df, config, user)
-                                    elif(config['HEDGE_TYPE'] == "H-M100" ):
+                                    elif(config['HEDGE_TYPE'] == "H-M100" or config['HEDGE_TYPE'] == "H-M200" ):
                                         hedge_result = get_hedge_option(signal, close, strike, instruments_df, config, user)
                                     
                                     
