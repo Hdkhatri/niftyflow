@@ -458,6 +458,12 @@ def get_optimal_option(signal, spot, nearest_price, instruments_df, config, user
         return None, None, None, None
 
 def get_hedge_option(signal, spot, strike, instruments_df, config, user):
+    if config['HEDGE_TYPE'] == "H-M100":
+        HEDGE_STRIKE_DIFF = 100
+    elif config['HEDGE_TYPE'] == "H-M200":
+        HEDGE_STRIKE_DIFF = 200
+    else:
+        HEDGE_STRIKE_DIFF = 100  # Default value
     if config['EXPIRY'] == "NEXT_WEEK":
         days = 7
     elif config['EXPIRY'] == "NEXT_TO_NEXT_WEEK":

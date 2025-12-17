@@ -43,22 +43,22 @@ def live_trading(instruments_df, config, key, user):
         send_telegram_message(f"🚀 {user['user']} {SERVER}  |  {key}  | {config['INTERVAL']} Live trading started!",user['telegram_chat_id'], user['telegram_token'])
         logging.info(f"🚀 {user['user']} {SERVER}  |  {key}  | TRADE mode is ON. Running in LIVE mode.")
 
-    open_trade = load_open_position(config, key, user, user['id'])
-
-    if open_trade:
-        trade = open_trade
-        position = open_trade["Signal"]
-        logging.info(f"📌 {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} Resumed open position: {position} | {open_trade['OptionSymbol']} @ ₹{open_trade['OptionSellPrice']} | Qty: {open_trade['qty']} | Hedge Symbol: {open_trade['hedge_option_symbol']} @ ₹{open_trade['hedge_option_buy_price']} | Hedge Qty: {open_trade['hedge_qty']}")
-        print(f"➡️ {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} Loaded open position: {open_trade}")
-        send_telegram_message(f"📌 {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} Resumed open position: {position} | {open_trade['OptionSymbol']} @ ₹{open_trade['OptionSellPrice']} | Qty: {open_trade['qty']} | Hedge Symbol: {open_trade['hedge_option_symbol']} @ ₹{open_trade['hedge_option_buy_price']} | Hedge Qty: {open_trade['hedge_qty']}",user['telegram_chat_id'], user['telegram_token'])
-    else:
-        trade = {}
-        position = None
-        print(f"ℹ️ {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} No open position. Waiting for next signal...")
-        logging.info(f"ℹ️ {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} No open position. Waiting for next signal...")
-
+    
 
     while True:
+        open_trade = load_open_position(config, key, user, user['id'])
+        if open_trade:
+            trade = open_trade
+            position = open_trade["Signal"]
+            logging.info(f"📌 {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} Resumed open position: {position} | {open_trade['OptionSymbol']} @ ₹{open_trade['OptionSellPrice']} | Qty: {open_trade['qty']} | Hedge Symbol: {open_trade['hedge_option_symbol']} @ ₹{open_trade['hedge_option_buy_price']} | Hedge Qty: {open_trade['hedge_qty']}")
+            print(f"➡️ {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} Loaded open position: {open_trade}")
+            send_telegram_message(f"📌 {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} Resumed open position: {position} | {open_trade['OptionSymbol']} @ ₹{open_trade['OptionSellPrice']} | Qty: {open_trade['qty']} | Hedge Symbol: {open_trade['hedge_option_symbol']} @ ₹{open_trade['hedge_option_buy_price']} | Hedge Qty: {open_trade['hedge_qty']}",user['telegram_chat_id'], user['telegram_token'])
+        else:
+            trade = {}
+            position = None
+            print(f"ℹ️ {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} No open position. Waiting for next signal...")
+            logging.info(f"ℹ️ {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} No open position. Waiting for next signal...")
+   
         try:
             configs = get_trade_configs(user['id'])
             config = configs[key]
@@ -177,8 +177,9 @@ def live_trading(instruments_df, config, key, user):
                     strike = result[1]
                     if(config['HEDGE_TYPE'] == "H-P10" ):
                         hedge_result = get_optimal_option("BUY", close, HEDGE_NEAREST_LTP, instruments_df, config, user)
-                    elif(config['HEDGE_TYPE'] == "H-M100" ):
+                    elif(config['HEDGE_TYPE'] == "H-M100" or config['HEDGE_TYPE'] == "H-M200" ):
                         hedge_result = get_hedge_option("BUY", close, strike, instruments_df, config, user)
+                    
                     
                     if result is None or result[0] is None or hedge_result is None or hedge_result[0] is None:
                         logging.error(f"❌INTERVAL {config['INTERVAL']} | {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']}: No suitable option found for BUY signal.")
@@ -273,7 +274,7 @@ def live_trading(instruments_df, config, key, user):
                     strike = result[1]
                     if(config['HEDGE_TYPE'] == "H-P10" ):
                         hedge_result = get_optimal_option("SELL", close, HEDGE_NEAREST_LTP, instruments_df, config, user)
-                    elif(config['HEDGE_TYPE'] == "H-M100" ):
+                    elif(config['HEDGE_TYPE'] == "H-M100" or config['HEDGE_TYPE'] == "H-M200" ):
                         hedge_result = get_hedge_option("SELL", close, strike, instruments_df, config, user)
                     
                     if result is None or result[0] is None or hedge_result is None or hedge_result[0] is None:
@@ -423,7 +424,7 @@ def live_trading(instruments_df, config, key, user):
                                         
                                         if(config['HEDGE_TYPE'] == "H-P10" ):
                                             hedge_result = get_optimal_option(signal, close, HEDGE_NEAREST_LTP, instruments_df, config, user)
-                                        elif(config['HEDGE_TYPE'] == "H-M100" ):
+                                        elif(config['HEDGE_TYPE'] == "H-M100" or config['HEDGE_TYPE'] == "H-M200" ):
                                             hedge_result = get_hedge_option(signal, close, strike, instruments_df, config, user)
                                         
                                         
@@ -450,7 +451,7 @@ def live_trading(instruments_df, config, key, user):
                                     
                                     if(config['HEDGE_TYPE'] == "H-P10" ):
                                         hedge_result = get_optimal_option(signal, close, HEDGE_NEAREST_LTP, instruments_df, config, user)
-                                    elif(config['HEDGE_TYPE'] == "H-M100" ):
+                                    elif(config['HEDGE_TYPE'] == "H-M100" or config['HEDGE_TYPE'] == "H-M200" ):
                                         hedge_result = get_hedge_option(signal, close, strike, instruments_df, config, user)
                                     
                                     
