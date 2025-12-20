@@ -107,6 +107,8 @@ def place_aggressive_limit_order(tradingsymbol, qty, ordertype, config, user, ti
     
     print(config)
     if config['REAL_TRADE'].lower() != "yes":
+        print(f"⚠️ {config['KEY']} | Simulated Aggressive Limit Order placed (REAL_TRADE is not YES)")
+        logging.info(f"⚠️ {config['KEY']} | Simulated Aggressive Limit Order placed (REAL_TRADE is not YES)")
         return "SIMULATED_ORDER", None, 0
 
     kite = get_kite_client(user)
@@ -161,6 +163,8 @@ def place_aggressive_limit_order(tradingsymbol, qty, ordertype, config, user, ti
                         o["average_price"] * o["quantity"] for o in history if o["status"] == "COMPLETE") / filled_qty
                     avg_price = round(avg_price, 2)
                 if filled_qty >= int(qty):
+                    print(f"✅{config['KEY']} | Aggressive Limit Order Placed: {ordertype} {tradingsymbol} | Order ID: {order_id}")
+                    logging.info(f"✅{config['KEY']} | Aggressive Limit Order Placed: {ordertype} {tradingsymbol} | Order ID: {order_id}")
                     return order_id, avg_price, filled_qty
 
             time.sleep(0.3)  # short polling delay
@@ -169,18 +173,21 @@ def place_aggressive_limit_order(tradingsymbol, qty, ordertype, config, user, ti
         if filled_qty < int(qty) and order_id:
             try:
                 kite.cancel_order(variety=kite.VARIETY_REGULAR, order_id=order_id)
-                print(f"🛑 Cancelled remaining {qty - filled_qty} qty for {tradingsymbol}")
-                logging.info(f"Cancelled remaining {qty - filled_qty} qty for {tradingsymbol}")
+                print(f"🛑 {config['KEY']} | Cancelled remaining {qty - filled_qty} qty for {tradingsymbol}")
+                logging.info(f"{config['KEY']} | Cancelled remaining {qty - filled_qty} qty for {tradingsymbol}")
             except Exception as ce:
-                print(f"⚠ Failed to cancel unfilled qty: {ce}")
-                logging.error(f"Failed to cancel unfilled qty: {ce}")
+                print(f"⚠{config['KEY']} | Failed to cancel unfilled qty: {ce}")
+                logging.error(f"{config['KEY']} | Failed to cancel unfilled qty: {ce}")
+                return "SIMULATED_ORDER", None, 0
 
-        print(f"⚠️ Timeout: Filled {filled_qty}/{qty} for {tradingsymbol}")
+        print(f"⚠️{config['KEY']} | Timeout: Filled {filled_qty}/{qty} for {tradingsymbol}")
+        logging.warning(f"{config['KEY']} | Timeout: Filled {filled_qty}/{qty} for {tradingsymbol}")
         return order_id, avg_price, filled_qty
 
     except Exception as e:
-        print(f"❌ Aggressive Limit Order failed: {e}")
-        return None, None, 0
+        print(f"❌ {config['KEY']} | Aggressive Limit Order failed: {e}")
+        logging.error(f"{config['KEY']} | Aggressive Limit Order failed: {e}")
+        return "SIMULATED_ORDER", None, 0
 
 
 
@@ -214,6 +221,8 @@ def get_historical_order(order_id, user):
 
 def place_option_market_order(tradingsymbol, qty, ordertype, config, user):
     if config['REAL_TRADE'].lower() != "yes":
+        print(f"⚠️ {config['KEY']} | Simulated Market Order placed (REAL_TRADE is not YES)")
+        logging.info(f"⚠️ {config['KEY']} | Simulated Market Order placed (REAL_TRADE is not YES)")
         return "SIMULATED_ORDER", None, 0
 
     kite = get_kite_client(user)
@@ -237,14 +246,14 @@ def place_option_market_order(tradingsymbol, qty, ordertype, config, user):
                 avg_price = round(avg_price, 2)
             if filled_qty >= int(qty):
                 
-                print(f"✅ Market Order Placed: {ordertype} {tradingsymbol} | Order ID: {order_id}")
-                logging.info(f"✅ Market Order Placed: {ordertype} {tradingsymbol} | Order ID: {order_id}")
+                print(f"✅{config['KEY']} | Market Order Placed: {ordertype} {tradingsymbol} | Order ID: {order_id}")
+                logging.info(f"✅{config['KEY']} | Market Order Placed: {ordertype} {tradingsymbol} | Order ID: {order_id}")
         return order_id, avg_price, filled_qty
         
     except Exception as e:
-        print(f"❌ Market Order failed for {tradingsymbol}: {e}")
-        logging.error(f"Market Order failed for {tradingsymbol}: {e}")
-        return None, None, 0
+        print(f"❌{config['KEY']} | Market Order failed for {tradingsymbol}: {e}")
+        logging.error(f"{config['KEY']} | Market Order failed for {tradingsymbol}: {e}")
+        return "SIMULATED_ORDER", None, 0
 
 
 #Only limit order 
@@ -253,16 +262,16 @@ def place_option_hybrid_order_old(tradingsymbol, qty, ordertype,config , user):
     return place_aggressive_limit_order(tradingsymbol, qty, ordertype, config, user)
 
 
-#Hybrid order: Try aggressive limit first, then market if not filled
+#Hybrid order: Try market first, then aggressive limit if not filled
 def place_option_hybrid_order(tradingsymbol, qty, ordertype,config , user):
     
-    
-    order_id, avg_price, filled_qty = place_aggressive_limit_order(tradingsymbol, qty, ordertype, config, user)
+    order_id, avg_price, filled_qty = place_option_market_order(tradingsymbol, qty, ordertype,config , user)
     if order_id and order_id != "SIMULATED_ORDER":
         return order_id, avg_price, filled_qty
     else:
-        order_id = place_option_market_order(tradingsymbol, qty, ordertype,config , user)
-        return order_id, None, 0
+        logging.info(f"⚠️{config['KEY']} | market order not filled for {tradingsymbol}, {order_id}, {avg_price}, {filled_qty}, placing market order")
+        order_id, avg_price, filled_qty = place_aggressive_limit_order(tradingsymbol, qty, ordertype, config, user)
+        return order_id, avg_price, filled_qty
    
 
 
@@ -281,6 +290,7 @@ def place_basket_order(orders, config, user):
             "result": result
         })
     return results
+
 
 
 
