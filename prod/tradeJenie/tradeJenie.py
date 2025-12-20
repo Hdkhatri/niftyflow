@@ -142,7 +142,7 @@ def live_trading(instruments_df, config, key, user):
                         order_id ,avg_price,qty = place_option_hybrid_order(trade["OptionSymbol"], trade["qty"], "BUY",config, user)
                         hedge_order_id , hedge_avg_price, hedge_qty = place_option_hybrid_order(trade["hedge_option_symbol"], trade["qty"], "SELL", config, user)
 
-                        logging.info(f"order_id : {order_id} | opt_symbol : {trade['OptionSymbol']} avg_price : {avg_price} | qty : {qty}")
+                        logging.info(f"{key} | order_id : {order_id} | opt_symbol : {trade['OptionSymbol']} avg_price : {avg_price} | qty : {qty}")
 
                         if avg_price is None:
                             avg_price = get_quotes(trade["OptionSymbol"], user)
@@ -198,7 +198,7 @@ def live_trading(instruments_df, config, key, user):
 
                         
                         order_id ,avg_price,qty = place_option_hybrid_order(opt_symbol, config['QTY'], "SELL", config, user)
-                        logging.info(f"order_id : {order_id} | opt_symbol : {opt_symbol} avg_price : {avg_price} | qty : {qty}")
+                        logging.info(f"{key} | order_id : {order_id} | opt_symbol : {opt_symbol} avg_price : {avg_price} | qty : {qty}")
                         logging.info(f"📤INTERVAL {config['INTERVAL']} | Entering BUY: Selling PE {opt_symbol} | Qty: {config['QTY']}")
                         time.sleep(2)
                         
@@ -242,7 +242,7 @@ def live_trading(instruments_df, config, key, user):
                         order_id ,avg_price,qty = place_option_hybrid_order(trade["OptionSymbol"], trade["qty"], "BUY", config, user)
                         hedge_order_id , hedge_avg_price, hedge_qty = place_option_hybrid_order(trade["hedge_option_symbol"], trade["qty"], "SELL", config, user)
 
-                        logging.info(f"order_id : {order_id} | opt_symbol : {trade['OptionSymbol']} avg_price : {avg_price} | qty : {qty}")
+                        logging.info(f"{key} | order_id : {order_id} | opt_symbol : {trade['OptionSymbol']} avg_price : {avg_price} | qty : {qty}")
                         logging.info(f"📥INTERVAL {config['INTERVAL']} | Exiting BUY: Buying back {trade['OptionSymbol']} | Qty: {trade['qty']}")
                         if hedge_avg_price is None:
                             hedge_avg_price = get_quotes(trade["hedge_option_symbol"], user) or 0.0
@@ -293,7 +293,7 @@ def live_trading(instruments_df, config, key, user):
                         logging.info(f"📤 {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} Entering SELL: {opt_symbol} | Strike: {strike} | Expiry: {expiry} | LTP: ₹{ltp:.2f}")
                         
                         order_id ,avg_price,qty = place_option_hybrid_order(opt_symbol, config['QTY'], "SELL", config, user)
-                        logging.info(f"order_id : {order_id} | opt_symbol : {opt_symbol} avg_price : {avg_price} | qty : {qty}")
+                        logging.info(f"{key} | order_id : {order_id} | opt_symbol : {opt_symbol} avg_price : {avg_price} | qty : {qty}")
                         (opt_symbol, config['QTY'], "SELL")
                         logging.info(f"📤 Entering SELL: Selling CE {opt_symbol} | Qty: {config['QTY']}")
                         time.sleep(2)
@@ -369,7 +369,7 @@ def live_trading(instruments_df, config, key, user):
                             logging.info(f"📥INTERVAL {config['INTERVAL']} | Target Exit: Buying back {trade['OptionSymbol']} | Qty: {trade['qty']}")
                             
                             order_id ,avg_price,qty = place_option_hybrid_order(trade["OptionSymbol"], trade["qty"], "BUY", config, user)
-                            logging.info(f"order_id : {order_id} | opt_symbol : {trade['OptionSymbol']} avg_price : {avg_price} | qty : {qty}")
+                            logging.info(f"{key} | order_id : {order_id} | opt_symbol : {trade['OptionSymbol']} avg_price : {avg_price} | qty : {qty}")
                             logging.info(f"📥 Target Exit: Buying back {trade['OptionSymbol']} | Qty: {trade['qty']}")
                             if hedge_position["hedge_option_symbol"] and hedge_position["hedge_qty"]:
                                 hedge_avg_price = get_quotes(hedge_position["hedge_option_symbol"], user)
@@ -399,7 +399,7 @@ def live_trading(instruments_df, config, key, user):
                             trade = {} 
                             
                             if config['NEW_TRADE'].lower() == "no":
-                                hedge_order_id , hedge_avg_price, hedge_qty = place_option_hybrid_order(hedge_position["hedge_option_symbol"], trade["qty"], "SELL", config, user)
+                                hedge_order_id , hedge_avg_price, hedge_qty = place_option_hybrid_order(hedge_position["hedge_option_symbol"], config["QTY"], "SELL", config, user)
                                 print(f"🚫 {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} No new trades allowed after target exit.")
                                 logging.info(f"🚫 {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} No new trades allowed after target exit.")
                                 position = None
@@ -478,7 +478,7 @@ def live_trading(instruments_df, config, key, user):
                                 
                                 order_id ,avg_price,qty = place_option_hybrid_order(opt_symbol, config['QTY'], "SELL", config, user)
 
-                                logging.info(f"order_id : {order_id} | opt_symbol : {opt_symbol} avg_price : {avg_price} | qty : {qty}")
+                                logging.info(f"{key} | order_id : {order_id} | opt_symbol : {opt_symbol} avg_price : {avg_price} | qty : {qty}")
                                 logging.info(f"🔁INTERVAL {config['INTERVAL']} | Reentry: Selling {opt_symbol} | Qty: {config['QTY']}")
                                 time.sleep(2)
 
@@ -534,7 +534,7 @@ def live_trading(instruments_df, config, key, user):
                         order_id ,avg_price,qty = place_option_hybrid_order(trade["OptionSymbol"], trade["qty"], "BUY",config, user)
                         
 
-                        logging.info(f"order_id : {order_id} | opt_symbol : {trade['OptionSymbol']} avg_price : {avg_price} | qty : {qty}")
+                        logging.info(f"{key} | order_id : {order_id} | opt_symbol : {trade['OptionSymbol']} avg_price : {avg_price} | qty : {qty}")
 
                         if avg_price is None:
                             avg_price = get_quotes(trade["OptionSymbol"], user)
@@ -576,7 +576,7 @@ def live_trading(instruments_df, config, key, user):
 
                         
                         order_id ,avg_price,qty = place_option_hybrid_order(opt_symbol, config['QTY'], "SELL", config, user)
-                        logging.info(f"order_id : {order_id} | opt_symbol : {opt_symbol} avg_price : {avg_price} | qty : {qty}")
+                        logging.info(f"{key} | order_id : {order_id} | opt_symbol : {opt_symbol} avg_price : {avg_price} | qty : {qty}")
                         logging.info(f"📤INTERVAL {config['INTERVAL']} | Entering BUY: Selling PE {opt_symbol} | Qty: {config['QTY']}")
                         time.sleep(2)
 
@@ -615,7 +615,7 @@ def live_trading(instruments_df, config, key, user):
                         
                         order_id ,avg_price,qty = place_option_hybrid_order(trade["OptionSymbol"], trade["qty"], "BUY", config, user)
                         
-                        logging.info(f"order_id : {order_id} | opt_symbol : {trade['OptionSymbol']} avg_price : {avg_price} | qty : {qty}")
+                        logging.info(f"{key} | order_id : {order_id} | opt_symbol : {trade['OptionSymbol']} avg_price : {avg_price} | qty : {qty}")
                         logging.info(f"📥INTERVAL {config['INTERVAL']} | Exiting BUY: Buying back {trade['OptionSymbol']} | Qty: {trade['qty']}")
                         
                         if avg_price is None:
@@ -655,7 +655,7 @@ def live_trading(instruments_df, config, key, user):
                         logging.info(f"📤 {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} Entering SELL: {opt_symbol} | Strike: {strike} | Expiry: {expiry} | LTP: ₹{ltp:.2f}")
                         
                         order_id ,avg_price,qty = place_option_hybrid_order(opt_symbol, config['QTY'], "SELL", config, user)
-                        logging.info(f"order_id : {order_id} | opt_symbol : {opt_symbol} avg_price : {avg_price} | qty : {qty}")
+                        logging.info(f"{key} | order_id : {order_id} | opt_symbol : {opt_symbol} avg_price : {avg_price} | qty : {qty}")
                         (opt_symbol, config['QTY'], "SELL")
                         logging.info(f"📤 Entering SELL: Selling CE {opt_symbol} | Qty: {config['QTY']}")
                         time.sleep(2)
@@ -719,7 +719,7 @@ def live_trading(instruments_df, config, key, user):
                             logging.info(f"📥INTERVAL {config['INTERVAL']} | Target Exit: Buying back {trade['OptionSymbol']} | Qty: {trade['qty']}")
                             
                             order_id ,avg_price,qty = place_option_hybrid_order(trade["OptionSymbol"], trade["qty"], "BUY", config, user)
-                            logging.info(f"order_id : {order_id} | opt_symbol : {trade['OptionSymbol']} avg_price : {avg_price} | qty : {qty}")
+                            logging.info(f"{key} | order_id : {order_id} | opt_symbol : {trade['OptionSymbol']} avg_price : {avg_price} | qty : {qty}")
                             logging.info(f"📥 Target Exit: Buying back {trade['OptionSymbol']} | Qty: {trade['qty']}")
                             
                             if avg_price is None:
@@ -771,7 +771,7 @@ def live_trading(instruments_df, config, key, user):
                                 
                                 order_id ,avg_price,qty = place_option_hybrid_order(opt_symbol, config['QTY'], "SELL", config, user)
 
-                                logging.info(f"order_id : {order_id} | opt_symbol : {opt_symbol} avg_price : {avg_price} | qty : {qty}")
+                                logging.info(f"{key} | order_id : {order_id} | opt_symbol : {opt_symbol} avg_price : {avg_price} | qty : {qty}")
                                 logging.info(f"🔁INTERVAL {config['INTERVAL']} | Reentry: Selling {opt_symbol} | Qty: {config['QTY']}")
                                 time.sleep(2)
 
