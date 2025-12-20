@@ -248,7 +248,8 @@ def get_trade_configs(user_id):
                 "EXPIRY": EXPIRY,
                 "HEDGE_TYPE": HEDGE_TYPE,
                 "HEDGE_ROLLOVER_TYPE": HEDGE_ROLLOVER_TYPE,
-                "STRATEGY": STRATEGY
+                "STRATEGY": STRATEGY,
+                "KEY": KEY
             }
             configs[KEY] = config_dict
         return configs
