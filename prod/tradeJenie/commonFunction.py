@@ -143,6 +143,7 @@ def init_db():
                 LST_UPDT_DT TEXT,
                 HEDGE_TYPE TEXT,
                 HEDGE_ROLLOVER_TYPE TEXT,
+                ACTIVE_FLAG INTEGER,
                 FOREIGN KEY(USER_ID) REFERENCES user_dtls(id)
             )
         """)
@@ -185,8 +186,8 @@ def save_trade_config(new_config):
         sql = """
             INSERT INTO trade_config (
                 USER_ID, KEY, INTERVAL, LOT, NEAREST_LTP, INTRADAY, NEW_TRADE, REAL_TRADE,
-                EXPIRY, STRATEGY, CRT_DT, LST_UPDT_DT, HEDGE_TYPE, HEDGE_ROLLOVER_TYPE
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                EXPIRY, STRATEGY, CRT_DT, LST_UPDT_DT, HEDGE_TYPE, HEDGE_ROLLOVER_TYPE, ACTIVE_FLAG
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
         params = (
             new_config.get("USER_ID"),
@@ -202,7 +203,8 @@ def save_trade_config(new_config):
             datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
             datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
             new_config.get("HEDGE_TYPE"),
-            new_config.get("HEDGE_ROLLOVER_TYPE")
+            new_config.get("HEDGE_ROLLOVER_TYPE"),
+            new_config.get("ACTIVE_FLAG", 1)
         )
         c.execute(sql, params)
         conn.commit()
@@ -221,11 +223,11 @@ def get_trade_configs(user_id):
         cursor = conn.cursor()
         cursor.execute("""
             SELECT USER_ID, KEY, STRATEGY, INTERVAL, LOT, NEAREST_LTP, INTRADAY, NEW_TRADE,
-                REAL_TRADE, EXPIRY, HEDGE_TYPE, HEDGE_ROLLOVER_TYPE
+                REAL_TRADE, EXPIRY, HEDGE_TYPE, HEDGE_ROLLOVER_TYPE, ACTIVE_FLAG
             FROM trade_config 
-            WHERE USER_ID = ?
+            WHERE USER_ID = ? AND ACTIVE_FLAG = 1
 			GROUP by USER_ID, KEY, STRATEGY, INTERVAL, LOT, NEAREST_LTP, INTRADAY, NEW_TRADE,
-                REAL_TRADE, EXPIRY, HEDGE_TYPE, HEDGE_ROLLOVER_TYPE
+                REAL_TRADE, EXPIRY, HEDGE_TYPE, HEDGE_ROLLOVER_TYPE, ACTIVE_FLAG
         """, (user_id,))
 
         rows = cursor.fetchall()
@@ -235,7 +237,7 @@ def get_trade_configs(user_id):
         for row in rows:
             (
                 USER_ID, KEY, STRATEGY, INTERVAL, LOT, NEAREST_LTP, INTRADAY, NEW_TRADE,
-                REAL_TRADE, EXPIRY, HEDGE_TYPE, HEDGE_ROLLOVER_TYPE
+                REAL_TRADE, EXPIRY, HEDGE_TYPE, HEDGE_ROLLOVER_TYPE, ACTIVE_FLAG
             ) = row
 
             config_dict = {
@@ -248,6 +250,7 @@ def get_trade_configs(user_id):
                 "EXPIRY": EXPIRY,
                 "HEDGE_TYPE": HEDGE_TYPE,
                 "HEDGE_ROLLOVER_TYPE": HEDGE_ROLLOVER_TYPE,
+                "ACTIVE_FLAG": ACTIVE_FLAG,
                 "STRATEGY": STRATEGY,
                 "KEY": KEY
             }

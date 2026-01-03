@@ -418,7 +418,7 @@ def live_trading(instruments_df, config, key, user):
 
                                 if config['HEDGE_ROLLOVER_TYPE'] == 'SEMI':
                                     if expiry != last_expiry:
-                                        hedge_order_id , hedge_avg_price, hedge_qty = place_option_hybrid_order(hedge_position["hedge_option_symbol"], config["QTY"], "SELL", config, user)
+                                        hedge_order_id , hedge_avg_price, hedge_qty = place_option_hybrid_order(hedge_position["hedge_option_symbol"], hedge_position["hedge_qty"], "SELL", config, user)
                                         logging.info(f" {key} | Expiry changed from {last_expiry} to {expiry}. Closing previous hedge position before reentry.")
                                         logging.info(f" {key} | Previous hedge position {hedge_position['hedge_option_symbol']} sold at ₹{hedge_avg_price} | Qty: {hedge_qty}")
                                         
@@ -445,7 +445,7 @@ def live_trading(instruments_df, config, key, user):
                                         hedge_position['hedge_entry_time'] = current_time
                                         hedge_position['expiry'] = hedge_expiry
                                 elif config['HEDGE_ROLLOVER_TYPE'] == 'FULL':
-                                    hedge_order_id , hedge_avg_price, hedge_qty = place_option_hybrid_order(hedge_position["hedge_option_symbol"], config["QTY"], "SELL", config, user)
+                                    hedge_order_id , hedge_avg_price, hedge_qty = place_option_hybrid_order(hedge_position["hedge_option_symbol"], hedge_position["hedge_qty"], "SELL", config, user)
                                     logging.info(f" {key} | HEDGE_ROLLOVER_TYPE is True. Closing previous hedge position before reentry.")
                                     logging.info(f" {key} | Previous hedge position {hedge_position['hedge_option_symbol']} sold at ₹{hedge_avg_price} | Qty: {hedge_qty}")
                                     
