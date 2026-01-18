@@ -143,6 +143,11 @@ def init_db():
                 LST_UPDT_DT TEXT,
                 HEDGE_TYPE TEXT,
                 HEDGE_ROLLOVER_TYPE TEXT,
+                ACTIVE_FLAG INTEGER,
+                MONTHLY_STOPLOSS INTEGER,
+                ACTIVATE_MONTHLY_SL INTEGER DEFAULT 0,
+                STOPLOSS_PER_TRADE INTEGER,
+                ACTIVATE_SL_PER_TRADE INTEGER DEFAULT 0,
                 FOREIGN KEY(USER_ID) REFERENCES user_dtls(id)
             )
         """)
@@ -185,8 +190,8 @@ def save_trade_config(new_config):
         sql = """
             INSERT INTO trade_config (
                 USER_ID, KEY, INTERVAL, LOT, NEAREST_LTP, INTRADAY, NEW_TRADE, REAL_TRADE,
-                EXPIRY, STRATEGY, CRT_DT, LST_UPDT_DT, HEDGE_TYPE, HEDGE_ROLLOVER_TYPE
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                EXPIRY, STRATEGY, CRT_DT, LST_UPDT_DT, HEDGE_TYPE, HEDGE_ROLLOVER_TYPE, ACTIVE_FLAG, MONTHLY_STOPLOSS, ACTIVATE_MONTHLY_SL, STOPLOSS_PER_TRADE, ACTIVATE_SL_PER_TRADE
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
         params = (
             new_config.get("USER_ID"),
@@ -202,7 +207,12 @@ def save_trade_config(new_config):
             datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
             datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
             new_config.get("HEDGE_TYPE"),
-            new_config.get("HEDGE_ROLLOVER_TYPE")
+            new_config.get("HEDGE_ROLLOVER_TYPE"),
+            new_config.get("ACTIVE_FLAG", 1),
+            new_config.get("MONTHLY_STOPLOSS"),
+            new_config.get("ACTIVATE_MONTHLY_SL", 0),
+            new_config.get("STOPLOSS_PER_TRADE"),
+            new_config.get("ACTIVATE_SL_PER_TRADE", 0)
         )
         c.execute(sql, params)
         conn.commit()
@@ -221,11 +231,11 @@ def get_trade_configs(user_id):
         cursor = conn.cursor()
         cursor.execute("""
             SELECT USER_ID, KEY, STRATEGY, INTERVAL, LOT, NEAREST_LTP, INTRADAY, NEW_TRADE,
-                REAL_TRADE, EXPIRY, HEDGE_TYPE, HEDGE_ROLLOVER_TYPE
+                REAL_TRADE, EXPIRY, HEDGE_TYPE, HEDGE_ROLLOVER_TYPE, ACTIVE_FLAG, MONTHLY_STOPLOSS, ACTIVATE_MONTHLY_SL, STOPLOSS_PER_TRADE, ACTIVATE_SL_PER_TRADE
             FROM trade_config 
-            WHERE USER_ID = ?
+            WHERE USER_ID = ? AND ACTIVE_FLAG = 1
 			GROUP by USER_ID, KEY, STRATEGY, INTERVAL, LOT, NEAREST_LTP, INTRADAY, NEW_TRADE,
-                REAL_TRADE, EXPIRY, HEDGE_TYPE, HEDGE_ROLLOVER_TYPE
+                REAL_TRADE, EXPIRY, HEDGE_TYPE, HEDGE_ROLLOVER_TYPE, ACTIVE_FLAG, MONTHLY_STOPLOSS, ACTIVATE_MONTHLY_SL, STOPLOSS_PER_TRADE, ACTIVATE_SL_PER_TRADE
         """, (user_id,))
 
         rows = cursor.fetchall()
@@ -235,7 +245,7 @@ def get_trade_configs(user_id):
         for row in rows:
             (
                 USER_ID, KEY, STRATEGY, INTERVAL, LOT, NEAREST_LTP, INTRADAY, NEW_TRADE,
-                REAL_TRADE, EXPIRY, HEDGE_TYPE, HEDGE_ROLLOVER_TYPE
+                REAL_TRADE, EXPIRY, HEDGE_TYPE, HEDGE_ROLLOVER_TYPE, ACTIVE_FLAG, MONTHLY_STOPLOSS, ACTIVATE_MONTHLY_SL, STOPLOSS_PER_TRADE, ACTIVATE_SL_PER_TRADE
             ) = row
 
             config_dict = {
@@ -248,8 +258,13 @@ def get_trade_configs(user_id):
                 "EXPIRY": EXPIRY,
                 "HEDGE_TYPE": HEDGE_TYPE,
                 "HEDGE_ROLLOVER_TYPE": HEDGE_ROLLOVER_TYPE,
+                "ACTIVE_FLAG": ACTIVE_FLAG,
                 "STRATEGY": STRATEGY,
-                "KEY": KEY
+                "KEY": KEY,
+                "MONTHLY_STOPLOSS": MONTHLY_STOPLOSS,
+                "ACTIVATE_MONTHLY_SL": ACTIVATE_MONTHLY_SL,
+                "STOPLOSS_PER_TRADE": STOPLOSS_PER_TRADE,
+                "ACTIVATE_SL_PER_TRADE": ACTIVATE_SL_PER_TRADE
             }
             configs[KEY] = config_dict
         return configs
@@ -1027,3 +1042,75 @@ def is_today_holiday():
     print("Today:", today)
     print("Is holiday?", today in holidays)
     return today in holidays
+
+def get_monthly_strategy_total_pnl(user,config, month=None, year=None):
+    try:
+        conn = sqlite3.connect(DB_FILE)
+        c = conn.cursor()
+        if month is None or year is None:
+            now = datetime.datetime.now()
+            month = now.month
+            year = now.year
+        sql = """
+            SELECT SUM(total_pnl*qty) FROM completed_trades
+            WHERE key = ? AND user_id = ? AND strftime('%m', exit_time) = ? AND strftime('%Y', exit_time) = ?
+        """
+        params = (config['KEY'], user['id'], f"{month:02d}", str(year))
+        c.execute(sql, params)
+        result = c.fetchone()
+        conn.close()
+        total_pnl = result[0] if result[0] is not None else 0.0
+        print(f"✅ Total PnL for {config['KEY']} in {month}/{year}: {total_pnl}")
+        logging.info(f"✅ Total PnL for {config['KEY']} in {month}/{year}: {total_pnl}")
+        return total_pnl
+    except Exception as e:
+        print(f"❌ Error calculating monthly PnL: {e}")
+        logging.error(f"Error calculating monthly PnL: {e}")
+        return 0.0
+
+def check_monthly_stoploss_hit(user,config):
+    if config['ACTIVATE_MONTHLY_SL'] == 1 and config['MONTHLY_STOPLOSS'] != None:
+        total_pnl = get_monthly_strategy_total_pnl(user, config)
+        if total_pnl <= -abs(config['MONTHLY_STOPLOSS']):
+            print(f"🚫 {user['user']}  |  {config['KEY']}  |  {config['INTERVAL']} MONTHLY_STOPLOSS limit reached ({total_pnl} <= -{config['MONTHLY_STOPLOSS']}). No new trades allowed. Skipping till next month.")
+            return True
+        else:
+            print(f"✅ {user['user']}  |  {config['KEY']}  |  {config['INTERVAL']} MONTHLY_STOPLOSS limit not reached ({total_pnl} > -{config['MONTHLY_STOPLOSS']}). Trades allowed.")
+            return False
+    else:
+        print(f"ℹ️ {user['user']}  |  {config['KEY']}  |  {config['INTERVAL']} MONTHLY_STOPLOSS not activated.")
+        return False
+    
+def check_trade_stoploss_hit(user, trade, config):
+    print(f"ℹ️ Checking TRADE_STOPLOSS for {config['KEY']} interval on trade {trade['OptionSymbol']}")
+    current_ltp = get_quotes(trade["OptionSymbol"] ,user)
+    entry_ltp = trade["OptionSellPrice"]
+    total_pnl = None
+    if config['HEDGE_TYPE'] != "NH":
+        logging.info(f"Calculating total PnL including hedge for trade {trade['OptionSymbol']} and hedge {trade['hedge_option_symbol']}")
+        hedge_current_ltp = get_quotes(trade["hedge_option_symbol"] ,user)
+        hedge_entry_ltp = trade["hedge_option_buy_price"]
+        logging.info(f"Trade {trade['OptionSymbol']} | Entry LTP: {entry_ltp}, Current LTP: {current_ltp}")
+        logging.info(f"Hedge {trade['hedge_option_symbol']} | Entry LTP: {hedge_entry_ltp}, Current LTP: {hedge_current_ltp}")
+        if hedge_current_ltp is not None and hedge_entry_ltp is not None and current_ltp is not None and entry_ltp is not None:
+            total_pnl = (entry_ltp - current_ltp) + (hedge_current_ltp - hedge_entry_ltp)   
+    else:
+        logging.info(f"Calculating total PnL for trade {trade['OptionSymbol']} without hedge")
+        logging.info(f"Trade {trade['OptionSymbol']} | Entry LTP: {entry_ltp}, Current LTP: {current_ltp}")
+        if current_ltp is not None and entry_ltp is not None:
+            total_pnl = (entry_ltp - current_ltp)
+            
+    if total_pnl is None:
+        return False
+    total_pnl = total_pnl * trade.get("qty", config['QTY'])
+    logging.info(f"Total PnL for trade {trade['OptionSymbol']}: {total_pnl}")
+    if config['ACTIVATE_SL_PER_TRADE'] and config['STOPLOSS_PER_TRADE'] != None:
+        if total_pnl <= -abs(config['STOPLOSS_PER_TRADE']):
+            print(f"🚫 {config['KEY']} TRADE_STOPLOSS limit reached for {trade['OptionSymbol']} ({total_pnl} <= -{config['STOPLOSS_PER_TRADE']}). Closing position.")
+            return True
+        else:
+            print(f"✅ {config['KEY']} TRADE_STOPLOSS limit not reached for {trade['OptionSymbol']} ({total_pnl} > -{config['STOPLOSS_PER_TRADE']}).")
+            return False
+    else:
+        print(f"ℹ️ {config['KEY']} TRADE_STOPLOSS not set.")
+        return False
