@@ -6,7 +6,7 @@ from datetime import timedelta
 import pandas as pd
 import sqlite3
 import logging
-from commonFunction import close_position_and_no_new_trade, convertIntoHeikinashi, delete_open_position, generate_god_signals, get_next_candle_time, get_optimal_option, get_trade_configs, hd_strategy, init_db, is_market_open, load_open_position, railway_track_strategy, record_trade, save_open_position, wait_until_next_candle, who_tried, will_market_open_within_minutes,get_hedge_option,get_lot_size
+from commonFunction import check_monthly_stoploss_hit, close_position_and_no_new_trade, convertIntoHeikinashi, delete_open_position, generate_god_signals, get_next_candle_time, get_optimal_option, get_trade_configs, hd_strategy, init_db, is_market_open, load_open_position, railway_track_strategy, record_trade, save_open_position, wait_until_next_candle, who_tried, will_market_open_within_minutes,get_hedge_option,get_lot_size,check_trade_stoploss_hit
 from config import  HEDGE_NEAREST_LTP, SYMBOL,SEGMENT, CANDLE_DAYS as DAYS, REQUIRED_CANDLES, LOG_FILE,INSTRUMENTS_FILE, OPTION_SYMBOL, SERVER
 from kitefunction import get_historical_df, place_option_hybrid_order, get_token_for_symbol, get_quotes
 from telegrambot import send_telegram_message
@@ -173,6 +173,11 @@ def live_trading(instruments_df, config, key, user):
                         logging.info(f"🚫INTERVAL {config['INTERVAL']} | {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} No new trades allowed. Skipping BUY signal.")
                         break
 
+                    
+                    if check_monthly_stoploss_hit(user, config):
+                        break
+
+
                     result = get_optimal_option("BUY", close, config['NEAREST_LTP'], instruments_df, config, user)
                     strike = result[1]
                     if(config['HEDGE_TYPE'] == "H-P10" ):
@@ -269,7 +274,10 @@ def live_trading(instruments_df, config, key, user):
                         print(f"🚫INTERVAL {config['INTERVAL']} | {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} No new trades allowed. Skipping SELL signal.")
                         logging.info(f"🚫INTERVAL {config['INTERVAL']} | {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} No new trades allowed. Skipping SELL signal.")
                         break
-
+                    
+                    if check_monthly_stoploss_hit(user, config):
+                        break
+                    
                     result = get_optimal_option("SELL", close, config['NEAREST_LTP'], instruments_df, config, user)
                     strike = result[1]
                     if(config['HEDGE_TYPE'] == "H-P10" ):
@@ -345,11 +353,55 @@ def live_trading(instruments_df, config, key, user):
                             logging.info(f"⏰ {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} Intraday mode: No new trades after 3:15 PM. Waiting for market close.")
                             send_telegram_message(f"⏰ {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} Intraday mode: No new trades after 3:15 PM. Waiting for market close.",user['telegram_chat_id'], user['telegram_token'])
                             break
-                    # ✅ Target Achieved and Re-Entry
+
                     if trade and "OptionSymbol" in trade and "OptionSellPrice" in trade and target_hit == False:
                         current_ltp = get_quotes(trade["OptionSymbol"] ,user)
                         entry_ltp = trade["OptionSellPrice"]
 
+                        if check_trade_stoploss_hit(user, trade, config):
+                            hedge_position = {"hedge_option_symbol": trade.get("hedge_option_symbol"),
+                                            "hedge_qty": trade.get("hedge_qty"),
+                                            "hedge_entry_time": trade.get("hedge_entry_time"), "hedge_option_buy_price": trade.get("hedge_option_buy_price"), 
+                                            "hedge_strike": trade.get("hedge_strike"), "expiry": trade.get("expiry")}
+
+                            trade["SpotExit"] = close
+                            trade["ExitTime"] = current_time
+                            trade["OptionBuyPrice"] = current_ltp
+                            trade["PnL"] = entry_ltp - current_ltp
+                            print(f"📥 {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} StopLoss Exit: Buying back {trade['OptionSymbol']} | Qty: {trade['qty']}")
+                            logging.info(f"📥INTERVAL {config['INTERVAL']} | StopLoss Exit: Buying back {trade['OptionSymbol']} | Qty: {trade['qty']}")
+
+                            order_id ,avg_price,qty = place_option_hybrid_order(trade["OptionSymbol"], trade["qty"], "BUY", config, user)
+                            hedge_order_id , hedge_avg_price, hedge_qty = place_option_hybrid_order(hedge_position["hedge_option_symbol"], hedge_position["hedge_qty"], "SELL", config, user)
+                            logging.info(f"{key} | order_id : {order_id} | opt_symbol : {trade['OptionSymbol']} avg_price : {avg_price} | qty : {qty}")
+                            logging.info(f"📥 StopLoss Exit: Buying back {trade['OptionSymbol']} | Qty: {trade['qty']}")
+                            if hedge_position["hedge_option_symbol"] and hedge_position["hedge_qty"]:
+                                hedge_avg_price = get_quotes(hedge_position["hedge_option_symbol"], user)
+                                hedge_position['hedge_option_buy_price'] = hedge_avg_price
+                            if avg_price is None:
+                                avg_price = current_ltp
+                                qty = config['QTY']
+                            trade.update({
+                                "OptionBuyPrice": avg_price,
+                                "ExitTime": current_time,
+                                "PnL": entry_ltp - avg_price,
+                                "qty": qty,
+                                "ExitReason": "STOPLOSS_HIT",
+                                "hedge_option_sell_price": hedge_avg_price,
+                                "hedge_exit_time": current_time,
+                                "hedge_pnl": hedge_avg_price - trade["hedge_option_buy_price"] ,
+                                "total_pnl": (trade["OptionSellPrice"] - avg_price) + (hedge_avg_price - trade["hedge_option_buy_price"])
+                            })
+                            record_trade(trade, config, user['id'])
+                            delete_open_position(trade["OptionSymbol"], config, trade, user['id'])
+                            send_telegram_message(f"📤 {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} Exit {trade['Signal']}\n{trade['OptionSymbol']} @ ₹{current_ltp:.2f}. Hedge Exit Symbol {trade['hedge_option_symbol']} | @ ₹{trade['hedge_option_sell_price']:.2f} | profit per quantity :{trade['total_pnl']}",user['telegram_chat_id'], user['telegram_token'])
+                            logging.info(f"🔴 {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} Target triggered for {trade['OptionSymbol']} at ₹{current_ltp:.2f}")
+
+                            last_expiry = trade["Expiry"]
+                            signal = trade["Signal"]
+                            trade = {} 
+                            position = None
+                            break
 
                         
                         if current_ltp != None and entry_ltp != None and entry_ltp != 0.0 and current_ltp <= 0.6 * entry_ltp:
@@ -359,6 +411,7 @@ def live_trading(instruments_df, config, key, user):
                                             "hedge_entry_time": trade.get("hedge_entry_time"), "hedge_option_buy_price": trade.get("hedge_option_buy_price"), 
                                             "hedge_strike": trade.get("hedge_strike"), "expiry": trade.get("expiry")}
                             
+
 
                             target_hit = True  # Set the flag to True to avoid multiple triggers
                             trade["SpotExit"] = close
@@ -406,6 +459,8 @@ def live_trading(instruments_df, config, key, user):
 
                                 break
                             
+                            if check_monthly_stoploss_hit(user, config):
+                                break
                             
                             result = get_optimal_option(signal, close, config['NEAREST_LTP'], instruments_df, config, user)
                             
@@ -444,6 +499,28 @@ def live_trading(instruments_df, config, key, user):
                                         hedge_position['hedge_qty'] = hedge_qty
                                         hedge_position['hedge_entry_time'] = current_time
                                         hedge_position['expiry'] = hedge_expiry
+                                    else:
+                                        if hedge_position["hedge_qty"] == config['QTY']:
+                                            logging.info(f" {key} | HEDGE_ROLLOVER_TYPE is SEMI. Hedge quantity matches. No action needed.")
+                                        else:
+                                            if(hedge_position["hedge_qty"] > config['QTY']):
+                                                qty_to_sell = hedge_position["hedge_qty"] - config['QTY']
+                                                hedge_order_id , hedge_avg_price, hedge_qty = place_option_hybrid_order(hedge_position["hedge_option_symbol"], qty_to_sell, "SELL", config, user)
+                                                logging.info(f" {key} | HEDGE_ROLLOVER_TYPE is SEMI. Hedge quantity mismatch. Sold extra qty: {qty_to_sell}")
+                                                logging.info(f" {key} | Previous hedge position {hedge_position['hedge_option_symbol']} sold at ₹{hedge_avg_price} | Qty: {hedge_qty}")
+                                                hedge_position["hedge_qty"] = config['QTY']
+                                            else:
+                                                qty_to_buy = config['QTY'] - hedge_position["hedge_qty"]
+                                                hedge_order_id , hedge_avg_price, hedge_qty = place_option_hybrid_order(hedge_position["hedge_option_symbol"], qty_to_buy, "BUY", config, user)
+                                                hedge_avg_price = get_quotes(hedge_position["hedge_option_symbol"], user)
+                                                logging.info(f" {key} | HEDGE_ROLLOVER_TYPE is SEMI. Hedge quantity mismatch. Bought additional qty: {qty_to_buy}")
+                                                logging.info(f" {key} | Previous hedge position {hedge_position['hedge_option_symbol']} bought at ₹{hedge_avg_price} | Qty: {hedge_qty}")
+                                                hedge_position["hedge_qty"] = config['QTY']
+                                                hedge_position['hedge_option_buy_price'] = (hedge_position['hedge_option_buy_price'] + hedge_avg_price)/2
+
+                                            
+                                            
+                
                                 elif config['HEDGE_ROLLOVER_TYPE'] == 'FULL':
                                     hedge_order_id , hedge_avg_price, hedge_qty = place_option_hybrid_order(hedge_position["hedge_option_symbol"], hedge_position["hedge_qty"], "SELL", config, user)
                                     logging.info(f" {key} | HEDGE_ROLLOVER_TYPE is True. Closing previous hedge position before reentry.")
@@ -561,6 +638,9 @@ def live_trading(instruments_df, config, key, user):
                         logging.info(f"🚫INTERVAL {config['INTERVAL']} | {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} No new trades allowed. Skipping BUY signal.")
                         break
 
+                    if check_monthly_stoploss_hit(user, config):
+                        break
+
                     result = get_optimal_option("BUY", close, config['NEAREST_LTP'], instruments_df, config, user)
                     strike = result[1]                   
                     
@@ -640,7 +720,9 @@ def live_trading(instruments_df, config, key, user):
                         print(f"🚫INTERVAL {config['INTERVAL']} | {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} No new trades allowed. Skipping SELL signal.")
                         logging.info(f"🚫INTERVAL {config['INTERVAL']} | {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} No new trades allowed. Skipping SELL signal.")
                         break
-
+                    
+                    if check_monthly_stoploss_hit(user, config):
+                        break
                     result = get_optimal_option("SELL", close, config['NEAREST_LTP'], instruments_df, config, user)
                     strike = result[1]
                                         
@@ -707,6 +789,10 @@ def live_trading(instruments_df, config, key, user):
                     if trade and "OptionSymbol" in trade and "OptionSellPrice" in trade and target_hit == False:
                         current_ltp = get_quotes(trade["OptionSymbol"] ,user)
                         entry_ltp = trade["OptionSellPrice"]
+
+                        if check_trade_stoploss_hit(user, trade, config):
+                            trade, position = close_position_and_no_new_trade(trade, position, close, ts,config, user, key)
+                            break
                         
                         if current_ltp != None and entry_ltp != None and entry_ltp != 0.0 and current_ltp <= 0.6 * entry_ltp:
                             
@@ -754,6 +840,8 @@ def live_trading(instruments_df, config, key, user):
 
                                 break
                             
+                            if check_monthly_stoploss_hit(user, config):
+                                break
                             
                             result = get_optimal_option(signal, close, config['NEAREST_LTP'], instruments_df, config, user)
                             
