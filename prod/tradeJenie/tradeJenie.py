@@ -36,13 +36,25 @@ def live_trading(instruments_df, config, key, user):
 
     if config['REAL_TRADE'].lower() != "yes":
         print(f"🚫 {user['user']} {SERVER}  |  {key}  | TRADE mode is OFF SIMULATED_ORDER will be tracked")
-        # send_telegram_message(f"🛠️ {user['user']} {SERVER}  |  {key}  | OnlyLive {config['INTERVAL']} running in {'SIMULATION' if config['REAL_TRADE'].lower() != 'yes' else 'LIVE'} mode.",user['telegram_chat_id'], user['telegram_token'])
+        send_telegram_message(f"🛠️ {user['user']} {SERVER}  |  {key}  | OnlyLive {config['INTERVAL']} running in {'SIMULATION' if config['REAL_TRADE'].lower() != 'yes' else 'LIVE'} mode.",user['telegram_chat_id'], user['telegram_token'])
         logging.info(f"🚫 {user['user']} {SERVER}  |  {key}  | TRADE mode is OFF. Running in SIMULATION mode.")
     else:    
         print(f"🚀 {user['user']} {SERVER}  |  {key}  | TRADE mode is ON LIVE_ORDER will be placed")
-        # send_telegram_message(f"🚀 {user['user']} {SERVER}  |  {key}  | {config['INTERVAL']} Live trading started!",user['telegram_chat_id'], user['telegram_token'])
+        send_telegram_message(f"🚀 {user['user']} {SERVER}  |  {key}  | {config['INTERVAL']} Live trading started!",user['telegram_chat_id'], user['telegram_token'])
         logging.info(f"🚀 {user['user']} {SERVER}  |  {key}  | TRADE mode is ON. Running in LIVE mode.")
-
+    open_trade = load_open_position(config, key, user, user['id'])
+    if open_trade:
+            trade = open_trade
+            position = open_trade["Signal"]
+            logging.info(f"📌 {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} Resumed open position: {position} | {open_trade['OptionSymbol']} @ ₹{open_trade['OptionSellPrice']} | Qty: {open_trade['qty']} | Hedge Symbol: {open_trade['hedge_option_symbol']} @ ₹{open_trade['hedge_option_buy_price']} | Hedge Qty: {open_trade['hedge_qty']}")
+            print(f"➡️ {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} Loaded open position: {open_trade}")
+            send_telegram_message(f"📌 {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} Resumed open position: {position} | {open_trade['OptionSymbol']} @ ₹{open_trade['OptionSellPrice']} | Qty: {open_trade['qty']} | Hedge Symbol: {open_trade['hedge_option_symbol']} @ ₹{open_trade['hedge_option_buy_price']} | Hedge Qty: {open_trade['hedge_qty']}",user['telegram_chat_id'], user['telegram_token'])
+    else:
+        trade = {}
+        position = None
+        print(f"ℹ️ {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} No open position. Waiting for next signal...")
+        logging.info(f"ℹ️ {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} No open position. Waiting for next signal...")
+   
     
 
     while True:
