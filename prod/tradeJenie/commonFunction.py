@@ -152,6 +152,21 @@ def init_db():
             )
         """)
 
+        c.execute("""
+            CREATE TABLE "kite_session" (
+                "session_pk"	INTEGER,
+                "user_id"	INTEGER,
+                "username"	TEXT,
+                "access_token"	TEXT,
+                "api_key"	TEXT,
+                "api_secret"	TEXT,
+                "crt_dt"	TEXT,
+                "lst_updt_dt"	TEXT,
+                PRIMARY KEY("session_pk"),
+                FOREIGN KEY("user_id") REFERENCES "user_dtls"("id")
+            )
+        """)
+
         # Commit changes and close connection
         conn.commit()
         print(f"Database initialized successfully at {os.path.abspath(DB_FILE)}")

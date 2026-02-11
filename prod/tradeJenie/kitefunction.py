@@ -2,9 +2,10 @@ import json
 import pandas as pd
 import datetime, time
 import os
+import sqlite3
 import logging
 from kiteconnect import KiteConnect
-from config import ACCESS_TOKEN_FILE, INSTRUMENTS_FILE, LOG_FILE
+from config import ACCESS_TOKEN_FILE, INSTRUMENTS_FILE, LOG_FILE, DB_FILE
 
 
 logging.basicConfig(
@@ -18,11 +19,25 @@ instruments_df = pd.read_csv(INSTRUMENTS_FILE)
 
 def get_kite_client(user):
     try:
-        FILE = user['user'] + "_" + ACCESS_TOKEN_FILE
-        with open(FILE, "r") as f:
-            token_data = json.load(f)
-        kite = KiteConnect(api_key=token_data["api_key"])
-        kite.set_access_token(token_data["access_token"])
+        # Fetch token data from kite_session table
+        conn = sqlite3.connect(DB_FILE)
+        c = conn.cursor()
+        c.execute("""
+            SELECT access_token, api_key, api_secret 
+            FROM kite_session 
+            WHERE user_id = ?
+        """, (user['id'],))
+        row = c.fetchone()
+        conn.close()
+        
+        if not row:
+            print(f"❌ No session found for user_id: {user['id']}")
+            logging.error(f"No session found for user_id: {user['id']}")
+            return None
+        
+        access_token, api_key, api_secret = row
+        kite = KiteConnect(api_key=api_key)
+        kite.set_access_token(access_token)
         return kite
     except Exception as e:
         print("❌ Could not load access token:", e)

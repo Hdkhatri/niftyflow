@@ -152,6 +152,21 @@ def init_db():
             )
         """)
 
+        c.execute("""
+            CREATE TABLE "kite_session" (
+                "session_pk"	INTEGER,
+                "user_id"	INTEGER,
+                "username"	TEXT,
+                "access_token"	TEXT,
+                "api_key"	TEXT,
+                "api_secret"	TEXT,
+                "crt_dt"	TEXT,
+                "lst_updt_dt"	TEXT,
+                PRIMARY KEY("session_pk"),
+                FOREIGN KEY("user_id") REFERENCES "user_dtls"("id")
+            )
+        """)
+
         # Commit changes and close connection
         conn.commit()
         print(f"Database initialized successfully at {os.path.abspath(DB_FILE)}")
@@ -1114,3 +1129,18 @@ def check_trade_stoploss_hit(user, trade, config):
     else:
         print(f"ℹ️ {config['KEY']} TRADE_STOPLOSS not set.")
         return False
+
+def check_login_success(user,password):
+    try:
+        conn = sqlite3.connect(DB_FILE)
+        c = conn.cursor()
+        c.execute("SELECT * FROM user_dtls WHERE user = ? AND kite_password = ?", (user, password))
+        result = c.fetchone()
+        conn.close()
+        return result[0] is not None, result if result is not None else None
+    except Exception as e:
+        print(f"❌ Error checking login: {e}")
+        logging.error(f"❌ Error checking login: {e}")
+        return False, None
+    
+

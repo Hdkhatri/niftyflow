@@ -36,12 +36,13 @@ def live_trading(instruments_df, config, key, user):
 
     if config['REAL_TRADE'].lower() != "yes":
         print(f"🚫 {user['user']} {SERVER}  |  {key}  | TRADE mode is OFF SIMULATED_ORDER will be tracked")
-        send_telegram_message(f"🛠️ {user['user']} {SERVER}  |  {key}  | OnlyLive {config['INTERVAL']} running in {'SIMULATION' if config['REAL_TRADE'].lower() != 'yes' else 'LIVE'} mode.",user['telegram_chat_id'], user['telegram_token'])
+        # send_telegram_message(f"🛠️ {user['user']} {SERVER}  |  {key}  | OnlyLive {config['INTERVAL']} running in {'SIMULATION' if config['REAL_TRADE'].lower() != 'yes' else 'LIVE'} mode.",user['telegram_chat_id'], user['telegram_token'])
         logging.info(f"🚫 {user['user']} {SERVER}  |  {key}  | TRADE mode is OFF. Running in SIMULATION mode.")
     else:    
         print(f"🚀 {user['user']} {SERVER}  |  {key}  | TRADE mode is ON LIVE_ORDER will be placed")
-        send_telegram_message(f"🚀 {user['user']} {SERVER}  |  {key}  | {config['INTERVAL']} Live trading started!",user['telegram_chat_id'], user['telegram_token'])
+        # send_telegram_message(f"🚀 {user['user']} {SERVER}  |  {key}  | {config['INTERVAL']} Live trading started!",user['telegram_chat_id'], user['telegram_token'])
         logging.info(f"🚀 {user['user']} {SERVER}  |  {key}  | TRADE mode is ON. Running in LIVE mode.")
+    
     open_trade = load_open_position(config, key, user, user['id'])
     if open_trade:
             trade = open_trade

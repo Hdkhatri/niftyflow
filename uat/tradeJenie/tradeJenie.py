@@ -43,6 +43,7 @@ def live_trading(instruments_df, config, key, user):
         # send_telegram_message(f"🚀 {user['user']} {SERVER}  |  {key}  | {config['INTERVAL']} Live trading started!",user['telegram_chat_id'], user['telegram_token'])
         logging.info(f"🚀 {user['user']} {SERVER}  |  {key}  | TRADE mode is ON. Running in LIVE mode.")
     
+    open_trade = load_open_position(config, key, user, user['id'])
     if open_trade:
             trade = open_trade
             position = open_trade["Signal"]
