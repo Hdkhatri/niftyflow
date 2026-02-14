@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Recurring Deposit (RD) Calculator Online | Maturity Value</title>
+  <meta name="description" content="Free RD Calculator: Estimate the maturity value of your recurring deposit. Simple tool for Indian savers and investors." />
+  <link rel="canonical" href="https://niftyflow.in/rd-calculator.html" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "RD Calculator",
+    "url": "https://niftyflow.in/rd-calculator.html",
+    "description": "Free RD Calculator: Estimate the maturity value of your recurring deposit. Simple tool for Indian savers and investors.",
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "All"
+  }
+  </script>
+</head>
+<body>
+<header class="container header">
+  <div class="logo">
+    <div><img src="assets/images/logo.svg" alt="NiftyFlow logo" /></div>
+    <div>
+      <div style="font-weight:800;color:var(--purple-900)">NiftyFlow</div>
+      <div style="font-size:12px;color:#6b5f82">Simple • Steady • Automated</div>
+    </div>
+  </div>
+  <nav class="nav">
+    <a href="index.html">Home</a>
+    <a href="calculators.html">All Calculators</a>
+    <a href="strategy.html">Strategy</a>
+    <a href="automation.html">Automation</a>
+    <a href="blog.html">Blog</a>
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+</header>
+<main class="container">
+  <section class="section card">
+    <h1>Recurring Deposit (RD) Calculator</h1>
+    <p class="lead">Estimate the maturity value of your recurring deposit. Enter your monthly deposit, tenure, and interest rate to get started.</p>
+    <form id="rdForm">
+      <div class="form-row">
+        <div class="input"><label>Monthly Deposit (₹)</label><input id="rd_monthly" type="number" required /></div>
+        <div class="input"><label>Tenure (years)</label><input id="rd_years" type="number" required /></div>
+        <div class="input"><label>Interest Rate (% p.a.)</label><input id="rd_rate" type="number" step="0.01" required /></div>
+      </div>
+      <div style="margin-top:8px"><button type="submit" class="btn btn-primary">Calculate</button></div>
+    </form>
+    <div style="margin-top:12px" id="rd_result"></div>
+    <div style="margin-top:24px">
+      <h2>What is an RD Calculator?</h2>
+      <p>This calculator helps you estimate the maturity value of your recurring deposit, considering monthly deposits and compounding interest.</p>
+      <h2>How to use the RD Calculator?</h2>
+      <ul>
+        <li>Enter your monthly deposit, tenure, and interest rate.</li>
+        <li>Click Calculate to see your maturity value.</li>
+      </ul>
+      <h2>Frequently Asked Questions</h2>
+      <h3>How is RD maturity calculated?</h3>
+      <p>The calculator uses the future value formula for recurring deposits with compounding interest.</p>
+      <h3>Is RD safe?</h3>
+      <p>RDs are considered safe and are offered by banks and post offices in India.</p>
+      <hr style="margin:32px 0 18px 0;">
+      <div style="background:#f7f5ff;padding:18px 16px;border-radius:10px;max-width:480px;margin:0 auto 0 auto;text-align:center;box-shadow:0 2px 12px #e6e1f7;">
+        <h2 style="margin-top:0">Book Free Consultation</h2>
+        <p style="margin-bottom:12px">Want a personalized savings plan or have questions? Contact us for a free consultation:</p>
+        <a href="mailto:niftyflow.service@gmail.com" style="display:inline-block;margin:6px 0 10px 0;font-weight:600;color:#5E35B1;text-decoration:underline;font-size:1.08rem">niftyflow.service@gmail.com</a><br>
+        <a href="https://wa.me/918087616404" target="_blank" rel="noopener" style="display:inline-block;margin:6px 0 0 0;font-weight:600;color:#25D366;text-decoration:none;font-size:1.08rem"><img src="assets/images/whatsapp.svg" alt="WhatsApp" style="height:18px;vertical-align:middle;margin-right:6px">Chat on WhatsApp</a>
+      </div>
+      <!-- Sticky Contact Bar -->
+      <div class="sticky-contact-bar">
+        <span style="font-weight:600;">Book Free Consultation:</span>
+        <a href="contact.html">Contact (Email & WhatsApp)</a>
+      </div>
+    </div>
+  </section>
+</main>
+<script src="assets/js/app.js"></script>
+<script>
+function rdCalc() {
+  const monthly = parseFloat(document.getElementById('rd_monthly').value)||0;
+  const years = parseFloat(document.getElementById('rd_years').value)||0;
+  const rate = parseFloat(document.getElementById('rd_rate').value)||0;
+  const n = years*12;
+  const r = rate/12/100;
+  let maturity = 0;
+  let resultMsg = '';
+  if (monthly <= 0 || years <= 0 || rate <= 0) {
+    resultMsg = '<span style="color:#b71c1c;font-weight:500">Please enter all values above zero to see your RD result.</span>';
+    document.getElementById('rd_result').innerHTML = resultMsg;
+    return;
+  }
+  if(r===0) maturity = monthly*n;
+  else maturity = monthly*((Math.pow(1+r,n)-1)/r)*(1+r);
+  const invested = monthly*n;
+  const gain = maturity - invested;
+  resultMsg = `By depositing <b>₹${monthly.toLocaleString()}</b> every month for <b>${years} years</b> at <b>${rate}%</b> interest, you will receive about <b>₹${maturity.toLocaleString(undefined,{maximumFractionDigits:0})}</b> at maturity.`;
+  resultMsg += `<br>You will have invested <b>₹${invested.toLocaleString(undefined,{maximumFractionDigits:0})}</b>, and earned interest of <b>₹${gain.toLocaleString(undefined,{maximumFractionDigits:0})}</b>.`;
+  document.getElementById('rd_result').innerHTML = resultMsg;
+}
+document.getElementById('rdForm').onsubmit = function(e){ e.preventDefault(); rdCalc(); };
+</script>
+<a href="https://wa.me/918087616404" class="floating-whatsapp" target="_blank" rel="noopener" title="Chat on WhatsApp">
+  <img src="assets/images/whatsapp.svg" alt="WhatsApp" style="width:38px;height:38px;">
+</a>
+<style>
+.sticky-contact-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #f7f5ff;
+  color: #3F0071;
+  box-shadow: 0 -2px 12px #e6e1f7;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+  padding: 12px 8px 10px 8px;
+  z-index: 1000;
+  font-size: 1.08rem;
+}
+.sticky-contact-bar a {
+  color: #5E35B1;
+  font-weight: 600;
+  text-decoration: underline;
+  margin: 0 6px;
+}
+.floating-whatsapp {
+  position: fixed;
+  right: 18px;
+  bottom: 70px;
+  z-index: 1100;
+  background: #25D366;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(40,40,40,0.12);
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: box-shadow 0.2s;
+}
+.floating-whatsapp:hover {
+  box-shadow: 0 4px 16px rgba(40,40,40,0.18);
+  background: #1ebe57;
+}
+@media (max-width: 600px) {
+  .sticky-contact-bar {
+    flex-direction: column;
+    font-size: 1rem;
+    gap: 8px;
+    padding: 10px 4px 8px 4px;
+  }
+  .floating-whatsapp {
+    right: 10px;
+    bottom: 64px;
+    padding: 6px;
+  }
+}
+</style>
+</body>
+</html>

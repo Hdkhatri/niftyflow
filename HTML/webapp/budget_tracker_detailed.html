@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Budget & Goal Planner</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Roboto', Arial, sans-serif; background: linear-gradient(120deg, #e0eafc, #cfdef3); margin: 0; }
+        .container { max-width: 650px; margin: 40px auto; background: #fff; padding: 36px 48px; border-radius: 16px; box-shadow: 0 4px 24px #b0c4de; }
+        h1 { margin-top: 0; font-weight: 700; color: #2196F3; }
+        label { display: block; margin-top: 18px; font-weight: 500; }
+        input[type="number"], input[type="text"] { width: 100%; padding: 10px; margin-top: 6px; border: 1px solid #b0c4de; border-radius: 6px; font-size: 16px; }
+        .category-list { margin-top: 10px; }
+        .category-row { display: flex; gap: 10px; margin-bottom: 8px; }
+        .category-row input { flex: 1; }
+        button { margin-top: 24px; padding: 12px 28px; background: #2196F3; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: 600; }
+        button.add-category { background: #4CAF50; margin-top: 10px; }
+        .summary { margin-top: 36px; background: #e3f2fd; padding: 22px; border-radius: 12px; }
+        .progress-bar { background: #eee; border-radius: 8px; overflow: hidden; height: 28px; margin-top: 14px; }
+        .progress { background: #4CAF50; height: 100%; transition: width 0.5s; }
+        .chart-container { margin-top: 30px; }
+        .adspace { margin: 30px 0; text-align: center; }
+        .feedback { margin-top: 40px; background: #fff3e0; padding: 18px; border-radius: 8px; }
+        .about { margin-top: 40px; font-size: 15px; color: #555; }
+        @media (max-width: 700px) {
+            .container { padding: 18px 8px; }
+        }
+    </style>
+</head>
+<body>
+<header class="container header">
+    <div class="logo">
+        <img src="assets/images/logo.svg" alt="NiftyFlow logo" />
+        <div>
+            <div style="font-weight:800;color:var(--purple-900)">NiftyFlow</div>
+            <div style="font-size:12px;color:#6b5f82">Simple • Steady • Automated</div>
+        </div>
+    </div>
+    <button class="menu-toggle" aria-label="Open menu" tabindex="0">
+        <span></span><span></span><span></span>
+    </button>
+    <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="strategy.html">Strategy</a>
+        <a href="calculators.html">Calculators</a>
+        <a href="automation.html">Automation</a>
+        <a href="blog.html">Blog</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+    </nav>
+    <div class="mobile-menu-overlay">
+        <button class="menu-close" aria-label="Close menu">&times;</button>
+        <nav class="mobile-nav">
+            <a href="index.html">Home</a>
+            <a href="strategy.html">Strategy</a>
+            <a href="calculators.html">Calculators</a>
+            <a href="automation.html">Automation</a>
+            <a href="blog.html">Blog</a>
+            <a href="about.html">About</a>
+            <a href="contact.html">Contact</a>
+        </nav>
+    </div>
+</header>
+        <div class="container">
+        <h1>Smart Budget & Goal Planner</h1>
+        <form id="budgetForm">
+            <label>Monthly Income:</label>
+            <input type="number" id="income" min="0" required>
+            <label>Savings Goal:</label>
+            <input type="number" id="goal" min="0" required>
+            <label>Expense Categories:</label>
+            <div class="category-list" id="categoryList">
+                <div class="category-row">
+                    <input type="text" placeholder="Category (e.g. Rent)" class="cat-name" required>
+                    <input type="number" placeholder="Amount" class="cat-amount" min="0" required>
+                </div>
+            </div>
+            <button type="button" class="add-category" onclick="addCategory()">+ Add Category</button>
+            <button type="submit">Calculate & Analyse</button>
+        </form>
+        <div class="summary" id="summary" style="display:none;">
+            <strong>Summary:</strong>
+            <div id="summaryText"></div>
+            <div class="progress-bar">
+                <div class="progress" id="progress" style="width:0%"></div>
+            </div>
+            <div id="advice" style="margin-top:18px;font-weight:500;color:#4CAF50;"></div>
+        </div>
+        <div class="chart-container" style="display:none;">
+            <canvas id="expenseChart" height="180"></canvas>
+        </div>
+        <div class="adspace">
+            <!-- AdSense code goes here -->
+            <em>Ad space</em>
+        </div>
+        <div class="feedback">
+            <h2>Tell Us What You Want!</h2>
+            <form id="feedbackForm">
+                <label>Your Name:</label>
+                <input type="text" id="name" required>
+                <label>Email (optional):</label>
+                <input type="text" id="email">
+                <label>What features do you want?</label>
+                <input type="text" id="features" required>
+                <button type="submit">Send Feedback</button>
+            </form>
+            <div id="feedbackMsg" style="margin-top:10px;color:green;"></div>
+        </div>
+        <div class="about">
+            <h3>Why Use This?</h3>
+            Track your money. Achieve your goals. Stay disciplined.<br>
+            <strong>Join our community:</strong> <a href="https://t.me/+yourgroup" target="_blank">Telegram Group</a>
+        </div>
+    </div>
+    <script>
+        function addCategory() {
+            var list = document.getElementById('categoryList');
+            var row = document.createElement('div');
+            row.className = 'category-row';
+            row.innerHTML = '<input type="text" placeholder="Category (e.g. Food)" class="cat-name" required> <input type="number" placeholder="Amount" class="cat-amount" min="0" required>';
+            list.appendChild(row);
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            var budgetForm = document.getElementById('budgetForm');
+            if (budgetForm) {
+                budgetForm.onsubmit = function(e) {
+                    e.preventDefault();
+                    var income = parseFloat(document.getElementById('income').value) || 0;
+                    var goal = parseFloat(document.getElementById('goal').value) || 0;
+                    var catNames = document.querySelectorAll('.cat-name');
+                    var catAmounts = document.querySelectorAll('.cat-amount');
+                    var expenses = 0;
+                    var categories = [];
+                    for (var i = 0; i < catNames.length; i++) {
+                        var name = catNames[i].value.trim() || 'Other';
+                        var amt = parseFloat(catAmounts[i].value) || 0;
+                        expenses += amt;
+                        categories.push({name: name, amount: amt});
+                    }
+                    var savings = income - expenses;
+                    var percent = goal ? Math.min(100, Math.round((savings/goal)*100)) : 0;
+                    var summaryText = `Income: ₹${income.toLocaleString()}<br>Expenses: ₹${expenses.toLocaleString()}<br>Savings: ₹${savings.toLocaleString()}<br>Goal: ₹${goal.toLocaleString()}<br>Progress: ${percent}%`;
+                    document.getElementById('summaryText').innerHTML = summaryText;
+                    document.getElementById('progress').style.width = percent + '%';
+                    document.getElementById('summary').style.display = 'block';
+                    // Advice logic
+                    var advice = '';
+                    if (savings < 0) advice = 'Warning: You are overspending! Reduce expenses.';
+                    else if (percent < 50) advice = 'Try to save more. Review your expenses.';
+                    else if (percent < 100) advice = 'Good progress! Stay disciplined.';
+                    else advice = 'Congratulations! You reached your savings goal.';
+                    document.getElementById('advice').innerText = advice;
+                    // Chart
+                    if (categories.length > 0) {
+                        document.querySelector('.chart-container').style.display = 'block';
+                        var ctx = document.getElementById('expenseChart').getContext('2d');
+                        if (window.expenseChart) window.expenseChart.destroy();
+                        window.expenseChart = new Chart(ctx, {
+                            type: 'pie',
+                            data: {
+                                labels: categories.map(c => c.name),
+                                datasets: [{
+                                    data: categories.map(c => c.amount),
+                                    backgroundColor: ['#2196F3','#4CAF50','#FF9800','#E91E63','#9C27B0','#00BCD4','#8BC34A','#FFC107','#795548','#607D8B']
+                                }]
+                            },
+                            options: {
+                                plugins: { legend: { position: 'bottom' } },
+                                responsive: true
+                            }
+                        });
+                    }
+                };
+            }
+            var feedbackForm = document.getElementById('feedbackForm');
+            if (feedbackForm) {
+                feedbackForm.onsubmit = function(e) {
+                    e.preventDefault();
+                    document.getElementById('feedbackMsg').innerText = 'Thank you for your feedback!';
+                    document.getElementById('feedbackForm').reset();
+                };
+            }
+        });
+    </script>
+</body>
+<a href="https://wa.me/918087616404" class="floating-whatsapp" target="_blank" rel="noopener" title="Chat on WhatsApp">
+    <img src="assets/images/whatsapp.svg" alt="WhatsApp" style="width:38px;height:38px;">
+</a>
+<style>
+.floating-whatsapp {
+    position: fixed;
+    right: 18px;
+    bottom: 70px;
+    z-index: 1100;
+    background: #25D366;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(40,40,40,0.12);
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: box-shadow 0.2s;
+}
+.floating-whatsapp:hover {
+    box-shadow: 0 4px 16px rgba(40,40,40,0.18);
+    background: #1ebe57;
+}
+@media (max-width: 600px) {
+    .floating-whatsapp {
+        right: 10px;
+        bottom: 64px;
+        padding: 6px;
+    }
+}
+</style>
+</html>

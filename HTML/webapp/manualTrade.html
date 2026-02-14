@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Manual Entry Trade — Select User</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <div class="container py-4">
+    <h1 class="h4 mb-3">Select Existing User</h1>
+
+    <div class="card">
+      <div class="card-body">
+        <div class="mb-3">
+          <label for="userSelect" class="form-label">User</label>
+          <select id="userSelect" class="form-select">
+            <option value="">-- Select user --</option>
+            {% for u in users %}
+            <option value="{{ u['id'] }}">{{ u['user'] }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <button id="loadKeys" class="btn btn-primary">Load Keys</button>
+          <a href="/" class="btn btn-link">Refresh</a>
+        </div>
+
+        <div id="keysContainer"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('loadKeys').addEventListener('click', function(){
+      const sel = document.getElementById('userSelect');
+      const userId = sel.value;
+      const container = document.getElementById('keysContainer');
+      container.innerHTML = '';
+      if (!userId) {
+        container.innerHTML = '<div class="alert alert-warning">Please select a user.</div>';
+        return;
+      }
+
+      fetch('/get_keys/' + encodeURIComponent(userId))
+        .then(resp => {
+          if (!resp.ok) throw new Error('Network response was not ok');
+          return resp.json();
+        })
+        .then(data => {
+          if (!Array.isArray(data) || data.length === 0) {
+            container.innerHTML = '<div class="alert alert-info">No keys found for this user.</div>';
+            return;
+          }
+
+          // build table of keys with action buttons and a Next Action column
+          const table = document.createElement('table');
+          table.className = 'table table-sm table-bordered';
+          const thead = document.createElement('thead');
+          thead.innerHTML = '<tr><th>Key</th><th>Action</th><th>Next Action</th></tr>';
+          table.appendChild(thead);
+          const tbody = document.createElement('tbody');
+
+          data.forEach(k => {
+            const tr = document.createElement('tr');
+            const tdKey = document.createElement('td');
+            tdKey.textContent = k;
+            const tdAction = document.createElement('td');
+            const btn = document.createElement('button');
+            btn.className = 'btn btn-sm btn-success';
+            btn.textContent = 'Add Manual order';
+            btn.addEventListener('click', function(){
+              // disable while processing
+              btn.disabled = true;
+              btn.textContent = 'Sending...';
+              fetch('/manual_order', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({user_id: userId, key: k})
+              })
+              .then(r => r.json())
+              .then(res => {
+                const msg = document.createElement('div');
+                msg.className = res.status === 'ok' ? 'alert alert-success mt-2' : 'alert alert-danger mt-2';
+                msg.textContent = res.message || JSON.stringify(res);
+                container.insertBefore(msg, table.nextSibling);
+                btn.disabled = false;
+                btn.textContent = 'Add Manual order';
+              })
+              .catch(err => {
+                console.error(err);
+                const msg = document.createElement('div');
+                msg.className = 'alert alert-danger mt-2';
+                msg.textContent = 'Error sending manual order';
+                container.insertBefore(msg, table.nextSibling);
+                btn.disabled = false;
+                btn.textContent = 'Add Manual order';
+              });
+            });
+            tdAction.appendChild(btn);
+
+            // Next Action cell: show existing trade for this key
+            const tdNext = document.createElement('td');
+            tdNext.style.minWidth = '260px';
+            // button to fetch and show existing trade inline
+            const btnShow = document.createElement('button');
+            btnShow.className = 'btn btn-sm btn-info me-2';
+            btnShow.textContent = 'Show Existing Trade';
+            btnShow.addEventListener('click', function(){
+              // navigate to dedicated open trades page for this key
+              window.location.href = '/open_trades?user_id=' + encodeURIComponent(userId) + '&key=' + encodeURIComponent(k);
+            });
+
+            tdNext.appendChild(btnShow);
+
+            tr.appendChild(tdKey);
+            tr.appendChild(tdAction);
+            tr.appendChild(tdNext);
+            tbody.appendChild(tr);
+          });
+
+          table.appendChild(tbody);
+          container.appendChild(document.createElement('hr'));
+          const heading = document.createElement('h6');
+          heading.textContent = 'Keys';
+          container.appendChild(heading);
+          container.appendChild(table);
+        })
+        .catch(err => {
+          console.error(err);
+          container.innerHTML = '<div class="alert alert-danger">Error loading keys.</div>';
+        });
+    });
+  </script>
+</body>
+</html>

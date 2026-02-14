@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradeJenie - Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 450px;
+            padding: 40px;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .login-header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        input[type="text"].error,
+        input[type="password"].error {
+            border-color: #e74c3c;
+            background-color: #fadbd8;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .captcha-container {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .captcha-box {
+            background: white;
+            padding: 10px;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .captcha-image {
+            background: #e0e0e0;
+            padding: 10px 15px;
+            border-radius: 3px;
+            font-size: 18px;
+            letter-spacing: 5px;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            color: #333;
+            min-width: 150px;
+            text-align: center;
+            user-select: none;
+        }
+
+        .captcha-refresh {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.3s ease;
+        }
+
+        .captcha-refresh:hover {
+            background: #764ba2;
+        }
+
+        .captcha-input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .captcha-input-group input {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 3px;
+            font-size: 14px;
+        }
+
+        .captcha-input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .login-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .login-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+
+        .validation-feedback {
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .validation-feedback.show {
+            display: block;
+        }
+
+        .validation-feedback.valid {
+            color: #27ae60;
+        }
+
+        .validation-feedback.invalid {
+            color: #e74c3c;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                margin: 20px;
+                padding: 30px;
+            }
+
+            .login-header h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h1>🚀 TradeJenie</h1>
+            <p>Automated Trading System</p>
+        </div>
+
+        <div class="alert alert-success" id="successAlert"></div>
+        <div class="alert alert-error" id="errorAlert"></div>
+        <div class="alert alert-warning" id="warningAlert"></div>
+
+        <form id="loginForm" method="POST" onsubmit="handleLogin(event)">
+            <!-- Username Field -->
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    name="username" 
+                    placeholder="Enter your username"
+                    required
+                    onchange="validateUsername()"
+                    oninput="validateUsername()"
+                >
+                <div class="error-message" id="usernameError"></div>
+                <div class="validation-feedback" id="usernameFeedback"></div>
+            </div>
+
+            <!-- Password Field -->
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    placeholder="Enter your password"
+                    required
+                    onchange="validatePassword()"
+                    oninput="validatePassword()"
+                >
+                <div class="error-message" id="passwordError"></div>
+                <div class="validation-feedback" id="passwordFeedback"></div>
+            </div>
+
+            <!-- CAPTCHA Section -->
+            <div class="captcha-container">
+                <label>CAPTCHA Verification</label>
+                <div class="captcha-box">
+                    <div class="captcha-image" id="captchaImage"></div>
+                    <button type="button" class="captcha-refresh" onclick="refreshCaptcha()">🔄 Refresh</button>
+                </div>
+                <div class="captcha-input-group">
+                    <input 
+                        type="text" 
+                        id="captchaInput" 
+                        name="captcha" 
+                        placeholder="Enter CAPTCHA code"
+                        required
+                        onchange="validateCaptcha()"
+                        oninput="validateCaptcha()"
+                    >
+                </div>
+                <div class="error-message" id="captchaError"></div>
+                <div class="validation-feedback" id="captchaFeedback"></div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="login-button" id="loginBtn">Login</button>
+
+            <!-- Loading Indicator -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        let captchaCode = '';
+
+        // Initialize CAPTCHA on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            generateCaptcha();
+        });
+
+        // Generate random CAPTCHA
+        function generateCaptcha() {
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            const length = 6;
+            captchaCode = '';
+            for (let i = 0; i < length; i++) {
+                captchaCode += characters.charAt(Math.floor(Math.random() * characters.length));
+            }
+            displayCaptcha();
+        }
+
+        // Display CAPTCHA with random styling
+        function displayCaptcha() {
+            const captchaElement = document.getElementById('captchaImage');
+            captchaElement.textContent = captchaCode;
+            
+            // Add random rotation and color
+            const rotation = Math.floor(Math.random() * 10) - 5;
+            const colors = ['#333', '#667eea', '#764ba2', '#e74c3c'];
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            
+            captchaElement.style.transform = `rotate(${rotation}deg)`;
+            captchaElement.style.color = randomColor;
+            captchaElement.style.fontStyle = Math.random() > 0.5 ? 'italic' : 'normal';
+        }
+
+        // Refresh CAPTCHA
+        function refreshCaptcha() {
+            generateCaptcha();
+            clearValidationMessage('captcha');
+            document.getElementById('captchaInput').value = '';
+        }
+
+        // Validate Username
+        function validateUsername() {
+            const username = document.getElementById('username').value.trim();
+            const errorElement = document.getElementById('usernameError');
+            const feedbackElement = document.getElementById('usernameFeedback');
+            const input = document.getElementById('username');
+
+            // Clear previous messages
+            errorElement.textContent = '';
+            errorElement.classList.remove('show');
+            feedbackElement.textContent = '';
+            feedbackElement.classList.remove('show');
+            input.classList.remove('error');
+
+            // Validation rules
+            if (username.length === 0) {
+                showError('username', 'Username is required');
+                return false;
+            }
+
+            if (username.length < 3) {
+                showError('username', 'Username must be at least 3 characters');
+                return false;
+            }
+
+            if (!/^[a-zA-Z0-9_@.]+$/.test(username)) {
+                showError('username', 'Username can only contain letters, numbers, @, _, and .');
+                return false;
+            }
+
+            showValid('username', '✓ Username is valid');
+            return true;
+        }
+
+        // Validate Password
+        function validatePassword() {
+            const password = document.getElementById('password').value;
+            const errorElement = document.getElementById('passwordError');
+            const feedbackElement = document.getElementById('passwordFeedback');
+            const input = document.getElementById('password');
+
+            // Clear previous messages
+            errorElement.textContent = '';
+            errorElement.classList.remove('show');
+            feedbackElement.textContent = '';
+            feedbackElement.classList.remove('show');
+            input.classList.remove('error');
+
+            // Validation rules
+            if (password.length === 0) {
+                showError('password', 'Password is required');
+                return false;
+            }
+
+            if (password.length < 6) {
+                showError('password', 'Password must be at least 6 characters');
+                return false;
+            }
+
+            showValid('password', '✓ Password is valid');
+            return true;
+        }
+
+        // Validate CAPTCHA
+        function validateCaptcha() {
+            const captchaInput = document.getElementById('captchaInput').value.trim();
+            const errorElement = document.getElementById('captchaError');
+            const feedbackElement = document.getElementById('captchaFeedback');
+            const input = document.getElementById('captchaInput');
+
+            // Clear previous messages
+            errorElement.textContent = '';
+            errorElement.classList.remove('show');
+            feedbackElement.textContent = '';
+            feedbackElement.classList.remove('show');
+            input.classList.remove('error');
+
+            if (captchaInput.length === 0) {
+                showError('captcha', 'CAPTCHA is required');
+                return false;
+            }
+
+            if (captchaInput === captchaCode) {
+                showValid('captcha', '✓ CAPTCHA verified');
+                return true;
+            } else {
+                showError('captcha', 'CAPTCHA is incorrect');
+                return false;
+            }
+        }
+
+        // Show error message
+        function showError(fieldType, message) {
+            const errorElement = document.getElementById(fieldType + 'Error');
+            const input = document.getElementById(fieldType === 'captcha' ? 'captchaInput' : fieldType);
+            errorElement.textContent = message;
+            errorElement.classList.add('show');
+            input.classList.add('error');
+        }
+
+        // Show valid message
+        function showValid(fieldType, message) {
+            const feedbackElement = document.getElementById(fieldType + 'Feedback');
+            const input = document.getElementById(fieldType === 'captcha' ? 'captchaInput' : fieldType);
+            feedbackElement.textContent = message;
+            feedbackElement.classList.add('show', 'valid');
+            input.classList.remove('error');
+        }
+
+        // Clear validation message
+        function clearValidationMessage(fieldType) {
+            const errorElement = document.getElementById(fieldType + 'Error');
+            const feedbackElement = document.getElementById(fieldType + 'Feedback');
+            errorElement.classList.remove('show');
+            feedbackElement.classList.remove('show');
+        }
+
+        // Handle Login Form Submission
+        async function handleLogin(event) {
+            event.preventDefault();
+
+            // Validate all fields
+            const usernameValid = validateUsername();
+            const passwordValid = validatePassword();
+            const captchaValid = validateCaptcha();
+
+            if (!usernameValid || !passwordValid || !captchaValid) {
+                showAlert('error', 'Please fix the errors above');
+                return;
+            }
+
+            // Show loading
+            document.getElementById('loginBtn').disabled = true;
+            document.getElementById('loading').style.display = 'block';
+
+            try {
+                const formData = new FormData(document.getElementById('loginForm'));
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert('success', 'Login successful! Redirecting...');
+                    setTimeout(() => {
+                        window.location.href = data.redirect || '/dashboard';
+                    }, 1500);
+                } else {
+                    showAlert('error', data.message || 'Login failed. Please try again.');
+                    refreshCaptcha();
+                    document.getElementById('loginBtn').disabled = false;
+                    document.getElementById('loading').style.display = 'none';
+                }
+            } catch (error) {
+                showAlert('error', 'An error occurred. Please try again.');
+                console.error('Login error:', error);
+                document.getElementById('loginBtn').disabled = false;
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        // Show Alert
+        function showAlert(type, message) {
+            const alertElement = document.getElementById(type + 'Alert');
+            alertElement.textContent = message;
+            alertElement.classList.add('show');
+
+            if (type !== 'success') {
+                setTimeout(() => {
+                    alertElement.classList.remove('show');
+                }, 5000);
+            }
+        }
+
+        // Real-time validation on input
+        document.getElementById('username')?.addEventListener('blur', validateUsername);
+        document.getElementById('password')?.addEventListener('blur', validatePassword);
+        document.getElementById('captchaInput')?.addEventListener('blur', validateCaptcha);
+    </script>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>EMI vs SIP Calculator Online | Compare Loan vs Investment</title>
+  <meta name="description" content="Free EMI vs SIP Calculator: Compare loan EMI outgo vs SIP investment growth. See which is better for your financial goals." />
+  <link rel="canonical" href="https://niftyflow.in/emi-vs-sip-calculator.html" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "EMI vs SIP Calculator",
+    "url": "https://niftyflow.in/emi-vs-sip-calculator.html",
+    "description": "Free EMI vs SIP Calculator: Compare loan EMI outgo vs SIP investment growth. See which is better for your financial goals.",
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "All"
+  }
+  </script>
+</head>
+<body>
+<header class="container header">
+  <div class="logo">
+    <img src="assets/images/logo.svg" alt="NiftyFlow logo" />
+    <div>
+      <div style="font-weight:800;color:var(--purple-900)">NiftyFlow</div>
+      <div style="font-size:12px;color:#6b5f82">Simple • Steady • Automated</div>
+    </div>
+  </div>
+  <button class="menu-toggle" aria-label="Open menu" tabindex="0">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav">
+    <a href="index.html">Home</a>
+    <a href="strategy.html">Strategy</a>
+    <a href="calculators.html">Calculators</a>
+    <a href="automation.html">Automation</a>
+    <a href="blog.html">Blog</a>
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+  <div class="mobile-menu-overlay">
+    <button class="menu-close" aria-label="Close menu">&times;</button>
+    <nav class="mobile-nav">
+      <a href="index.html">Home</a>
+      <a href="strategy.html">Strategy</a>
+      <a href="calculators.html">Calculators</a>
+      <a href="automation.html">Automation</a>
+      <a href="blog.html">Blog</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </div>
+</header>
+<main class="container">
+  <section class="section card">
+    <h1>EMI vs SIP Calculator</h1>
+    <p class="lead">Compare your loan EMI outgo with the potential growth of a SIP investment. Enter your loan and SIP details to see which is better for your goals.</p>
+    <form id="emivsipForm">
+      <div class="form-row">
+        <div class="input"><label>Loan Amount (₹)</label><input id="emivsip_loan" type="number" placeholder="e.g. 1000000" required /></div>
+        <div class="input"><label>Loan Tenure (years)</label><input id="emivsip_years" type="number" placeholder="e.g. 10" required /></div>
+        <div class="input"><label>Loan Interest Rate (%)</label><input id="emivsip_emi_rate" type="number" placeholder="e.g. 8" required /></div>
+      </div>
+      <div class="form-row">
+        <div class="input"><label>Monthly SIP (₹)</label><input id="emivsip_sip" type="number" placeholder="e.g. 10000" required /></div>
+        <div class="input"><label>SIP Return Rate (%)</label><input id="emivsip_sip_rate" type="number" placeholder="e.g. 12" required /></div>
+      </div>
+      <div style="margin-top:8px"><button type="submit" class="btn btn-primary">Compare</button></div>
+    </form>
+    <div style="margin-top:12px" id="emivsip_result"></div>
+    <div style="margin-top:24px">
+      <h2>What is EMI vs SIP?</h2>
+      <p>This calculator helps you compare the total outgo on a loan (EMI) versus the potential growth of investing the same amount in a SIP.</p>
+      <h2>How to use the EMI vs SIP Calculator?</h2>
+      <ul>
+        <li>Enter your loan amount, tenure, and interest rate.</li>
+        <li>Enter your monthly SIP and expected return rate.</li>
+        <li>Click Compare to see the results.</li>
+      </ul>
+      <h2>Frequently Asked Questions</h2>
+      <h3>What does the result show?</h3>
+      <p>The result shows the total amount paid as EMI and the future value of the same amount invested as SIP.</p>
+      <h3>Which is better?</h3>
+      <p>It depends on your financial goals, risk appetite, and loan/investment rates.</p>
+      <hr style="margin:32px 0 18px 0;">
+      <div style="background:#f7f5ff;padding:18px 16px;border-radius:10px;max-width:480px;margin:0 auto 0 auto;text-align:center;box-shadow:0 2px 12px #e6e1f7;">
+        <h2 style="margin-top:0">Book Free Consultation</h2>
+        <p style="margin-bottom:12px">Want a personalized plan or have questions? Contact us for a free consultation:</p>
+        <a href="mailto:niftyflow.service@gmail.com" style="display:inline-block;margin:6px 0 10px 0;font-weight:600;color:#5E35B1;text-decoration:underline;font-size:1.08rem">niftyflow.service@gmail.com</a><br>
+        <a href="https://wa.me/918087616404" target="_blank" rel="noopener" style="display:inline-block;margin:6px 0 0 0;font-weight:600;color:#25D366;text-decoration:none;font-size:1.08rem"><img src="assets/images/whatsapp.svg" alt="WhatsApp" style="height:18px;vertical-align:middle;margin-right:6px">Chat on WhatsApp</a>
+      </div>
+      <!-- Sticky Contact Bar -->
+      <div class="sticky-contact-bar">
+        <span style="font-weight:600;">Book Free Consultation:</span>
+        <a href="contact.html">Contact (Email & WhatsApp)</a>
+      </div>
+    </div>
+  </section>
+</main>
+<script src="assets/js/app.js"></script>
+<script>
+function emivsipCalc() {
+  const loan = parseFloat(document.getElementById('emivsip_loan').value)||0;
+  const years = parseFloat(document.getElementById('emivsip_years').value)||0;
+  const emiRate = parseFloat(document.getElementById('emivsip_emi_rate').value)||0;
+  const sip = parseFloat(document.getElementById('emivsip_sip').value)||0;
+  const sipRate = parseFloat(document.getElementById('emivsip_sip_rate').value)||0;
+  const mn = years*12;
+  const mr = emiRate/12/100;
+  let emi = 0;
+  if(mr===0) emi = loan/mn;
+  else emi = loan*mr*Math.pow(1+mr,mn)/(Math.pow(1+mr,mn)-1);
+  const totalEmi = emi*mn;
+  const sr = sipRate/12/100;
+  let fv = 0;
+  if(sr===0) fv = sip*mn;
+  else fv = sip*((Math.pow(1+sr,mn)-1)/sr)*(1+sr);
+  document.getElementById('emivsip_result').innerText =
+    `Total EMI paid: ₹${totalEmi.toLocaleString(undefined,{maximumFractionDigits:0})}.\nFuture value of SIP: ₹${fv.toLocaleString(undefined,{maximumFractionDigits:0})}.`;
+}
+document.getElementById('emivsipForm').onsubmit = function(e){ e.preventDefault(); emivsipCalc(); };
+</script>
+<a href="https://wa.me/918087616404" class="floating-whatsapp" target="_blank" rel="noopener" title="Chat on WhatsApp">
+  <img src="assets/images/whatsapp.svg" alt="WhatsApp" style="width:38px;height:38px;">
+</a>
+<style>
+.sticky-contact-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #f7f5ff;
+  color: #3F0071;
+  box-shadow: 0 -2px 12px #e6e1f7;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+  padding: 12px 8px 10px 8px;
+  z-index: 1000;
+  font-size: 1.08rem;
+}
+.sticky-contact-bar a {
+  color: #5E35B1;
+  font-weight: 600;
+  text-decoration: underline;
+  margin: 0 6px;
+}
+.floating-whatsapp {
+  position: fixed;
+  right: 18px;
+  bottom: 70px;
+  z-index: 1100;
+  background: #25D366;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(40,40,40,0.12);
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: box-shadow 0.2s;
+}
+.floating-whatsapp:hover {
+  box-shadow: 0 4px 16px rgba(40,40,40,0.18);
+  background: #1ebe57;
+}
+@media (max-width: 600px) {
+  .sticky-contact-bar {
+    flex-direction: column;
+    font-size: 1rem;
+    gap: 8px;
+    padding: 10px 4px 8px 4px;
+  }
+  .floating-whatsapp {
+    right: 10px;
+    bottom: 64px;
+    padding: 6px;
+  }
+}
+</style>
+</body>
+</html>

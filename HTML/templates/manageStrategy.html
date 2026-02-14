@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Strategy - TradeJenie</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/manageStrategies.css') }}">
+    <style>
+        .form-section {
+            background: #f9f9f9;
+            padding: 25px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.2s ease;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 1024px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-section h5 {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .btn-save {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-cancel {
+            background: #e0e0e0;
+            color: #333;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-left: 10px;
+        }
+
+        .btn-cancel:hover {
+            background: #d0d0d0;
+        }
+
+        .form-actions {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+
+        .badge-section {
+            margin-bottom: 20px;
+        }
+
+        .help-text {
+            font-size: 12px;
+            color: #999;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header (Reusable) -->
+    {% include 'header.html' %}
+
+    <!-- Main Container -->
+    <div class="container-main">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb-nav">
+            <a href="/dashboard"><i class="fas fa-home"></i> Dashboard</a>
+            <span> / </span>
+            <a href="/managestrategies"><i class="fas fa-tasks"></i> Manage Strategies</a>
+            <span> / Strategy Configuration</span>
+        </div>
+
+        <!-- Alerts -->
+        <div class="alert-container">
+            <div class="alert alert-success" id="successAlert" role="alert">
+                <i class="fas fa-check-circle"></i> <span id="successMessage"></span>
+            </div>
+            <div class="alert alert-danger" id="errorAlert" role="alert">
+                <i class="fas fa-exclamation-circle"></i> <span id="errorMessage"></span>
+            </div>
+            <div class="alert alert-info" id="infoAlert" role="alert">
+                <i class="fas fa-info-circle"></i> <span id="infoMessage"></span>
+            </div>
+        </div>
+
+        <!-- Strategy Configuration Section -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2><i class="fas fa-cog"></i> Strategy Configuration</h2>
+            </div>
+            <div class="section-content">
+                <div id="configContainer" style="text-align: center; padding: 40px;">
+                    <div class="loading-spinner"></div>
+                    <p style="margin-top: 15px; color: #999;">Loading strategy configuration...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // ===== GLOBAL STATE =====
+        let currentUserId = "{{ user_id }}";
+        let strategyId = new URLSearchParams(window.location.search).get('strategy_id');
+        let currentConfig = {};
+
+        // ===== UTILITY FUNCTIONS =====
+        function showAlert(type, message) {
+            const alertElement = document.getElementById(type + 'Alert');
+            const messageElement = document.getElementById(type + 'Message');
+            if (alertElement && messageElement) {
+                messageElement.textContent = message;
+                alertElement.classList.add('show');
+                if (type !== 'error') {
+                    setTimeout(() => alertElement.classList.remove('show'), 4000);
+                }
+            }
+        }
+
+        // ===== INITIALIZATION =====
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!currentUserId || currentUserId === 'None' || currentUserId === '') {
+                showAlert('error', 'User not found. Redirecting to login...');
+                setTimeout(() => window.location.href = '/login', 2000);
+                return;
+            }
+            
+            if (!strategyId) {
+                showAlert('error', 'Strategy ID not provided.');
+                setTimeout(() => window.location.href = '/managestrategies', 2000);
+                return;
+            }
+            
+            loadStrategyConfig();
+        });
+
+        // ===== DATA LOADING =====
+        function loadStrategyConfig() {
+            fetch(`/api/get-strategy-config?strategy_id=${strategyId}&user_id=${currentUserId}`)
+                .then(r => {
+                    if (!r.ok) throw new Error('Failed to load strategy');
+                    return r.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        currentConfig = data.strategy || {};
+                        renderConfigForm();
+                    } else {
+                        showAlert('error', data.message || 'Failed to load strategy');
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    document.getElementById('configContainer').innerHTML = 
+                        '<div class="empty-state"><div class="empty-state-icon">⚠️</div><p>Failed to load strategy configuration</p></div>';
+                });
+        }
+
+        // ===== RENDERING =====
+        function renderConfigForm() {
+            const container = document.getElementById('configContainer');
+            
+            let html = '<form id="configForm" onsubmit="return handleSaveConfig(event)">';
+            html += '<div class="form-section">';
+            html += '<h5 style="margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid #ddd;"><i class="fas fa-sliders-h"></i> ' + currentConfig.KEY + '  </h5>';
+            
+            // Row 1: Interval + Strategy
+            html += '<div class="form-row">';
+            html += `<div class="form-group">
+                <label for="interval">Interval *</label>
+                <select id="interval" name="interval" required>
+                    <option value="">-- Select Interval --</option>
+                    <option value="1minute" ${currentConfig.INTERVAL === '1minute' ? 'selected' : ''}>1 Minute</option>
+                    <option value="5minute" ${currentConfig.INTERVAL === '5minute' ? 'selected' : ''}>5 Minutes</option>
+                    <option value="15minute" ${currentConfig.INTERVAL === '15minute' ? 'selected' : ''}>15 Minutes</option>
+                    <option value="30minute" ${currentConfig.INTERVAL === '30minute' ? 'selected' : ''}>30 Minutes</option>
+                    <option value="60minute" ${currentConfig.INTERVAL === '60minute' ? 'selected' : ''}>1 Hour</option>
+                    <option value="daily" ${currentConfig.INTERVAL === 'daily' ? 'selected' : ''}>Daily</option>
+                </select>
+                <div class="help-text">Candle interval for analysis</div>
+            </div>`;
+            
+            html += `<div class="form-group">
+                <label for="strategy">Strategy *</label>
+                <select id="strategy" name="strategy" required>
+                    <option value="">-- Select Strategy --</option>
+                    <option value="GOD" ${currentConfig.STRATEGY === 'GOD' ? 'selected' : ''}>GOD</option>
+                    <option value="HDSTRATEGY" ${currentConfig.STRATEGY === 'HDSTRATEGY' ? 'selected' : ''}>HD Strategy</option>
+                    <option value="RAILWAY_TRACK" ${currentConfig.STRATEGY === 'RAILWAY_TRACK' ? 'selected' : ''}>Railway Track</option>
+                </select>
+                <div class="help-text">Trading strategy to use</div>
+            </div>`;
+            html += '</div>';
+            
+            // Row 2: Lot + Nearest LTP
+            html += '<div class="form-row">';
+            html += `<div class="form-group">
+                <label for="lot">Lot Size *</label>
+                <input type="number" id="lot" name="lot" value="${currentConfig.LOT || ''}" min="1" required>
+                <div class="help-text">Number of lots per trade</div>
+            </div>`;
+            
+            html += `<div class="form-group">
+                <label for="nearest_ltp">Nearest LTP *</label>
+                <input type="number" id="nearest_ltp" name="nearest_ltp" value="${currentConfig.NEAREST_LTP || ''}" min="0" required>
+                <div class="help-text">Nearest LTP for option selection</div>
+            </div>`;
+            html += '</div>';
+            
+            // Row 3: Hedge Type + Hedge Rollover Type
+            html += '<div class="form-row">';
+            html += `<div class="form-group">
+                <label for="hedge_type">Hedge Type *</label>
+                <select id="hedge_type" name="hedge_type" required>
+                    <option value="">-- Select Hedge Type --</option>
+                    <option value="NH" ${currentConfig.HEDGE_TYPE === 'NH' ? 'selected' : ''}>No Hedge (NH)</option>
+                    <option value="H-P10" ${currentConfig.HEDGE_TYPE === 'H-P10' ? 'selected' : ''}>Hedge Plus 10 (H-P10)</option>
+                    <option value="H-M100" ${currentConfig.HEDGE_TYPE === 'H-M100' ? 'selected' : ''}>Hedge Minus 100 (H-M100)</option>
+                    <option value="H-M200" ${currentConfig.HEDGE_TYPE === 'H-M200' ? 'selected' : ''}>Hedge Minus 200 (H-M200)</option>
+                </select>
+                <div class="help-text">Hedging strategy</div>
+            </div>`;
+            
+            html += `<div class="form-group">
+                <label for="hedge_rollover_type">Hedge Rollover Type</label>
+                <select id="hedge_rollover_type" name="hedge_rollover_type">
+                    <option value="">-- Select --</option>
+                    <option value="FULL" ${currentConfig.HEDGE_ROLLOVER_TYPE === 'FULL' ? 'selected' : ''}>Full</option>
+                    <option value="SEMI" ${currentConfig.HEDGE_ROLLOVER_TYPE === 'SEMI' ? 'selected' : ''}>Semi</option>
+                    <option value="NONE" ${currentConfig.HEDGE_ROLLOVER_TYPE === 'NONE' ? 'selected' : ''}>None</option>
+                </select>
+                <div class="help-text">How to rollover hedge positions</div>
+            </div>`;
+            html += '</div>';
+            
+            // Row 4: Expiry + Real Trade
+            html += '<div class="form-row">';
+            html += `<div class="form-group">
+                <label for="expiry">Expiry *</label>
+                <select id="expiry" name="expiry" required>
+                    <option value="">-- Select Expiry --</option>
+                    <option value="NEXT_WEEK" ${currentConfig.EXPIRY === 'NEXT_WEEK' ? 'selected' : ''}>Next Week</option>
+                    <option value="NEXT_MONTH" ${currentConfig.EXPIRY === 'NEXT_MONTH' ? 'selected' : ''}>Next Month</option>
+                </select>
+                <div class="help-text">Option expiry type</div>
+            </div>`;
+            
+            html += `<div class="form-group">
+                <label for="real_trade">Real Trade *</label>
+                <select id="real_trade" name="real_trade" required>
+                    <option value="">-- Select --</option>
+                    <option value="yes" ${currentConfig.REAL_TRADE === 'yes' ? 'selected' : ''}>Yes</option>
+                    <option value="no" ${currentConfig.REAL_TRADE === 'no' ? 'selected' : ''}>No (Paper Trading)</option>
+                </select>
+                <div class="help-text">Execute real trades or paper trade</div>
+            </div>`;
+            html += '</div>';
+            
+            // Row 5: Intraday + New Trade
+            html += '<div class="form-row">';
+            html += `<div class="form-group">
+                <label for="intraday">Intraday *</label>
+                <select id="intraday" name="intraday" required>
+                    <option value="">-- Select --</option>
+                    <option value="yes" ${currentConfig.INTRADAY === 'yes' ? 'selected' : ''}>Yes</option>
+                    <option value="no" ${currentConfig.INTRADAY === 'no' ? 'selected' : ''}>No</option>
+                </select>
+                <div class="help-text">Close positions at market end</div>
+            </div>`;
+            
+            html += `<div class="form-group">
+                <label for="new_trade">New Trade *</label>
+                <select id="new_trade" name="new_trade" required>
+                    <option value="">-- Select --</option>
+                    <option value="yes" ${currentConfig.NEW_TRADE === 'yes' ? 'selected' : ''}>Yes</option>
+                    <option value="no" ${currentConfig.NEW_TRADE === 'no' ? 'selected' : ''}>No</option>
+                </select>
+                <div class="help-text">Allow new trades to be created</div>
+            </div>`;
+            html += '</div>';
+            
+            // Row 6: Monthly StopLoss + Activate Monthly SL
+            html += '<div class="form-row">';
+            html += `<div class="form-group">
+                <label for="monthly_stoploss">Monthly Stop Loss</label>
+                <input type="number" id="monthly_stoploss" name="monthly_stoploss" value="${currentConfig.MONTHLY_STOPLOSS || 0}">
+                <div class="help-text">Monthly stop loss limit</div>
+            </div>`;
+            
+            html += `<div class="form-group">
+                <label for="activate_monthly_sl">Activate Monthly SL *</label>
+                <select id="activate_monthly_sl" name="activate_monthly_sl" required>
+                    <option value="0" ${currentConfig.ACTIVATE_MONTHLY_SL === 0 || currentConfig.ACTIVATE_MONTHLY_SL === '0' ? 'selected' : ''}>No</option>
+                    <option value="1" ${currentConfig.ACTIVATE_MONTHLY_SL === 1 || currentConfig.ACTIVATE_MONTHLY_SL === '1' ? 'selected' : ''}>Yes</option>
+                </select>
+                <div class="help-text">Enable monthly stop loss checking</div>
+            </div>`;
+            html += '</div>';
+            
+            // Row 7: StopLoss Per Trade + Activate SL Per Trade
+            html += '<div class="form-row">';
+            html += `<div class="form-group">
+                <label for="stoploss_per_trade">Stop Loss Per Trade</label>
+                <input type="number" id="stoploss_per_trade" name="stoploss_per_trade" value="${currentConfig.STOPLOSS_PER_TRADE || 0}">
+                <div class="help-text">Stop loss per individual trade</div>
+            </div>`;
+            
+            html += `<div class="form-group">
+                <label for="activate_sl_per_trade">Activate SL Per Trade *</label>
+                <select id="activate_sl_per_trade" name="activate_sl_per_trade" required>
+                    <option value="0" ${currentConfig.ACTIVATE_SL_PER_TRADE === 0 || currentConfig.ACTIVATE_SL_PER_TRADE === '0' ? 'selected' : ''}>No</option>
+                    <option value="1" ${currentConfig.ACTIVATE_SL_PER_TRADE === 1 || currentConfig.ACTIVATE_SL_PER_TRADE === '1' ? 'selected' : ''}>Yes</option>
+                </select>
+                <div class="help-text">Enable per-trade stop loss checking</div>
+            </div>`;
+            html += '</div>';
+            
+            // Form Actions
+            html += '<div class="form-actions">';
+            html += '<button type="submit" class="btn-save"><i class="fas fa-save"></i> Save Configuration</button>';
+            html += '<button type="button" class="btn-cancel" onclick="window.location.href=\'/managestrategies\'"><i class="fas fa-times"></i> Cancel</button>';
+            html += '</div>';
+            
+            html += '</div></form>';
+            
+            container.innerHTML = html;
+        }
+
+        // ===== FORM HANDLING =====
+        function handleSaveConfig(event) {
+            event.preventDefault();
+            
+            // Get form data
+            const formData = new FormData(document.getElementById('configForm'));
+            const configData = {
+                strategy_id: strategyId,
+                user_id: currentUserId,
+                interval: formData.get('interval'),
+                strategy: formData.get('strategy'),
+                lot: formData.get('lot'),
+                nearest_ltp: formData.get('nearest_ltp'),
+                hedge_type: formData.get('hedge_type'),
+                hedge_rollover_type: formData.get('hedge_rollover_type'),
+                expiry: formData.get('expiry'),
+                real_trade: formData.get('real_trade'),
+                intraday: formData.get('intraday'),
+                new_trade: formData.get('new_trade'),
+                monthly_stoploss: formData.get('monthly_stoploss'),
+                activate_monthly_sl: formData.get('activate_monthly_sl'),
+                stoploss_per_trade: formData.get('stoploss_per_trade'),
+                activate_sl_per_trade: formData.get('activate_sl_per_trade')
+            };
+            
+            // Send to backend
+            fetch('/api/update-strategy-config', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(configData)
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert('success', 'Strategy configuration saved successfully!');
+                    setTimeout(() => window.location.href = '/managestrategies', 2000);
+                } else {
+                    showAlert('error', data.message || 'Failed to save configuration');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                showAlert('error', 'Error saving configuration');
+            });
+            
+            return false;
+        }
+    </script>
+</body>
+</html>

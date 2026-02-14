@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Retirement Planner Online | Retirement Corpus & Income Calculator</title>
+  <meta name="description" content="Free Retirement Planner: Calculate your retirement corpus, monthly income, and plan for a secure future. Easy tool for Indian investors." />
+  <link rel="canonical" href="https://niftyflow.in/retirement-planner.html" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Retirement Planner",
+    "url": "https://niftyflow.in/retirement-planner.html",
+    "description": "Free Retirement Planner: Calculate your retirement corpus, monthly income, and plan for a secure future. Easy tool for Indian investors.",
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "All"
+  }
+  </script>
+</head>
+<body>
+<header class="container header">
+  <div class="logo">
+    <div><img src="assets/images/logo.svg" alt="NiftyFlow logo" /></div>
+    <div>
+      <div style="font-weight:800;color:var(--purple-900)">NiftyFlow</div>
+      <div style="font-size:12px;color:#6b5f82">Simple • Steady • Automated</div>
+    </div>
+  </div>
+  <nav class="nav">
+    <a href="index.html">Home</a>
+      <a href="calculators.html">Calculators</a>
+    <a href="strategy.html">Strategy</a>
+    <a href="automation.html">Automation</a>
+    <a href="blog.html">Blog</a>
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
+    <button class="menu-toggle" aria-label="Open menu" tabindex="0">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="mobile-menu-overlay">
+      <button class="menu-close" aria-label="Close menu">&times;</button>
+      <nav class="mobile-nav">
+        <a href="index.html">Home</a>
+        <a href="strategy.html">Strategy</a>
+        <a href="calculators.html">Calculators</a>
+        <a href="automation.html">Automation</a>
+        <a href="blog.html">Blog</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+    </div>
+  </nav>
+</header>
+<main class="container">
+  <section class="section card">
+    <h1>Retirement Planner</h1>
+    <p class="lead">Plan for a secure retirement. Estimate your retirement corpus, monthly income, and inflation-adjusted expenses. Enter your details to get started.</p>
+    <form id="retirementForm">
+      <div class="form-row">
+        <div class="input"><label>Current Age</label><input id="ret_age" type="number" placeholder="e.g. 30" required /></div>
+        <div class="input"><label>Retirement Age</label><input id="ret_retire_age" type="number" placeholder="e.g. 60" required /></div>
+        <div class="input"><label>Current Savings (₹)</label><input id="ret_savings" type="number" placeholder="e.g. 500000" required /></div>
+      </div>
+      <div class="form-row">
+        <div class="input"><label>Monthly Investment (₹)</label><input id="ret_investment" type="number" placeholder="e.g. 10000" required /></div>
+        <div class="input"><label>Expected Annual Return (%)</label><input id="ret_return" type="number" placeholder="e.g. 10" required /></div>
+        <div class="input"><label>Expected Monthly Expense in Retirement (₹)</label><input id="ret_expense" type="number" placeholder="e.g. 40000" required /></div>
+      </div>
+      <div class="form-row">
+        <div class="input"><label>Expected Years in Retirement</label><input id="ret_years_retired" type="number" placeholder="e.g. 25" required /></div>
+        <div class="input"><label>Expected Inflation Rate (%)</label><input id="ret_inflation" type="number" placeholder="e.g. 6" required /></div>
+      </div>
+      <div style="margin-top:8px"><button type="submit" class="btn btn-primary">Calculate Retirement</button></div>
+    </form>
+    <div style="margin-top:12px" id="retirement_result"></div>
+    <div style="margin-top:6px;color:#6b5f82" id="retirement_detail"></div>
+    <div style="margin-top:24px">
+      <h2>What is a Retirement Planner?</h2>
+      <p>A retirement planner helps you estimate the amount you need to retire comfortably, considering inflation, expenses, and investment returns.</p>
+      <h2>How to use the Retirement Planner?</h2>
+      <ul>
+        <li>Enter your current age, retirement age, and current savings.</li>
+        <li>Enter your monthly investment, expected return, and expected monthly expense in retirement.</li>
+        <li>Enter expected years in retirement and inflation rate.</li>
+        <li>Click Calculate Retirement to see your results.</li>
+      </ul>
+      <h2>Frequently Asked Questions</h2>
+      <h3>How is the retirement corpus calculated?</h3>
+      <p>The corpus is calculated based on your savings, investments, expected returns, and inflation-adjusted expenses during retirement.</p>
+      <h3>Why consider inflation?</h3>
+      <p>Inflation reduces the purchasing power of your money over time. Planning for inflation ensures your retirement income is sufficient.</p>
+      <hr style="margin:32px 0 18px 0;">
+      <div style="background:#f7f5ff;padding:18px 16px;border-radius:10px;max-width:480px;margin:0 auto 0 auto;text-align:center;box-shadow:0 2px 12px #e6e1f7;">
+        <h2 style="margin-top:0">Book Free Consultation</h2>
+        <p style="margin-bottom:12px">Want a personalized retirement plan or have questions? Contact us for a free consultation:</p>
+        <a href="mailto:niftyflow.service@gmail.com" style="display:inline-block;margin:6px 0 10px 0;font-weight:600;color:#5E35B1;text-decoration:underline;font-size:1.08rem">niftyflow.service@gmail.com</a><br>
+        <a href="https://wa.me/918087616404" target="_blank" rel="noopener" style="display:inline-block;margin:6px 0 0 0;font-weight:600;color:#25D366;text-decoration:none;font-size:1.08rem"><img src="assets/images/whatsapp.svg" alt="WhatsApp" style="height:18px;vertical-align:middle;margin-right:6px">Chat on WhatsApp</a>
+      </div>
+      <!-- Sticky Contact Bar -->
+      <div class="sticky-contact-bar">
+        <span style="font-weight:600;">Book Free Consultation:</span>
+        <a href="contact.html">Contact (Email & WhatsApp)</a>
+      </div>
+    </div>
+  </section>
+</main>
+<script src="assets/js/app.js"></script>
+<script>
+function retirementCalc() {
+  const age = parseFloat(document.getElementById('ret_age').value)||0;
+  const retireAge = parseFloat(document.getElementById('ret_retire_age').value)||0;
+  const savings = parseFloat(document.getElementById('ret_savings').value)||0;
+  const monthly = parseFloat(document.getElementById('ret_investment').value)||0;
+  const returnRate = parseFloat(document.getElementById('ret_return').value)||0;
+  const expense = parseFloat(document.getElementById('ret_expense').value)||0;
+  const yearsRetired = parseFloat(document.getElementById('ret_years_retired').value)||0;
+  const inflation = parseFloat(document.getElementById('ret_inflation').value)||0;
+  const yearsToRetire = retireAge - age;
+  const monthsToRetire = yearsToRetire * 12;
+  const r = returnRate/100/12;
+  let futureValue = savings * Math.pow(1+r, monthsToRetire);
+  for(let i=1;i<=monthsToRetire;i++){
+    futureValue += monthly * Math.pow(1+r, monthsToRetire-i);
+  }
+  const expenseAtRetirement = expense * Math.pow(1+inflation/100, yearsToRetire);
+  const corpusNeeded = expenseAtRetirement * 12 * yearsRetired;
+  document.getElementById('retirement_result').innerText =
+    `At retirement, you will have about ₹${futureValue.toLocaleString(undefined,{maximumFractionDigits:0})}. Estimated corpus needed: ₹${corpusNeeded.toLocaleString(undefined,{maximumFractionDigits:0})}.`;
+  document.getElementById('retirement_detail').innerText =
+    `Your monthly expense at retirement (inflation-adjusted) will be about ₹${expenseAtRetirement.toLocaleString(undefined,{maximumFractionDigits:0})}.`;
+}
+document.getElementById('retirementForm').onsubmit = function(e){ e.preventDefault(); retirementCalc(); };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<a href="https://wa.me/918087616404" class="floating-whatsapp" target="_blank" rel="noopener" title="Chat on WhatsApp">
+  <img src="assets/images/whatsapp.svg" alt="WhatsApp" style="width:38px;height:38px;">
+</a>
+<style>
+.sticky-contact-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #f7f5ff;
+  color: #3F0071;
+  box-shadow: 0 -2px 12px #e6e1f7;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+  padding: 12px 8px 10px 8px;
+  z-index: 1000;
+  font-size: 1.08rem;
+}
+.sticky-contact-bar a {
+  color: #5E35B1;
+  font-weight: 600;
+  text-decoration: underline;
+  margin: 0 6px;
+}
+.floating-whatsapp {
+  position: fixed;
+  right: 18px;
+  bottom: 70px;
+  z-index: 1100;
+  background: #25D366;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(40,40,40,0.12);
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: box-shadow 0.2s;
+}
+.floating-whatsapp:hover {
+  box-shadow: 0 4px 16px rgba(40,40,40,0.18);
+  background: #1ebe57;
+}
+@media (max-width: 600px) {
+  .sticky-contact-bar {
+    flex-direction: column;
+    font-size: 1rem;
+    gap: 8px;
+    padding: 10px 4px 8px 4px;
+  }
+  .floating-whatsapp {
+    right: 10px;
+    bottom: 64px;
+    padding: 6px;
+  }
+}
+</style>
+</body>
+</html>

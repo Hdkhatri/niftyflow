@@ -1,0 +1,192 @@
+<!-- Navigation Bar Header -->
+<style>
+    .navbar {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 0 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 70px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar-brand {
+        font-size: 24px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: white;
+    }
+
+    .navbar-user {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .user-info {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        font-size: 14px;
+    }
+
+    .user-info .username {
+        font-weight: 600;
+        font-size: 16px;
+    }
+
+    .user-info .login-time {
+        font-size: 12px;
+        opacity: 0.9;
+    }
+
+    .logout-btn {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 2px solid white;
+        padding: 8px 16px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background 0.3s ease;
+    }
+
+    .logout-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    @media (max-width: 768px) {
+        .navbar {
+            flex-direction: column;
+            height: auto;
+            gap: 15px;
+            padding: 15px;
+        }
+
+        .navbar-user {
+            width: 100%;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .user-info {
+            align-items: flex-start;
+        }
+    }
+</style>
+
+<div class="navbar">
+    <div class="navbar-brand" color="white">
+        🚀 TradeJenie
+    </div>
+    <div class="navbar-user">
+        <div class="user-info">
+            <div class="username" id="usernameDisplay">{{ username }}</div>
+            <!-- <div class="login-time" id="loginTimeDisplay">Login Time: {{ login_time }}</div> -->
+        </div>
+        <button class="logout-btn" onclick="handleLogout()">Logout</button>
+    </div>
+</div>
+
+<script>
+    // Handle logout
+    async function handleLogout() {
+        if (!confirm('Are you sure you want to logout?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch('/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const data = await response.json();
+            
+            if (response.ok && data.success) {
+                console.log('Logout successful, clearing local data and redirecting...');
+                
+                // Mark logout in localStorage so other tabs receive the storage event
+                try {
+                    localStorage.setItem('tradejenie_logout', Date.now().toString());
+                } catch (e) {
+                    // Ignore storage errors
+                }
+
+                // Clear sessionStorage in this tab
+                sessionStorage.clear();
+
+                // Wait a moment to ensure server-side session is cleared, then redirect
+                setTimeout(() => {
+                    window.location.href = data.redirect + '?t=' + Date.now();
+                }, 100);
+            } else {
+                console.error('Logout failed:', data);
+                showAlert('error', data.message || 'Logout failed. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error during logout:', error);
+            showAlert('error', 'An error occurred during logout. Please try refreshing the page.');
+            // Force redirect after 2 seconds if fetch fails
+            setTimeout(() => {
+                window.location.href = '/login?t=' + Date.now();
+            }, 2000);
+        }
+    }
+
+    // Show alert helper function
+    function showAlert(type, message) {
+        const alertElement = document.getElementById(type + 'Alert');
+        if (alertElement) {
+            alertElement.textContent = message;
+            alertElement.classList.add('show');
+
+            if (type !== 'error') {
+                setTimeout(() => {
+                    alertElement.classList.remove('show');
+                }, 3000);
+            }
+        } else {
+            // Fallback if alert element doesn't exist
+            alert(message);
+        }
+    }
+
+    // Listen for logout events in other tabs/windows
+    window.addEventListener('storage', function(e) {
+        try {
+            if (e.key === 'tradejenie_logout') {
+                // Another tab logged out — force reload to login
+                console.log('Detected logout in another tab, redirecting to login.');
+                window.location.href = '/login?t=' + Date.now();
+            }
+        } catch (err) {
+            console.error('Error handling storage event:', err);
+        }
+    });
+
+    // If this tab loads and a logout marker is already present, handle safely:
+    // - If a username is present (this page is a logged-in page), clear the marker
+    // - Otherwise (not logged in), redirect to login
+    try {
+        const logoutMarker = localStorage.getItem('tradejenie_logout');
+        const usernameText = (document.getElementById('usernameDisplay') && document.getElementById('usernameDisplay').textContent) ? document.getElementById('usernameDisplay').textContent.trim() : '';
+        if (logoutMarker) {
+            if (usernameText) {
+                // We're on a logged-in page — clear stale logout marker so dashboard doesn't immediately redirect
+                try { localStorage.removeItem('tradejenie_logout'); } catch (err) { /* ignore */ }
+                console.log('Cleared stale logout marker on logged-in page load.');
+            } else {
+                console.log('Logout marker present on load and no user detected, redirecting to login.');
+                window.location.href = '/login?t=' + Date.now();
+            }
+        }
+    } catch (e) {
+        // ignore
+    }
+</script>

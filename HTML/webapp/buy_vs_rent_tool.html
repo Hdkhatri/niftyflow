@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buy vs Rent Decision Tool</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Roboto', Arial, sans-serif; background: linear-gradient(120deg, #e0eafc, #cfdef3); margin: 0; }
+        .container { max-width: 700px; margin: 40px auto; background: #fff; padding: 36px 48px; border-radius: 16px; box-shadow: 0 4px 24px #b0c4de; }
+        h1 { margin-top: 0; font-weight: 700; color: #2196F3; }
+        label { display: block; margin-top: 18px; font-weight: 500; }
+        input[type="number"], input[type="text"] { width: 100%; padding: 10px; margin-top: 6px; border: 1px solid #b0c4de; border-radius: 6px; font-size: 16px; }
+        .property-list { margin-top: 10px; }
+        .property-row { display: flex; gap: 10px; margin-bottom: 8px; }
+        .property-row input { flex: 1; }
+        button { margin-top: 24px; padding: 12px 28px; background: #2196F3; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: 600; }
+        button.add-property { background: #4CAF50; margin-top: 10px; }
+        .result { margin-top: 36px; background: #e3f2fd; padding: 22px; border-radius: 12px; }
+        .advice { margin-top: 18px; font-weight: 500; color: #4CAF50; }
+        @media (max-width: 700px) {
+            .container { padding: 18px 8px; }
+        }
+    </style>
+</head>
+<body>
+<header class="container header">
+    <div class="logo">
+        <img src="assets/images/logo.svg" alt="NiftyFlow logo" />
+        <div>
+            <div style="font-weight:800;color:var(--purple-900)">NiftyFlow</div>
+            <div style="font-size:12px;color:#6b5f82">Simple • Steady • Automated</div>
+        </div>
+    </div>
+    <button class="menu-toggle" aria-label="Open menu" tabindex="0">
+        <span></span><span></span><span></span>
+    </button>
+    <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="strategy.html">Strategy</a>
+        <a href="calculators.html">Calculators</a>
+        <a href="automation.html">Automation</a>
+        <a href="blog.html">Blog</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+    </nav>
+    <div class="mobile-menu-overlay">
+        <button class="menu-close" aria-label="Close menu">&times;</button>
+        <nav class="mobile-nav">
+            <a href="index.html">Home</a>
+            <a href="strategy.html">Strategy</a>
+            <a href="calculators.html">Calculators</a>
+            <a href="automation.html">Automation</a>
+            <a href="blog.html">Blog</a>
+            <a href="about.html">About</a>
+            <a href="contact.html">Contact</a>
+        </nav>
+    </div>
+</header>
+        <div class="container">
+        <h1>Buy vs Rent Decision Tool</h1>
+        <form id="decisionForm">
+            <label>Monthly Income:</label>
+            <input type="number" id="income" min="0" required>
+            <label>Monthly Expenses (excluding rent/EMI):</label>
+            <input type="number" id="expenses" min="0" required>
+            <label>Current Rent Amount:</label>
+            <input type="number" id="rent" min="0" required>
+            <label>Desired Home Price:</label>
+            <input type="number" id="homePrice" min="0" required>
+            <label>Down Payment Available:</label>
+            <input type="number" id="downPayment" min="0" required>
+            <label>Expected Home Loan Interest Rate (%):</label>
+            <input type="number" id="interestRate" min="0" step="0.01" required>
+            <label>Loan Tenure (years):</label>
+        <button class="menu-toggle" aria-label="Open menu" tabindex="0">
+            <label>City/Location (optional):</label>
+            <input type="text" id="location">
+            <label>Properties You Already Own (Home, Plot, Commercial, etc.):</label>
+            <div class="property-list" id="propertyList">
+                <div class="property-row">
+                    <input type="text" placeholder="Type (e.g. Home, Plot)" class="prop-type">
+                    <input type="number" placeholder="Current Value" class="prop-value" min="0">
+                </div>
+            </div>
+            <button type="button" class="add-property" onclick="addProperty()">+ Add Property</button>
+            <button type="submit">Get Recommendation</button>
+        </form>
+        <div class="result" id="result" style="display:none;">
+            <strong>Recommendation:</strong>
+            <div id="resultText"></div>
+            <div class="advice" id="advice"></div>
+        </div>
+    </div>
+    <script>
+        function addProperty() {
+            var list = document.getElementById('propertyList');
+            var row = document.createElement('div');
+            row.className = 'property-row';
+            row.innerHTML = '<input type="text" placeholder="Type (e.g. Commercial)" class="prop-type"> <input type="number" placeholder="Current Value" class="prop-value" min="0">';
+            list.appendChild(row);
+        }
+        document.getElementById('decisionForm').onsubmit = function(e) {
+            e.preventDefault();
+            var income = parseFloat(document.getElementById('income').value) || 0;
+            var expenses = parseFloat(document.getElementById('expenses').value) || 0;
+            var rent = parseFloat(document.getElementById('rent').value) || 0;
+            var homePrice = parseFloat(document.getElementById('homePrice').value) || 0;
+            var downPayment = parseFloat(document.getElementById('downPayment').value) || 0;
+            var interestRate = parseFloat(document.getElementById('interestRate').value) || 0;
+            var tenure = parseInt(document.getElementById('tenure').value) || 0;
+            var appreciation = parseFloat(document.getElementById('appreciation').value) || 0;
+            var rentIncrease = parseFloat(document.getElementById('rentIncrease').value) || 0;
+            var otherSavings = parseFloat(document.getElementById('otherSavings').value) || 0;
+            var age = parseInt(document.getElementById('age').value) || 0;
+            var location = document.getElementById('location').value.trim();
+            var propTypes = document.querySelectorAll('.prop-type');
+            var propValues = document.querySelectorAll('.prop-value');
+            var ownedProperties = [];
+            for (var i = 0; i < propTypes.length; i++) {
+                var type = propTypes[i].value.trim();
+                var value = parseFloat(propValues[i].value) || 0;
+                if (type && value > 0) ownedProperties.push({type: type, value: value});
+            }
+            // Home Loan EMI Calculation
+            var loanAmount = homePrice - downPayment;
+            var monthlyRate = interestRate / 12 / 100;
+            var emi = loanAmount > 0 ? (loanAmount * monthlyRate * Math.pow(1 + monthlyRate, tenure * 12)) / (Math.pow(1 + monthlyRate, tenure * 12) - 1) : 0;
+            var totalMonthlyOutflowBuy = expenses + emi;
+            var totalMonthlyOutflowRent = expenses + rent;
+            // Affordability check
+            var canAffordEMI = (emi > 0) && (income > totalMonthlyOutflowBuy * 1.2);
+            // Rent vs Buy logic
+            var minDownPayment = homePrice * 0.2;
+            var savingsPerMonth = income - expenses - rent;
+            var yearsToSave = 0;
+            if (downPayment < minDownPayment) {
+                var needed = minDownPayment - downPayment;
+                yearsToSave = savingsPerMonth > 0 ? Math.ceil(needed / (savingsPerMonth * 12)) : Infinity;
+            }
+            // If user sells property, add its value to down payment
+            var plotValue = 0;
+            for (var i = 0; i < ownedProperties.length; i++) {
+                if (ownedProperties[i].type.toLowerCase().includes('plot')) {
+                    plotValue += ownedProperties[i].value;
+                }
+            }
+            var downPaymentWithPlot = downPayment + plotValue;
+            var canAffordWithPlot = downPaymentWithPlot >= minDownPayment;
+            var loanAmountWithPlot = homePrice - downPaymentWithPlot;
+            var emiWithPlot = loanAmountWithPlot > 0 ? (loanAmountWithPlot * monthlyRate * Math.pow(1 + monthlyRate, tenure * 12)) / (Math.pow(1 + monthlyRate, tenure * 12) - 1) : 0;
+            var totalMonthlyOutflowBuyWithPlot = expenses + emiWithPlot;
+            var canAffordEMIWithPlot = (emiWithPlot > 0) && (income > totalMonthlyOutflowBuyWithPlot * 1.2);
+            // Property appreciation
+            var futureHomeValue = homePrice * Math.pow(1 + appreciation / 100, tenure);
+            var futureRent = rent * Math.pow(1 + rentIncrease / 100, tenure);
+            // Already owns home?
+            var ownsHome = ownedProperties.some(p => p.type.toLowerCase().includes('home'));
+            var resultText = '';
+            var advice = '';
+            var details = '<hr><strong>Details:</strong><ul>';
+            details += `<li>Home Price: ₹${homePrice.toLocaleString()}</li>`;
+            details += `<li>Down Payment Available: ₹${downPayment.toLocaleString()}</li>`;
+            details += `<li>Minimum Down Payment (20%): ₹${minDownPayment.toLocaleString()}</li>`;
+            details += `<li>Monthly EMI (current down payment): ₹${emi.toLocaleString(undefined, {maximumFractionDigits:0})}</li>`;
+            details += `<li>Monthly EMI (if plot sold): ₹${emiWithPlot.toLocaleString(undefined, {maximumFractionDigits:0})}</li>`;
+            details += `<li>Monthly Savings (after expenses): ₹${savingsPerMonth.toLocaleString()}</li>`;
+            details += `<li>Years to save for 20% down payment: ${yearsToSave === Infinity ? 'Not possible with current savings' : yearsToSave}</li>`;
+            details += `<li>Future Home Value (after ${tenure} years): ₹${futureHomeValue.toLocaleString(undefined, {maximumFractionDigits:0})}</li>`;
+            details += `<li>Other Investments/Savings: ₹${otherSavings.toLocaleString()}</li>`;
+            details += `<li>Properties Owned: ${ownedProperties.map(p => p.type + ' (₹' + p.value.toLocaleString() + ')').join(', ') || 'None'}</li>`;
+            details += '</ul>';
+            if (ownsHome) {
+                resultText = 'You already own a home. Buying another may not be necessary unless for investment.';
+                advice = 'Consider diversifying into other assets or upgrading only if needed.';
+            } else if (!canAffordEMI) {
+                resultText = 'Buying a home now may not be financially safe. Your monthly income is not enough to comfortably afford the EMI.';
+                if (yearsToSave > 0 && yearsToSave !== Infinity) advice = `You need to save for about ${yearsToSave} year(s) to afford a 20% down payment.`;
+                else advice = 'Increase your income or reduce expenses to improve affordability.';
+                if (canAffordWithPlot && canAffordEMIWithPlot) {
+                    advice += '<br><span style="color:#2196F3">If you sell your plot (₹' + plotValue.toLocaleString() + '), you can use it for down payment and afford the home now. Your EMI will be ₹' + emiWithPlot.toLocaleString(undefined, {maximumFractionDigits:0}) + '.</span>';
+                }
+            } else {
+                // Compare total outflow
+                if (totalMonthlyOutflowBuy < totalMonthlyOutflowRent * 1.1) {
+                    resultText = 'Buying a home is financially reasonable at this point.';
+                    advice = `Your estimated EMI is ₹${emi.toLocaleString(undefined, {maximumFractionDigits:0})}. Future home value after ${tenure} years: ₹${futureHomeValue.toLocaleString(undefined, {maximumFractionDigits:0})}.`;
+                } else {
+                    resultText = 'Renting may be better for now. Buying would increase your monthly outflow significantly.';
+                    advice = `Consider buying when your income increases or home prices become more attractive.`;
+                }
+            }
+            document.getElementById('resultText').innerHTML = resultText + details;
+            document.getElementById('advice').innerHTML = advice;
+            document.getElementById('result').style.display = 'block';
+        };
+    </script>
+</body>
+<a href="https://wa.me/918087616404" class="floating-whatsapp" target="_blank" rel="noopener" title="Chat on WhatsApp">
+    <img src="assets/images/whatsapp.svg" alt="WhatsApp" style="width:38px;height:38px;">
+</a>
+<style>
+.floating-whatsapp {
+    position: fixed;
+    right: 18px;
+    bottom: 70px;
+    z-index: 1100;
+    background: #25D366;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(40,40,40,0.12);
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: box-shadow 0.2s;
+}
+.floating-whatsapp:hover {
+    box-shadow: 0 4px 16px rgba(40,40,40,0.18);
+    background: #1ebe57;
+}
+@media (max-width: 600px) {
+    .floating-whatsapp {
+        right: 10px;
+        bottom: 64px;
+        padding: 6px;
+    }
+}
+</style>
+</html>

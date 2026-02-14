@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget & Goal Tracker</title>
+    <!-- AdSense placeholder -->
+    <!-- <script data-ad-client="ca-pub-xxxxxxxxxx" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script> -->
+    <style>
+        body { font-family: Arial, sans-serif; background: #f7f7f7; margin: 0; }
+        .container { max-width: 500px; margin: 40px auto; background: #fff; padding: 30px 40px; border-radius: 10px; box-shadow: 0 2px 8px #ccc; }
+        h1 { margin-top: 0; }
+        label { display: block; margin-top: 18px; }
+        input[type="number"], input[type="text"] { width: 100%; padding: 8px; margin-top: 6px; border: 1px solid #ccc; border-radius: 4px; }
+        button { margin-top: 20px; padding: 10px 20px; background: #2196F3; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
+        .summary { margin-top: 30px; background: #e3f2fd; padding: 18px; border-radius: 8px; }
+        .progress-bar { background: #eee; border-radius: 8px; overflow: hidden; height: 24px; margin-top: 10px; }
+        .progress { background: #4CAF50; height: 100%; }
+        .adsense { margin: 30px 0; text-align: center; }
+        .feedback { margin-top: 40px; background: #fff3e0; padding: 18px; border-radius: 8px; }
+        .about { margin-top: 40px; font-size: 15px; color: #555; }
+    </style>
+</head>
+<body>
+<header class="container header">
+    <div class="logo">
+        <img src="assets/images/logo.svg" alt="NiftyFlow logo" />
+        <div>
+            <div style="font-weight:800;color:var(--purple-900)">NiftyFlow</div>
+            <div style="font-size:12px;color:#6b5f82">Simple • Steady • Automated</div>
+        </div>
+    </div>
+    <button class="menu-toggle" aria-label="Open menu" tabindex="0">
+        <span></span><span></span><span></span>
+    </button>
+    <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="strategy.html">Strategy</a>
+        <a href="calculators.html">Calculators</a>
+        <a href="automation.html">Automation</a>
+        <a href="blog.html">Blog</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+    </nav>
+    <div class="mobile-menu-overlay">
+        <button class="menu-close" aria-label="Close menu">&times;</button>
+        <nav class="mobile-nav">
+            <a href="index.html">Home</a>
+            <a href="strategy.html">Strategy</a>
+            <a href="calculators.html">Calculators</a>
+            <a href="automation.html">Automation</a>
+            <a href="blog.html">Blog</a>
+            <a href="about.html">About</a>
+            <a href="contact.html">Contact</a>
+        </nav>
+    </div>
+</header>
+        <div class="container">
+        <h1>Budget & Goal Tracker</h1>
+        <form id="budgetForm">
+            <label>Monthly Income:</label>
+            <input type="number" id="income" min="0" required>
+            <label>Monthly Expenses:</label>
+            <input type="number" id="expenses" min="0" required>
+            <label>Savings Goal:</label>
+            <input type="number" id="goal" min="0" required>
+            <button type="submit">Calculate</button>
+        </form>
+        <div class="summary" id="summary" style="display:none;">
+            <strong>Summary:</strong>
+            <div id="summaryText"></div>
+            <div class="progress-bar">
+                <div class="progress" id="progress" style="width:0%"></div>
+            </div>
+        </div>
+        <div class="adsense">
+            <!-- AdSense code goes here -->
+            <em>Ad space</em>
+        </div>
+        <div class="feedback">
+            <h2>Tell Us What You Want!</h2>
+            <form id="feedbackForm">
+                <label>Your Name:</label>
+                <input type="text" id="name" required>
+                <label>Email (optional):</label>
+                <input type="text" id="email">
+                <label>What features do you want?</label>
+                <input type="text" id="features" required>
+                <button type="submit">Send Feedback</button>
+            </form>
+            <div id="feedbackMsg" style="margin-top:10px;color:green;"></div>
+        </div>
+        <div class="about">
+            <h3>Why Use This?</h3>
+            Track your money. Achieve your goals. Stay disciplined.<br>
+            <strong>Join our community:</strong> <a href="https://t.me/+yourgroup" target="_blank">Telegram Group</a>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var budgetForm = document.getElementById('budgetForm');
+            if (budgetForm) {
+                budgetForm.onsubmit = function(e) {
+                    e.preventDefault();
+                    var income = parseFloat(document.getElementById('income').value) || 0;
+                    var expenses = parseFloat(document.getElementById('expenses').value) || 0;
+                    var goal = parseFloat(document.getElementById('goal').value) || 0;
+                    var savings = income - expenses;
+                    var percent = goal ? Math.min(100, Math.round((savings/goal)*100)) : 0;
+                    var summaryText = `Income: ₹${income.toLocaleString()}<br>Expenses: ₹${expenses.toLocaleString()}<br>Savings: ₹${savings.toLocaleString()}<br>Goal: ₹${goal.toLocaleString()}<br>Progress: ${percent}%`;
+                    document.getElementById('summaryText').innerHTML = summaryText;
+                    document.getElementById('progress').style.width = percent + '%';
+                    document.getElementById('summary').style.display = 'block';
+                };
+            }
+            var feedbackForm = document.getElementById('feedbackForm');
+            if (feedbackForm) {
+                feedbackForm.onsubmit = function(e) {
+                    e.preventDefault();
+                    document.getElementById('feedbackMsg').innerText = 'Thank you for your feedback!';
+                    document.getElementById('feedbackForm').reset();
+                };
+            }
+        });
+    </script>
+</body>
+<a href="https://wa.me/918087616404" class="floating-whatsapp" target="_blank" rel="noopener" title="Chat on WhatsApp">
+    <img src="assets/images/whatsapp.svg" alt="WhatsApp" style="width:38px;height:38px;">
+</a>
+<style>
+.floating-whatsapp {
+    position: fixed;
+    right: 18px;
+    bottom: 70px;
+    z-index: 1100;
+    background: #25D366;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(40,40,40,0.12);
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: box-shadow 0.2s;
+}
+.floating-whatsapp:hover {
+    box-shadow: 0 4px 16px rgba(40,40,40,0.18);
+    background: #1ebe57;
+}
+@media (max-width: 600px) {
+    .floating-whatsapp {
+        right: 10px;
+        bottom: 64px;
+        padding: 6px;
+    }
+}
+</style>
+</html>

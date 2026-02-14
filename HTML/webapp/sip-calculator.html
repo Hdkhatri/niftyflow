@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>SIP Calculator Online | Systematic Investment Plan Returns</title>
+  <meta name="description" content="Free SIP Calculator: Estimate your mutual fund SIP returns online. Calculate future value, total investment, and wealth gain with our easy SIP calculator tool." />
+  <link rel="canonical" href="https://niftyflow.in/sip-calculator.html" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "SIP Calculator",
+    "url": "https://niftyflow.in/sip-calculator.html",
+    "description": "Free SIP Calculator: Estimate your mutual fund SIP returns online. Calculate future value, total investment, and wealth gain with our easy SIP calculator tool.",
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "All"
+  }
+  </script>
+</head>
+<body>
+<header class="container header">
+  <div class="logo">
+    <div><img src="assets/images/logo.svg" alt="NiftyFlow logo" /></div>
+    <div>
+      <div style="font-weight:800;color:var(--purple-900)">NiftyFlow</div>
+      <div style="font-size:12px;color:#6b5f82">Simple • Steady • Automated</div>
+    </div>
+  </div>
+  <nav class="nav">
+    <a href="index.html">Home</a>
+    <a href="calculators.html">All Calculators</a>
+    <a href="strategy.html">Strategy</a>
+    <a href="automation.html">Automation</a>
+    <a href="blog.html">Blog</a>
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+</header>
+<main class="container">
+  <section class="section card">
+    <h1>SIP Calculator</h1>
+    <p class="lead">Estimate the future value of your mutual fund SIP investments. Enter your monthly SIP amount, expected annual return, and investment period to see your wealth grow.</p>
+    <form id="sipForm">
+      <div class="form-row">
+        <div class="input"><label>Monthly SIP (₹)</label><input id="sip_p" type="number" placeholder="e.g. 5000" /></div>
+        <div class="input"><label>Expected annual return (%)</label><input id="sip_r" type="number" placeholder="e.g. 12" /></div>
+        <div class="input"><label>Tenure (years)</label><input id="sip_n" type="number" placeholder="e.g. 10" /></div>
+      </div>
+      <div style="margin-top:8px"><button type="submit" class="btn btn-primary">Calculate</button></div>
+    </form>
+    <div style="margin-top:12px" id="sip_result"></div>
+    <div style="margin-top:6px;color:#6b5f82" id="sip_detail"></div>
+    <canvas id="sip_chart" height="120" style="margin-top:16px;max-width:520px;width:100%"></canvas>
+    <div style="margin-top:24px">
+      <h2>What is a SIP Calculator?</h2>
+      <p>A SIP (Systematic Investment Plan) calculator helps you estimate the future value of your regular mutual fund investments. It shows how much wealth you can accumulate by investing a fixed amount every month over a period of time at an expected rate of return.</p>
+      <h2>How to use the SIP Calculator?</h2>
+      <ul>
+        <li>Enter your monthly SIP amount.</li>
+        <li>Enter the expected annual return rate (in %).</li>
+        <li>Enter the number of years you plan to invest.</li>
+        <li>Click Calculate to see the results.</li>
+      </ul>
+      <h2>Frequently Asked Questions</h2>
+      <h3>How is SIP maturity amount calculated?</h3>
+      <p>The SIP maturity amount is calculated using the future value formula for a recurring investment, considering compounding returns.</p>
+      <h3>Is SIP better than lumpsum?</h3>
+      <p>SIP helps average out market volatility and is suitable for regular savers. Lumpsum is suitable for those with a large amount to invest at once.</p>
+      <hr style="margin:32px 0 18px 0;">
+      <div style="background:#f7f5ff;padding:18px 16px;border-radius:10px;max-width:480px;margin:0 auto 0 auto;text-align:center;box-shadow:0 2px 12px #e6e1f7;">
+        <h2 style="margin-top:0">Book Free Consultation</h2>
+        <p style="margin-bottom:12px">Want a personalized SIP plan or have questions? Contact us for a free consultation:</p>
+        <a href="mailto:niftyflow.service@gmail.com" style="display:inline-block;margin:6px 0 10px 0;font-weight:600;color:#5E35B1;text-decoration:underline;font-size:1.08rem">niftyflow.service@gmail.com</a><br>
+          <a href="https://wa.me/918087616404" target="_blank" rel="noopener" style="display:inline-block;margin:6px 0 0 0;font-weight:600;color:#25D366;text-decoration:none;font-size:1.08rem"><img src="assets/images/whatsapp.svg" alt="WhatsApp" style="height:18px;vertical-align:middle;margin-right:6px">Chat on WhatsApp</a>
+      </div>
+      <!-- Sticky Contact Bar -->
+      <div class="sticky-contact-bar">
+        <span style="font-weight:600;">Book Free Consultation:</span>
+        <a href="contact.html">Contact (Email & WhatsApp)</a>
+      </div>
+      <!-- Floating WhatsApp Button -->
+      <a href="https://wa.me/918087616404" class="floating-whatsapp" target="_blank" rel="noopener" title="Chat on WhatsApp">
+        <img src="assets/images/whatsapp.svg" alt="WhatsApp" style="width:38px;height:38px;">
+      </a>
+    </div>
+  </section>
+</main>
+<script src="assets/js/app.js"></script>
+<script>
+// Only enable SIP tab logic for this page
+function sipCalc() {
+  const p = parseFloat(document.getElementById('sip_p').value)||0;
+  const r = parseFloat(document.getElementById('sip_r').value)||0;
+  const n = parseFloat(document.getElementById('sip_n').value)||0;
+  const rn = r/100/12;
+  const months = n*12;
+  let fv = 0;
+  let values = [], labels = [];
+  for(let i=1;i<=months;i++){
+    let v = rn===0 ? p*i : p*((Math.pow(1+rn,i)-1)/rn)*(1+rn);
+    values.push(v.toFixed(2));
+    labels.push(i);
+  }
+  if(rn===0) fv = p*months;
+  else fv = p * ((Math.pow(1+rn, months)-1)/rn) * (1+rn);
+  const invested = p*months;
+  const gain = fv - invested;
+  let resultMsg = '';
+  if (p > 0 && r > 0 && n > 0) {
+    resultMsg = `Great! By investing <b>₹${p.toLocaleString()}</b> every month for <b>${n} years</b> at <b>${r}%</b> annual return, you could build a corpus of <b>₹${parseFloat(fv).toLocaleString(undefined, {maximumFractionDigits:0})}</b>.`;
+    resultMsg += `<br>You will have invested <b>₹${parseFloat(invested).toLocaleString(undefined, {maximumFractionDigits:0})}</b>, and your wealth gain will be <b>₹${parseFloat(gain).toLocaleString(undefined, {maximumFractionDigits:0})}</b>.`;
+  } else {
+    resultMsg = 'Please enter all values to see your SIP result.';
+  }
+  document.getElementById('sip_result').innerHTML = resultMsg;
+  document.getElementById('sip_detail').innerText = '';
+  if(window.sipChart) window.sipChart.destroy();
+  const ctx = document.getElementById('sip_chart').getContext('2d');
+  window.sipChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        { label: 'Investment Value', data: values, borderColor: '#6A1B9A', backgroundColor: 'rgba(106,27,154,0.1)', fill: true }
+      ]
+    },
+    options: { plugins: { legend: { display: false } }, scales: { x: { title: { display: true, text: 'Month' } }, y: { title: { display: true, text: 'Value (₹)' } } } }
+  });
+}
+document.getElementById('sipForm').onsubmit = function(e){ e.preventDefault(); sipCalc(); };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+.sticky-contact-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #f7f5ff;
+  color: #3F0071;
+  box-shadow: 0 -2px 12px #e6e1f7;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+  padding: 12px 8px 10px 8px;
+  z-index: 1000;
+  font-size: 1.08rem;
+}
+.sticky-contact-bar a {
+  color: #5E35B1;
+  font-weight: 600;
+  text-decoration: underline;
+  margin: 0 6px;
+}
+.floating-whatsapp {
+  position: fixed;
+  right: 18px;
+  bottom: 70px;
+  z-index: 1100;
+  background: #25D366;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(40,40,40,0.12);
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: box-shadow 0.2s;
+}
+.floating-whatsapp:hover {
+  box-shadow: 0 4px 16px rgba(40,40,40,0.18);
+  background: #1ebe57;
+}
+@media (max-width: 600px) {
+  .sticky-contact-bar {
+    flex-direction: column;
+    font-size: 1rem;
+    gap: 8px;
+    padding: 10px 4px 8px 4px;
+  }
+  .floating-whatsapp {
+    right: 10px;
+    bottom: 64px;
+    padding: 6px;
+  }
+}
+</style>
+</body>
+</html>

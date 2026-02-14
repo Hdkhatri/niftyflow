@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Options Profit/Loss Calculator Online | Options P&L Tool</title>
+  <meta name="description" content="Free Options Profit/Loss Calculator: Calculate profit or loss for options trades. Simple tool for Indian options traders." />
+  <link rel="canonical" href="https://niftyflow.in/options-pl-calculator.html" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Options Profit/Loss Calculator",
+    "url": "https://niftyflow.in/options-pl-calculator.html",
+    "description": "Free Options Profit/Loss Calculator: Calculate profit or loss for options trades. Simple tool for Indian options traders.",
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "All"
+  }
+  </script>
+</head>
+<body>
+<header class="container header">
+  <div class="logo">
+    <div><img src="assets/images/logo.svg" alt="NiftyFlow logo" /></div>
+    <div>
+      <div style="font-weight:800;color:var(--purple-900)">NiftyFlow</div>
+      <div style="font-size:12px;color:#6b5f82">Simple • Steady • Automated</div>
+    </div>
+  </div>
+  <nav class="nav">
+    <a href="index.html">Home</a>
+    <a href="calculators.html">All Calculators</a>
+    <a href="strategy.html">Strategy</a>
+    <a href="automation.html">Automation</a>
+    <a href="blog.html">Blog</a>
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+</header>
+<main class="container">
+  <section class="section card">
+    <h1>Options Profit/Loss Calculator</h1>
+    <p class="lead">Calculate the profit or loss for your options trades. Enter your trade details to get started.</p>
+    <form id="optionsPLForm">
+      <div class="form-row">
+    <button class="menu-toggle" aria-label="Open menu" tabindex="0">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="mobile-menu-overlay">
+      <button class="menu-close" aria-label="Close menu">&times;</button>
+      <nav class="mobile-nav">
+        <a href="index.html">Home</a>
+        <a href="strategy.html">Strategy</a>
+        <a href="calculators.html">Calculators</a>
+        <a href="automation.html">Automation</a>
+        <a href="blog.html">Blog</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+    </div>
+        <div class="input"><label>Option Type</label>
+          <select id="opl_type">
+            <option value="call">Call</option>
+            <option value="put">Put</option>
+          </select>
+        </div>
+        <div class="input"><label>Buy/Sell</label>
+          <select id="opl_side">
+            <option value="buy">Buy</option>
+            <option value="sell">Sell</option>
+          </select>
+        </div>
+        <div class="input"><label>Strike Price (₹)</label><input id="opl_strike" type="number" required /></div>
+        <div class="input"><label>Premium (₹)</label><input id="opl_premium" type="number" required /></div>
+        <div class="input"><label>Lot Size</label><input id="opl_lot" type="number" required /></div>
+        <div class="input"><label>Spot Price at Expiry (₹)</label><input id="opl_spot" type="number" required /></div>
+      </div>
+      <div style="margin-top:8px"><button type="submit" class="btn btn-primary">Calculate</button></div>
+    </form>
+    <div style="margin-top:12px" id="opl_result"></div>
+    <div style="margin-top:24px">
+      <h2>What is an Options Profit/Loss Calculator?</h2>
+      <p>This calculator helps you estimate the profit or loss for your options trades based on trade details and expiry price.</p>
+      <h2>How to use the Options P&L Calculator?</h2>
+      <ul>
+        <li>Select option type (Call/Put), Buy/Sell, and enter trade details.</li>
+        <li>Click Calculate to see your profit or loss.</li>
+      </ul>
+      <h2>Frequently Asked Questions</h2>
+      <h3>How is options P&L calculated?</h3>
+      <p>Profit or loss is calculated based on the difference between spot price at expiry, strike price, premium, and lot size.</p>
+      <h3>What is the maximum loss in options?</h3>
+      <p>For buyers, the maximum loss is the premium paid. For sellers, the risk can be unlimited (for naked options).</p>
+      <hr style="margin:32px 0 18px 0;">
+      <div style="background:#f7f5ff;padding:18px 16px;border-radius:10px;max-width:480px;margin:0 auto 0 auto;text-align:center;box-shadow:0 2px 12px #e6e1f7;">
+        <h2 style="margin-top:0">Book Free Consultation</h2>
+        <p style="margin-bottom:12px">Want a personalized options strategy or have questions? Contact us for a free consultation:</p>
+        <a href="mailto:niftyflow.service@gmail.com" style="display:inline-block;margin:6px 0 10px 0;font-weight:600;color:#5E35B1;text-decoration:underline;font-size:1.08rem">niftyflow.service@gmail.com</a><br>
+        <a href="https://wa.me/918087616404" target="_blank" rel="noopener" style="display:inline-block;margin:6px 0 0 0;font-weight:600;color:#25D366;text-decoration:none;font-size:1.08rem"><img src="assets/images/whatsapp.svg" alt="WhatsApp" style="height:18px;vertical-align:middle;margin-right:6px">Chat on WhatsApp</a>
+      </div>
+      <!-- Sticky Contact Bar -->
+      <div class="sticky-contact-bar">
+        <span style="font-weight:600;">Book Free Consultation:</span>
+        <a href="contact.html">Contact (Email & WhatsApp)</a>
+      </div>
+    </div>
+  </section>
+</main>
+<script src="assets/js/app.js"></script>
+<script>
+function optionsPLCalc() {
+  const type = document.getElementById('opl_type').value;
+  const side = document.getElementById('opl_side').value;
+  const strike = parseFloat(document.getElementById('opl_strike').value)||0;
+  const premium = parseFloat(document.getElementById('opl_premium').value)||0;
+  const lot = parseInt(document.getElementById('opl_lot').value)||0;
+  const spot = parseFloat(document.getElementById('opl_spot').value)||0;
+  let payoff = 0;
+  let result = '';
+  if (strike <= 0 || premium < 0 || lot <= 0 || spot < 0) {
+    result = '<span style="color:#b71c1c">Please enter all values above zero.</span>';
+  } else {
+    if (type === 'call') {
+      payoff = Math.max(spot - strike, 0) - premium;
+    } else {
+      payoff = Math.max(strike - spot, 0) - premium;
+    }
+    if (side === 'sell') payoff = -payoff;
+    const total = payoff * lot;
+    let plType = total > 0 ? 'Profit' : (total < 0 ? 'Loss' : 'No Profit/Loss');
+    result = `\
+      <div style="font-size:1.13em;font-weight:600;color:#4527a0;margin-bottom:6px">\
+        ${side==='buy'?'Bought':'Sold'} ${type.charAt(0).toUpperCase()+type.slice(1)} Option @ Strike ₹${strike.toLocaleString()} | Premium ₹${premium.toLocaleString()} | Lot Size ${lot}<br>\
+        Spot at Expiry: ₹${spot.toLocaleString()}\
+      </div>\
+      <div style="color:${total>0?'#2e7d32':'#b71c1c'};font-size:1.12em;margin-bottom:4px">\
+        ${plType}: <b>₹${Math.abs(total).toLocaleString(undefined,{maximumFractionDigits:0})}</b>\
+      </div>\
+      <div style="font-size:0.98em;color:#6b5f82">(Excludes brokerage, taxes, and other charges.)</div>\
+    `;
+  }
+  document.getElementById('opl_result').innerHTML = result;
+}
+document.getElementById('optionsPLForm').onsubmit = function(e){ e.preventDefault(); optionsPLCalc(); };
+</script>
+<a href="https://wa.me/918087616404" class="floating-whatsapp" target="_blank" rel="noopener" title="Chat on WhatsApp">
+  <img src="assets/images/whatsapp.svg" alt="WhatsApp" style="width:38px;height:38px;">
+</a>
+<style>
+.sticky-contact-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #f7f5ff;
+  color: #3F0071;
+  box-shadow: 0 -2px 12px #e6e1f7;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+  padding: 12px 8px 10px 8px;
+  z-index: 1000;
+  font-size: 1.08rem;
+}
+.sticky-contact-bar a {
+  color: #5E35B1;
+  font-weight: 600;
+  text-decoration: underline;
+  margin: 0 6px;
+}
+.floating-whatsapp {
+  position: fixed;
+  right: 18px;
+  bottom: 70px;
+  z-index: 1100;
+  background: #25D366;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(40,40,40,0.12);
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: box-shadow 0.2s;
+}
+.floating-whatsapp:hover {
+  box-shadow: 0 4px 16px rgba(40,40,40,0.18);
+  background: #1ebe57;
+}
+@media (max-width: 600px) {
+  .sticky-contact-bar {
+    flex-direction: column;
+    font-size: 1rem;
+    gap: 8px;
+    padding: 10px 4px 8px 4px;
+  }
+  .floating-whatsapp {
+    right: 10px;
+    bottom: 64px;
+    padding: 6px;
+  }
+}
+</style>
+</body>
+</html>
