@@ -6,6 +6,7 @@ import sqlite3
 import logging
 from kiteconnect import KiteConnect
 from config import ACCESS_TOKEN_FILE, INSTRUMENTS_FILE, LOG_FILE, DB_FILE
+from telegrambot import send_telegram_message
 
 
 logging.basicConfig(
@@ -241,6 +242,8 @@ def place_option_market_order(tradingsymbol, qty, ordertype, config, user):
         return "SIMULATED_ORDER", None, 0
 
     kite = get_kite_client(user)
+    avg_price = 0.0
+    filled_qty = 0
     try:
         tx_type = kite.TRANSACTION_TYPE_SELL if ordertype.upper() == "SELL" else kite.TRANSACTION_TYPE_BUY
         order_id = kite.place_order(
@@ -255,20 +258,209 @@ def place_option_market_order(tradingsymbol, qty, ordertype, config, user):
         history = get_historical_order(order_id, user)
         if history:
             filled_qty = sum(o["quantity"] for o in history if o["status"] == "COMPLETE")
+            print(f"✅{config['KEY']} | filled_qty:  {filled_qty} | {tradingsymbol} | Order ID: {order_id}")
+            logging.info(f"✅{config['KEY']} | filled_qty:  {filled_qty} | {tradingsymbol} | Order ID: {order_id}")
             if filled_qty > 0:
                 avg_price = sum(
                     o["average_price"] * o["quantity"] for o in history if o["status"] == "COMPLETE") / filled_qty
                 avg_price = round(avg_price, 2)
+                print(f"✅{config['KEY']} | avg_price:  {avg_price} | filled_qty:  {filled_qty} | {tradingsymbol} | Order ID: {order_id}")
+                logging.info(f"✅{config['KEY']} | avg_price:  {avg_price} | filled_qty:  {filled_qty} | {tradingsymbol} | Order ID: {order_id}")
             if filled_qty >= int(qty):
-                
                 print(f"✅{config['KEY']} | Market Order Placed: {ordertype} {tradingsymbol} | Order ID: {order_id}")
                 logging.info(f"✅{config['KEY']} | Market Order Placed: {ordertype} {tradingsymbol} | Order ID: {order_id}")
         return order_id, avg_price, filled_qty
         
     except Exception as e:
-        print(f"❌{config['KEY']} | Market Order failed for {tradingsymbol}: {e}")
-        logging.error(f"{config['KEY']} | Market Order failed for {tradingsymbol}: {e}")
+        print(f"❌{config['KEY']} | Market Order failed for {tradingsymbol}: {e} | avg_price: {avg_price} | filled_qty: {filled_qty}")
+        logging.error(f"{config['KEY']} | Market Order failed for {tradingsymbol}: {e} | avg_price: {avg_price} | filled_qty: {filled_qty}")
+        send_telegram_message(f"❌{config['KEY']} | Market Order failed for {tradingsymbol}: {e} | avg_price: {avg_price} | filled_qty: {filled_qty}")
         return "SIMULATED_ORDER", None, 0
+    
+def place_option_market_order_new(tradingsymbol, qty, ordertype, config, user, max_wait=20):
+    
+    if config['REAL_TRADE'].lower() != "yes":
+        print(f"⚠️ {config['KEY']} | Simulated Market Order placed")
+        logging.info(f"{config['KEY']} | Simulated Market Order placed")
+        return "SIMULATED_ORDER", 0.0, 0
+
+    kite = get_kite_client(user)
+
+    try:
+        tx_type = kite.TRANSACTION_TYPE_SELL if ordertype.upper() == "SELL" else kite.TRANSACTION_TYPE_BUY
+        
+        order_id = kite.place_order(
+            variety=kite.VARIETY_REGULAR,
+            exchange="NFO",
+            tradingsymbol=tradingsymbol,
+            transaction_type=tx_type,
+            quantity=qty,
+            order_type=kite.ORDER_TYPE_MARKET,
+            product=kite.PRODUCT_NRML
+        )
+
+        print(f"🟡 {config['KEY']} | Order Placed | Waiting for completion | ID: {order_id}")
+        logging.info(f"{config['KEY']} | Order Placed | ID: {order_id}")
+
+        start_time = time.time()
+        filled_qty = 0
+        avg_price = 0.0
+
+        while True:
+            history = get_historical_order(order_id, user)
+
+            if history:
+                completed_orders = [o for o in history if o["status"] == "COMPLETE"]
+                filled_qty = sum(o["quantity"] for o in completed_orders)
+
+                if filled_qty > 0:
+                    avg_price = round(
+                        sum(o["average_price"] * o["quantity"] for o in completed_orders) / filled_qty,
+                        2
+                    )
+
+                # Fully filled
+                if filled_qty >= int(qty):
+                    print(f"✅ {config['KEY']} | FULLY FILLED {tradingsymbol} | Qty: {filled_qty} | Avg: {avg_price}")
+                    logging.info(f"{config['KEY']} | FULLY FILLED {tradingsymbol}")
+                    return order_id, avg_price, filled_qty
+
+            # Timeout protection
+            if time.time() - start_time > max_wait:
+                print(f"⚠️ {config['KEY']} | Order Timeout | Filled: {filled_qty}/{qty}")
+                logging.warning(f"{config['KEY']} | Order Timeout")
+                send_telegram_message(
+                    f"⚠️ {config['KEY']} | Order Timeout for {tradingsymbol} | Filled {filled_qty}/{qty}"
+                )
+                return order_id, avg_price, filled_qty
+
+            time.sleep(1)  # Wait 1 second before checking again
+
+    except Exception as e:
+        logging.error(f"{config['KEY']} | Market Order failed for {tradingsymbol}: {str(e)}")
+        send_telegram_message(
+            f"❌ {config['KEY']} | Market Order failed for {tradingsymbol}: {str(e)}"
+        )
+        return None, 0.0, 0
+    
+def place_option_market_order_strict_one(
+        tradingsymbol,
+        qty,
+        ordertype,
+        config,
+        user,
+        max_wait=15,
+        max_attempts=3):
+
+    if config['REAL_TRADE'].lower() != "yes":
+        logging.info(f"{config['KEY']} | Simulated Order")
+        return "SIMULATED_ORDER", 0.0, 0
+
+    kite = get_kite_client(user)
+
+    required_qty = int(qty)
+    total_filled = 0
+    total_value = 0.0
+    attempt = 0
+
+    tx_type = kite.TRANSACTION_TYPE_SELL if ordertype.upper() == "SELL" \
+        else kite.TRANSACTION_TYPE_BUY
+
+    try:
+
+        while total_filled < required_qty and attempt < max_attempts:
+
+            remaining_qty = required_qty - total_filled
+            order_id = kite.place_order(
+                variety=kite.VARIETY_REGULAR,
+                exchange="NFO",
+                tradingsymbol=tradingsymbol,
+                transaction_type=tx_type,
+                quantity=remaining_qty,
+                order_type=kite.ORDER_TYPE_MARKET,
+                product=kite.PRODUCT_NRML
+            )
+
+            logging.info(f"{config['KEY']} | Attempt {attempt+1} | "
+                         f"Placed {remaining_qty} | ID {order_id}")
+
+            start_time = time.time()
+            filled_this_round = 0
+            avg_price = 0.0
+
+            # -------- WAIT FOR THIS ORDER TO COMPLETE --------
+            while True:
+                history = get_historical_order(order_id, user)
+
+                if history:
+                    completed = [
+                        o for o in history if o["status"] == "COMPLETE"
+                    ]
+
+                    filled_this_round = sum(o["quantity"] for o in completed)
+                    if filled_this_round > 0:
+                        avg_price = round(
+                            sum(o["average_price"] * o["quantity"]
+                                for o in completed) / filled_this_round,
+                            2
+                        )
+
+                # EXACT MATCH REQUIRED
+                if filled_this_round == remaining_qty:
+                    break
+
+                # Timeout for this attempt
+                if time.time() - start_time > max_wait:
+                    logging.warning(f"{config['KEY']} | Timeout attempt {attempt+1}")
+                    break
+                time.sleep(1)
+
+            # accumulate
+            total_filled += filled_this_round
+            total_value += filled_this_round * avg_price
+
+            # if exact qty achieved → SUCCESS
+            if total_filled == required_qty:
+                final_avg = round(total_value / total_filled, 2)
+                logging.info(f"{config['KEY']} | FULLY FILLED | Qty {total_filled}")
+                return order_id, final_avg, total_filled
+
+            attempt += 1
+            time.sleep(1)
+
+        # ==========================
+        # AFTER ALL ATTEMPTS FAILED
+        # ==========================
+
+        if total_filled > 0:
+            logging.error(f"{config['KEY']} | Partial fill after retries. "
+                          f"Exiting {total_filled}")
+            
+            reverse_tx = kite.TRANSACTION_TYPE_BUY \
+                if ordertype.upper() == "SELL" \
+                else kite.TRANSACTION_TYPE_SELL
+            
+            kite.place_order(
+                variety=kite.VARIETY_REGULAR,
+                exchange="NFO",
+                tradingsymbol=tradingsymbol,
+                transaction_type=reverse_tx,
+                quantity=total_filled,
+                order_type=kite.ORDER_TYPE_MARKET,
+                product=kite.PRODUCT_NRML
+            )
+            send_telegram_message(
+                f"❌ {config['KEY']} | Partial fill detected.\n"
+                f"Exited {total_filled} qty.")
+        return None, 0.0, 0
+
+    except Exception as e:
+        logging.error(f"{config['KEY']} | Order failed: {str(e)}")
+
+        send_telegram_message(
+            f"❌ {config['KEY']} | Order failed: {str(e)}"
+        )
+        return None, 0.0, 0
 
 
 #Only limit order 
@@ -280,12 +472,14 @@ def place_option_hybrid_order_old(tradingsymbol, qty, ordertype,config , user):
 #Hybrid order: Try market first, then aggressive limit if not filled
 def place_option_hybrid_order(tradingsymbol, qty, ordertype,config , user):
     
-    order_id, avg_price, filled_qty = place_option_market_order(tradingsymbol, qty, ordertype,config , user)
+    # order_id, avg_price, filled_qty = place_option_market_order(tradingsymbol, qty, ordertype,config , user)
+    order_id, avg_price, filled_qty = place_option_market_order_strict_isolated(tradingsymbol, qty, ordertype,config , user)
     if order_id and order_id != "SIMULATED_ORDER":
         return order_id, avg_price, filled_qty
     else:
-        logging.info(f"⚠️{config['KEY']} | market order not filled for {tradingsymbol}, {order_id}, {avg_price}, {filled_qty}, placing market order")
-        order_id, avg_price, filled_qty = place_aggressive_limit_order(tradingsymbol, qty, ordertype, config, user)
+        logging.info(f"⚠️{config['KEY']} | market order not filled for {tradingsymbol}, {order_id}, {avg_price}, {filled_qty}")
+        send_telegram_message(f"⚠️{config['KEY']} | market order not filled for {tradingsymbol}, {order_id}, {avg_price}, {filled_qty}")
+        # order_id, avg_price, filled_qty = place_aggressive_limit_order(tradingsymbol, qty, ordertype, config, user)
         return order_id, avg_price, filled_qty
    
 
@@ -307,25 +501,441 @@ def place_basket_order(orders, config, user):
     return results
 
 
+def check_symbol_in_positions(tradingsymbol, user):
+    kite = get_kite_client(user)
+    try:
+        positions = kite.positions()["net"]
+        print(f"Checking positions for {tradingsymbol} - Total positions: {len(positions)}")
+        print(f"Positions data: {positions}")
+        for pos in positions:
+            if pos["tradingsymbol"] == tradingsymbol and pos["quantity"] != 0:
+                return True, pos["quantity"]
+        return False, 0
+    except Exception as e:
+        print(f"❌ Error checking positions for {tradingsymbol}: {e}")
+        logging.error(f"Error checking positions for {tradingsymbol}: {e}")
+        return False,  0
+    
+def get_current_position_qty(kite, tradingsymbol):
+    """
+    Returns net position qty for given symbol.
+    Positive = long
+    Negative = short
+    """
+    positions = kite.positions()
+    for p in positions["net"]:
+        if p["tradingsymbol"] == tradingsymbol:
+            return p["quantity"]
+    return 0
 
 
+def place_option_market_order_bulletproof(
+        tradingsymbol,
+        qty,
+        ordertype,
+        config,
+        user,
+        max_wait=15,
+        max_attempts=3):
+
+    if config['REAL_TRADE'].lower() != "yes":
+        return "SIMULATED_ORDER", 0.0, 0
+
+    kite = get_kite_client(user)
+
+    required_qty = int(qty)
+    attempt = 0
+    total_value = 0.0
+
+    direction = 1 if ordertype.upper() == "BUY" else -1
+    tx_type = kite.TRANSACTION_TYPE_BUY if direction == 1 \
+        else kite.TRANSACTION_TYPE_SELL
+
+    try:
+
+        initial_position = get_current_position_qty(kite, tradingsymbol)
+
+        while attempt < max_attempts:
+
+            # -----------------------------
+            # CHECK ACTUAL POSITION FIRST
+            # -----------------------------
+            current_position = get_current_position_qty(kite, tradingsymbol)
+            actual_filled = abs(current_position - initial_position)
+
+            if actual_filled == required_qty:
+                avg_price = 0.0  # optional: compute from order history
+                logging.info(f"{config['KEY']} | Already fully filled via position check")
+                return None, avg_price, required_qty
+
+            remaining_qty = required_qty - actual_filled
+
+            if remaining_qty <= 0:
+                # Defensive guard
+                return None, 0.0, required_qty
+
+            # -----------------------------
+            # PLACE ORDER FOR REMAINING ONLY
+            # -----------------------------
+            order_id = kite.place_order(
+                variety=kite.VARIETY_REGULAR,
+                exchange="NFO",
+                tradingsymbol=tradingsymbol,
+                transaction_type=tx_type,
+                quantity=remaining_qty,
+                order_type=kite.ORDER_TYPE_MARKET,
+                product=kite.PRODUCT_NRML
+            )
+
+            logging.info(f"{config['KEY']} | Attempt {attempt+1} | "
+                         f"Placed {remaining_qty}")
+
+            start_time = time.time()
+
+            while True:
+
+                current_position = get_current_position_qty(kite, tradingsymbol)
+                actual_filled = abs(current_position - initial_position)
+
+                if actual_filled == required_qty:
+                    logging.info(f"{config['KEY']} | Fully filled confirmed by position")
+                    return order_id, 0.0, required_qty
+
+                if time.time() - start_time > max_wait:
+                    logging.warning(f"{config['KEY']} | Timeout on attempt {attempt+1}")
+                    break
+
+                time.sleep(1)
+
+            attempt += 1
+            time.sleep(1)
+
+        # --------------------------------
+        # AFTER ALL ATTEMPTS
+        # --------------------------------
+        current_position = get_current_position_qty(kite, tradingsymbol)
+        actual_filled = abs(current_position - initial_position)
+
+        if actual_filled > 0:
+            logging.error(f"{config['KEY']} | Partial fill detected. Squaring off {actual_filled}")
+
+            reverse_tx = kite.TRANSACTION_TYPE_BUY if direction == -1 \
+                else kite.TRANSACTION_TYPE_SELL
+
+            kite.place_order(
+                variety=kite.VARIETY_REGULAR,
+                exchange="NFO",
+                tradingsymbol=tradingsymbol,
+                transaction_type=reverse_tx,
+                quantity=actual_filled,
+                order_type=kite.ORDER_TYPE_MARKET,
+                product=kite.PRODUCT_NRML
+            )
+
+        return None, 0.0, 0
+
+    except Exception as e:
+        logging.error(f"{config['KEY']} | Order failed: {str(e)}")
+        return None, 0.0, 0
+
+# Using kite.orders() to get fill details instead of positions (more direct)
+
+def get_order_fill_details(kite, order_id):
+    """
+    Returns (filled_qty, avg_price, status)
+    from kite.orders() for specific order_id
+    """
+    orders = kite.orders()
+    for o in orders:
+        if o["order_id"] == order_id:
+            return (
+                o.get("filled_quantity", 0),
+                o.get("average_price", 0.0),
+                o.get("status", "")
+            )
+    return 0, 0.0, "UNKNOWN"
 
 
+def place_option_market_order_isolated(
+        tradingsymbol,
+        qty,
+        ordertype,
+        config,
+        user,
+        max_wait=15,
+        max_attempts=3):
+
+    if config['REAL_TRADE'].lower() != "yes":
+        logging.info(f"{config['KEY']} | Simulated order")
+        return "SIMULATED_ORDER", 0.0, 0
+
+    kite = get_kite_client(user)
+
+    required_qty = int(qty)
+    total_filled = 0
+    total_value = 0.0
+    attempt = 0
+
+    tx_type = kite.TRANSACTION_TYPE_SELL \
+        if ordertype.upper() == "SELL" \
+        else kite.TRANSACTION_TYPE_BUY
+
+    try:
+
+        while total_filled < required_qty and attempt < max_attempts:
+
+            remaining_qty = required_qty - total_filled
+
+            order_id = kite.place_order(
+                variety=kite.VARIETY_REGULAR,
+                exchange="NFO",
+                tradingsymbol=tradingsymbol,
+                transaction_type=tx_type,
+                quantity=remaining_qty,
+                order_type=kite.ORDER_TYPE_MARKET,
+                product=kite.PRODUCT_NRML
+            )
+
+            logging.info(f"{config['KEY']} | Attempt {attempt+1} | "
+                         f"Placed {remaining_qty} | ID {order_id}")
+
+            start_time = time.time()
+            filled_this_round = 0
+            avg_price = 0.0
+
+            while True:
+
+                filled_this_round, avg_price, status = \
+                    get_order_fill_details(kite, order_id)
+
+                # Exact match required
+                if filled_this_round == remaining_qty:
+                    break
+
+                # If cancelled/rejected → stop this attempt
+                if status in ["REJECTED", "CANCELLED"]:
+                    logging.error(f"{config['KEY']} | OrderID {order_id} | Order {status}")
+                    send_telegram_message(f"{config['KEY']} | OrderID {order_id} | Order {status}")
+                    break
+
+                if time.time() - start_time > max_wait:
+                    logging.warning(f"{config['KEY']} | Timeout attempt {attempt+1}")
+                    break
+
+                time.sleep(1)
+
+            # accumulate safe fills
+            total_filled += filled_this_round
+            total_value += filled_this_round * avg_price
+
+            # success condition
+            if total_filled == required_qty:
+                final_avg = round(total_value / total_filled, 2)
+                logging.info(f"{config['KEY']} | FULLY FILLED | Qty {total_filled}")
+                return order_id, final_avg, total_filled
+
+            attempt += 1
+            time.sleep(1)
+
+        # ============================
+        # AFTER ALL ATTEMPTS FAILED
+        # ============================
+        if total_filled > 0:
+            logging.error(f"{config['KEY']} | Partial fill. "
+                          f"Exiting {total_filled}")
+
+            reverse_tx = kite.TRANSACTION_TYPE_BUY \
+                if ordertype.upper() == "SELL" \
+                else kite.TRANSACTION_TYPE_SELL
+
+            exit_order_id = kite.place_order(
+                variety=kite.VARIETY_REGULAR,
+                exchange="NFO",
+                tradingsymbol=tradingsymbol,
+                transaction_type=reverse_tx,
+                quantity=total_filled,
+                order_type=kite.ORDER_TYPE_MARKET,
+                product=kite.PRODUCT_NRML
+            )
+
+            logging.info(f"{config['KEY']} | Exit Order ID {exit_order_id}")
+
+        return None, 0.0, 0
+
+    except Exception as e:
+        logging.error(f"{config['KEY']} | OrderID {order_id} | Order failed: {str(e)}")
+        send_telegram_message(f"{config['KEY']} | OrderID {order_id} | Order failed: {str(e)}")
+        return None, 0.0, 0
+# 
 
 
+# ==========================================
+# Helper: Get Order Details by Order ID
+# ==========================================
+def get_order_fill_details(kite, order_id):
+    """
+    Returns:
+        filled_qty (int),
+        avg_price (float),
+        status (str),
+        pending_qty (int)
+    """
+    try:
+        orders = kite.orders()
+        for o in orders:
+            if o["order_id"] == order_id:
+                return (
+                    o.get("filled_quantity", 0),
+                    o.get("average_price", 0.0),
+                    o.get("status", ""),
+                    o.get("pending_quantity", 0)
+                )
+    except Exception as e:
+        logging.warning(f"Order fetch failed for {order_id}: {str(e)}")
+
+    return 0, 0.0, "UNKNOWN", 0
 
 
+# ==========================================
+# Strict All-Or-Nothing Market Order Engine
+# ==========================================
+def place_option_market_order_strict_isolated(
+        tradingsymbol,
+        qty,
+        ordertype,
+        config,
+        user,
+        max_wait=15,
+        max_attempts=3):
 
+    if config['REAL_TRADE'].lower() != "yes":
+        logging.info(f"{config['KEY']} | Simulated Order")
+        return "SIMULATED_ORDER", 0.0, 0
 
+    kite = get_kite_client(user)
 
+    required_qty = int(qty)
+    total_filled = 0
+    total_value = 0.0
+    attempt = 0
 
+    tx_type = (
+        kite.TRANSACTION_TYPE_SELL
+        if ordertype.upper() == "SELL"
+        else kite.TRANSACTION_TYPE_BUY
+    )
 
+    try:
 
+        while total_filled < required_qty and attempt < max_attempts:
 
+            remaining_qty = required_qty - total_filled
 
+            order_id = kite.place_order(
+                variety=kite.VARIETY_REGULAR,
+                exchange="NFO",
+                tradingsymbol=tradingsymbol,
+                transaction_type=tx_type,
+                quantity=remaining_qty,
+                order_type=kite.ORDER_TYPE_MARKET,
+                product=kite.PRODUCT_NRML
+            )
 
+            logging.info(
+                f"{config['KEY']} | Attempt {attempt+1} | "
+                f"Placed {remaining_qty} | Order ID {order_id}"
+            )
 
+            start_time = time.time()
+            filled_this_round = 0
+            avg_price = 0.0
 
+            # ------------------------------
+            # WAIT FOR ORDER COMPLETION
+            # ------------------------------
+            while True:
 
+                filled_this_round, avg_price, status, pending_qty = get_order_fill_details(kite, order_id)
 
+                # 1️⃣ SUCCESS CONDITION
+                if status == "COMPLETE":
+                    if filled_this_round == remaining_qty:
+                        break
+                    else:
+                        logging.error(
+                            f"{config['KEY']} | COMPLETE but qty mismatch. "
+                            f"Filled {filled_this_round}, Expected {remaining_qty}"
+                        )
+                        break
 
+                # 2️⃣ TERMINAL FAILURE
+                if status in ["REJECTED", "CANCELLED"]:
+                    logging.error(
+                        f"{config['KEY']} | Order {status}"
+                    )
+                    break
+
+                # 3️⃣ STILL ACTIVE → WAIT
+                # (OPEN, VALIDATION PENDING, TRIGGER PENDING, etc.)
+
+                if time.time() - start_time > max_wait:
+                    logging.warning(
+                        f"{config['KEY']} | Timeout attempt {attempt+1}"
+                    )
+                    break
+
+                time.sleep(1)
+
+            # Accumulate safely
+            total_filled += filled_this_round
+            total_value += filled_this_round * avg_price
+
+            # SUCCESS CHECK (STRICT)
+            if total_filled == required_qty:
+                final_avg = round(total_value / total_filled, 2)
+                logging.info(
+                    f"{config['KEY']} | FULLY FILLED | Qty {total_filled}"
+                )
+                return order_id, final_avg, total_filled
+
+            attempt += 1
+            time.sleep(1)
+
+        # ==================================
+        # AFTER ALL ATTEMPTS FAILED
+        # ==================================
+        if total_filled > 0:
+            logging.error(
+                f"{config['KEY']} | Partial fill after retries. "
+                f"Exiting {total_filled}"
+            )
+
+            reverse_tx = (
+                kite.TRANSACTION_TYPE_BUY
+                if ordertype.upper() == "SELL"
+                else kite.TRANSACTION_TYPE_SELL
+            )
+
+            exit_order_id = kite.place_order(
+                variety=kite.VARIETY_REGULAR,
+                exchange="NFO",
+                tradingsymbol=tradingsymbol,
+                transaction_type=reverse_tx,
+                quantity=total_filled,
+                order_type=kite.ORDER_TYPE_MARKET,
+                product=kite.PRODUCT_NRML
+            )
+
+            logging.info(f"{config['KEY']} | Exit Order Placed | ID {exit_order_id}")
+
+            send_telegram_message(
+                f"❌ {config['KEY']} | Partial execution detected.\n"
+                f"Exited {total_filled} qty.")
+
+        return None, 0.0, 0
+
+    except Exception as e:
+        logging.error( f"{config['KEY']} | Market Order Failed: {str(e)}")
+        send_telegram_message(f"❌ {config['KEY']} | Market Order Failed:\n{str(e)}" )
+
+        return None, 0.0, 0
