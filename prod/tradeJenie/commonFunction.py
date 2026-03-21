@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import sqlite3
 import logging
-from kitefunction import  place_option_hybrid_order, get_avgprice_from_positions, get_token_for_symbol, get_quotes, get_profile
+from kitefunction import  place_option_hybrid_order, get_avgprice_from_positions, get_token_for_symbol, get_quotes_with_retry, get_profile
 from telegrambot import send_telegram_message
 from config import  DB_FILE, HEDGE_STRIKE_DIFF,SYMBOL,SEGMENT, CANDLE_DAYS as DAYS, REQUIRED_CANDLES, LOG_FILE,INSTRUMENTS_FILE, OPTION_SYMBOL, SERVER
 import os
@@ -415,18 +415,94 @@ def get_lot_size(config, instruments_df):
         logging.error(f"❌ Error getting lot size: {e}")
         return None
 
+#old code
+# def get_optimal_option(signal, spot, nearest_price, instruments_df, config, user):
+    
+#     if config['EXPIRY'] == "NEXT_WEEK":
+#         days = 7
+#     elif config['EXPIRY'] == "NEXT_TO_NEXT_WEEK":
+#         days = 14
+#     strike = int(round(spot / 100.0) * 100)
+#     print(f"Signal: {signal}, Spot: {spot}, Nearest 100 Strike: {strike}")
+#     df = instruments_df.copy()
+#     best_option = None
+#     best_ltp_diff = float('inf')
+#     while True:
+#         if signal == "BUY":
+#             opt_type = "PE"
+#             strike -= 100
+#         else:
+#             opt_type = "CE"
+#             strike += 100
+#         df_filtered = df[
+#             (df['name'] == OPTION_SYMBOL) &
+#             (df['segment'] == SEGMENT) &
+#             (df['strike'] == strike) &
+#             (df['tradingsymbol'].str.endswith(opt_type))
+#         ].copy()
+#         if df_filtered.empty:
+#             print(f"⚠️ No options found for strike {strike}{opt_type}")
+#             break
+#         df_filtered['expiry'] = pd.to_datetime(df_filtered['expiry'])
+#         today = pd.Timestamp.today().normalize()
+        
+#         if config['EXPIRY'] == "LAST":
+#             if today.day <= 15:
+#                 month_ref = today
+#             else:
+#                 month_ref = (today + pd.DateOffset(months=1)).replace(day=1)
+#             next_month = month_ref.replace(day=28) + timedelta(days=4)
+#             last_day_of_month = next_month - timedelta(days=next_month.day)
+#             last_tuesday = last_day_of_month - timedelta(days=(last_day_of_month.weekday() - 1) % 7)
+#             target_expiry = last_tuesday
+#         else:
+#             days_until_tuesday = (1 - today.weekday() + 7) % 7
+#             this_week_tuesday = today + timedelta(days=days_until_tuesday)
+#             target_expiry = this_week_tuesday + timedelta(days=days)
+
+#         week_start = target_expiry - timedelta(days=target_expiry.weekday())
+#         week_end = week_start + timedelta(days=6)
+#         target_options = df_filtered[
+#             (df_filtered['expiry'] >= week_start) & (df_filtered['expiry'] <= week_end)
+#         ].sort_values('expiry')
+#         if target_options.empty:
+#             print(f"❌ No options found in week {week_start.date()} to {week_end.date()} for strike {strike}{opt_type}")
+#             break
+#         opt = target_options.iloc[0]
+#         opt_symbol = opt['tradingsymbol']
+#         expiry = opt['expiry'].strftime('%Y-%m-%d')
+#         ltp = get_quotes_with_retry(opt_symbol, user) or 0.0
+#         diff = abs(ltp - nearest_price)
+#         if diff < best_ltp_diff:
+#             best_ltp_diff = diff
+#             best_option = (opt_symbol, strike, expiry, ltp)
+#         else:
+#             break
+    
+#     if best_option:
+#         print(f"✅{config['INTERVAL']} | {config['EXPIRY']}| Best option found: {best_option}")
+#         logging.info(f"{config['INTERVAL']} | Best option found: {best_option}")
+#         return best_option
+#     else:
+#         print(f"❌{config['INTERVAL']} | No suitable option found for signal {signal}")
+#         logging.info(f"{config['INTERVAL']} | No suitable option found for signal {signal}")
+#         return None, None, None, None
 
 def get_optimal_option(signal, spot, nearest_price, instruments_df, config, user):
-    
     if config['EXPIRY'] == "NEXT_WEEK":
         days = 7
     elif config['EXPIRY'] == "NEXT_TO_NEXT_WEEK":
         days = 14
+    else:
+        days = 0 
+
     strike = int(round(spot / 100.0) * 100)
     print(f"Signal: {signal}, Spot: {spot}, Nearest 100 Strike: {strike}")
+    
     df = instruments_df.copy()
     best_option = None
     best_ltp_diff = float('inf')
+
     while True:
         if signal == "BUY":
             opt_type = "PE"
@@ -434,18 +510,22 @@ def get_optimal_option(signal, spot, nearest_price, instruments_df, config, user
         else:
             opt_type = "CE"
             strike += 100
+
         df_filtered = df[
             (df['name'] == OPTION_SYMBOL) &
             (df['segment'] == SEGMENT) &
             (df['strike'] == strike) &
             (df['tradingsymbol'].str.endswith(opt_type))
         ].copy()
+
         if df_filtered.empty:
             print(f"⚠️ No options found for strike {strike}{opt_type}")
             break
+
         df_filtered['expiry'] = pd.to_datetime(df_filtered['expiry'])
         today = pd.Timestamp.today().normalize()
         
+        # --- Your Original Expiry Logic ---
         if config['EXPIRY'] == "LAST":
             if today.day <= 15:
                 month_ref = today
@@ -462,16 +542,26 @@ def get_optimal_option(signal, spot, nearest_price, instruments_df, config, user
 
         week_start = target_expiry - timedelta(days=target_expiry.weekday())
         week_end = week_start + timedelta(days=6)
+        
         target_options = df_filtered[
             (df_filtered['expiry'] >= week_start) & (df_filtered['expiry'] <= week_end)
         ].sort_values('expiry')
+
         if target_options.empty:
-            print(f"❌ No options found in week {week_start.date()} to {week_end.date()} for strike {strike}{opt_type}")
+            print(f"❌ No options found in week {week_start.date()} for strike {strike}")
             break
+
         opt = target_options.iloc[0]
         opt_symbol = opt['tradingsymbol']
         expiry = opt['expiry'].strftime('%Y-%m-%d')
-        ltp = get_quotes(opt_symbol, user) or 0.0
+
+        # FIXED: Using retry helper instead of 'or 0.0'
+        ltp = get_quotes_with_retry(opt_symbol, user)
+        
+        if ltp is None:
+            # Skip this strike if API fails completely
+            continue 
+
         diff = abs(ltp - nearest_price)
         if diff < best_ltp_diff:
             best_ltp_diff = diff
@@ -479,32 +569,92 @@ def get_optimal_option(signal, spot, nearest_price, instruments_df, config, user
         else:
             break
     
+    # FINAL TOLERANCE CHECK (+/- 10)
+    tolerance = 10
     if best_option:
-        print(f"✅{config['INTERVAL']} | {config['EXPIRY']}| Best option found: {best_option}")
-        logging.info(f"{config['INTERVAL']} | Best option found: {best_option}")
-        return best_option
-    else:
-        print(f"❌{config['INTERVAL']} | No suitable option found for signal {signal}")
-        logging.info(f"{config['INTERVAL']} | No suitable option found for signal {signal}")
-        return None, None, None, None
+        opt_symbol, opt_strike, opt_expiry, opt_ltp = best_option
+        if abs(opt_ltp - nearest_price) <= tolerance:
+            print(f"✅ Best option found: {best_option}")
+            return best_option
+        else:
+            print(f"❌ Rejected: Best price {opt_ltp} too far from target {nearest_price}")
 
+    return None, None, None, None
+#old version
+# def get_hedge_option(signal, spot, strike, instruments_df, config, user):
+#     if config['HEDGE_TYPE'] == "H-M100":
+#         HEDGE_STRIKE_DIFF = 100
+#     elif config['HEDGE_TYPE'] == "H-M200":
+#         HEDGE_STRIKE_DIFF = 200
+#     else:
+#         HEDGE_STRIKE_DIFF = 100  # Default value
+#     if config['EXPIRY'] == "NEXT_WEEK":
+#         days = 7
+#     elif config['EXPIRY'] == "NEXT_TO_NEXT_WEEK":
+#         days = 14
+#     if signal == "BUY":
+#         opt_type = "PE"
+#         hedge_strike = strike - HEDGE_STRIKE_DIFF
+#     else:
+#         opt_type = "CE"
+#         hedge_strike = strike + HEDGE_STRIKE_DIFF
+#     df = instruments_df.copy()
+#     df_filtered = df[
+#         (df['name'] == OPTION_SYMBOL) &
+#         (df['segment'] == SEGMENT) &
+#         (df['strike'] == hedge_strike) &
+#         (df['tradingsymbol'].str.endswith(opt_type))
+#     ].copy()
+#     if df_filtered.empty:
+#         print(f"❌ No hedge options found for strike {hedge_strike}{opt_type}")
+#         return None, None, None, None
+#     df_filtered['expiry'] = pd.to_datetime(df_filtered['expiry'])
+#     today = pd.Timestamp.today().normalize()
+#     if config['EXPIRY'] == "LAST":
+#         if today.day <= 15:
+#             month_ref = today
+#         else:
+#             month_ref = (today + pd.DateOffset(months=1)).replace(day=1)
+#         next_month = month_ref.replace(day=28) + timedelta(days=4)
+#         last_day_of_month = next_month - timedelta(days=next_month.day)
+#         last_tuesday = last_day_of_month - timedelta(days=(last_day_of_month.weekday() - 1) % 7)
+#         target_expiry = last_tuesday
+#     else:
+#         days_until_tuesday = (1 - today.weekday() + 7) % 7
+#         this_week_tuesday = today + timedelta(days=days_until_tuesday)
+#         target_expiry = this_week_tuesday + timedelta(days=days)
+#     week_start = target_expiry - timedelta(days=target_expiry.weekday())
+#     week_end = week_start + timedelta(days=6)
+#     target_options = df_filtered[
+#         (df_filtered['expiry'] >= week_start) & (df_filtered['expiry'] <= week_end)
+#     ].sort_values('expiry')
+#     if target_options.empty:
+#         print(f"❌ No hedge options found in week {week_start.date()} to {week_end.date()} for strike {hedge_strike}{opt_type}")
+#         return None, None, None, None
+#     opt = target_options.iloc[0]
+#     opt_symbol = opt['tradingsymbol']
+#     expiry = opt['expiry'].strftime('%Y-%m-%d')
+#     ltp = get_quotes_with_retry(opt_symbol, user) or 0.0
+#     print(f"✅ Hedge option found: {opt_symbol} | Strike: {hedge_strike} | Expiry: {expiry} | LTP: {ltp}")
+#     logging.info(f"Hedge option found: {opt_symbol} | Strike: {hedge_strike} | Expiry: {expiry} | LTP: {ltp}")
+#     return opt_symbol, hedge_strike, expiry, ltp
+
+# New version 
 def get_hedge_option(signal, spot, strike, instruments_df, config, user):
     if config['HEDGE_TYPE'] == "H-M100":
         HEDGE_STRIKE_DIFF = 100
     elif config['HEDGE_TYPE'] == "H-M200":
         HEDGE_STRIKE_DIFF = 200
     else:
-        HEDGE_STRIKE_DIFF = 100  # Default value
-    if config['EXPIRY'] == "NEXT_WEEK":
-        days = 7
-    elif config['EXPIRY'] == "NEXT_TO_NEXT_WEEK":
-        days = 14
+        HEDGE_STRIKE_DIFF = 100 
+
+    days = 7 if config['EXPIRY'] == "NEXT_WEEK" else 14 if config['EXPIRY'] == "NEXT_TO_NEXT_WEEK" else 0
+
     if signal == "BUY":
-        opt_type = "PE"
-        hedge_strike = strike - HEDGE_STRIKE_DIFF
+        opt_type, hedge_strike = "PE", strike - HEDGE_STRIKE_DIFF
     else:
-        opt_type = "CE"
-        hedge_strike = strike + HEDGE_STRIKE_DIFF
+        opt_type, hedge_strike = "CE", strike + HEDGE_STRIKE_DIFF
+
     df = instruments_df.copy()
     df_filtered = df[
         (df['name'] == OPTION_SYMBOL) &
@@ -512,38 +662,42 @@ def get_hedge_option(signal, spot, strike, instruments_df, config, user):
         (df['strike'] == hedge_strike) &
         (df['tradingsymbol'].str.endswith(opt_type))
     ].copy()
+
     if df_filtered.empty:
-        print(f"❌ No hedge options found for strike {hedge_strike}{opt_type}")
         return None, None, None, None
+
+    # --- Your Original Expiry Logic ---
     df_filtered['expiry'] = pd.to_datetime(df_filtered['expiry'])
     today = pd.Timestamp.today().normalize()
     if config['EXPIRY'] == "LAST":
-        if today.day <= 15:
-            month_ref = today
-        else:
-            month_ref = (today + pd.DateOffset(months=1)).replace(day=1)
+        month_ref = today if today.day <= 15 else (today + pd.DateOffset(months=1)).replace(day=1)
         next_month = month_ref.replace(day=28) + timedelta(days=4)
-        last_day_of_month = next_month - timedelta(days=next_month.day)
-        last_tuesday = last_day_of_month - timedelta(days=(last_day_of_month.weekday() - 1) % 7)
-        target_expiry = last_tuesday
+        last_day = next_month - timedelta(days=next_month.day)
+        target_expiry = last_day - timedelta(days=(last_day.weekday() - 1) % 7)
     else:
-        days_until_tuesday = (1 - today.weekday() + 7) % 7
-        this_week_tuesday = today + timedelta(days=days_until_tuesday)
-        target_expiry = this_week_tuesday + timedelta(days=days)
+        target_expiry = (today + timedelta(days=(1 - today.weekday() + 7) % 7)) + timedelta(days=days)
+
     week_start = target_expiry - timedelta(days=target_expiry.weekday())
     week_end = week_start + timedelta(days=6)
+    
     target_options = df_filtered[
         (df_filtered['expiry'] >= week_start) & (df_filtered['expiry'] <= week_end)
     ].sort_values('expiry')
+
     if target_options.empty:
-        print(f"❌ No hedge options found in week {week_start.date()} to {week_end.date()} for strike {hedge_strike}{opt_type}")
         return None, None, None, None
+
     opt = target_options.iloc[0]
     opt_symbol = opt['tradingsymbol']
     expiry = opt['expiry'].strftime('%Y-%m-%d')
-    ltp = get_quotes(opt_symbol, user) or 0.0
-    print(f"✅ Hedge option found: {opt_symbol} | Strike: {hedge_strike} | Expiry: {expiry} | LTP: {ltp}")
-    logging.info(f"Hedge option found: {opt_symbol} | Strike: {hedge_strike} | Expiry: {expiry} | LTP: {ltp}")
+
+    # FIXED: Using retry helper instead of 'or 0.0'
+    ltp = get_quotes_with_retry(opt_symbol, user)
+    
+    if ltp is None:
+        return None, None, None, None
+
+    print(f"✅ Hedge option found: {opt_symbol} | LTP: {ltp}")
     return opt_symbol, hedge_strike, expiry, ltp
 
 def save_open_position(trade, config, tradeGenie_id):
@@ -712,7 +866,7 @@ def get_next_expiry_optimal_option(signal, last_expiry, price, nearest_price, in
                 break
             option = df_same_expiry.iloc[0]
             opt_symbol = option['tradingsymbol']
-            ltp = get_quotes(opt_symbol, user) or 0.0
+            ltp = get_quotes_with_retry(opt_symbol, user) or 0.0
             if ltp == 0.0:
                 strike += strike_adjustment
                 continue
@@ -780,7 +934,7 @@ def close_position_and_no_new_trade(trade, position, close, ts, config, user, ke
         trade.update({
             "SpotExit": close,
             "ExitTime": ts,
-            "OptionBuyPrice": get_quotes(trade['OptionSymbol'], user),
+            "OptionBuyPrice": get_quotes_with_retry(trade['OptionSymbol'], user),
         })
         trade["PnL"] = trade["OptionSellPrice"] - trade["OptionBuyPrice"]
         trade["qty"] = trade.get("qty", config['QTY'])
@@ -793,10 +947,10 @@ def close_position_and_no_new_trade(trade, position, close, ts, config, user, ke
         logging.info(f"order_id : {order_id} | opt_symbol : {trade['OptionSymbol']} avg_price : {avg_price} | qty : {qty}")
         logging.info(f"📥INTERVAL {config['INTERVAL']} | Exiting BUY: Buying back {trade['OptionSymbol']} | Qty: {trade['qty']}")
         if hedge_avg_price is None:
-            hedge_avg_price = get_quotes(trade["hedge_option_symbol"], user) or 0.0
+            hedge_avg_price = get_quotes_with_retry(trade["hedge_option_symbol"], user) or 0.0
             hedge_qty = config['QTY']
         if avg_price is None:
-            avg_price = get_quotes(trade["OptionSymbol"], user) or 0.0
+            avg_price = get_quotes_with_retry(trade["OptionSymbol"], user) or 0.0
             qty = config['QTY']
         trade.update({
             "OptionBuyPrice": avg_price,
@@ -818,7 +972,7 @@ def close_position_and_no_new_trade(trade, position, close, ts, config, user, ke
         trade.update({
             "SpotExit": close,
             "ExitTime": ts,
-            "OptionBuyPrice": get_quotes(trade['OptionSymbol'], user),
+            "OptionBuyPrice": get_quotes_with_retry(trade['OptionSymbol'], user),
         })
         trade["PnL"] = trade["OptionSellPrice"] - trade["OptionBuyPrice"]
         trade["qty"] = trade.get("qty", config['QTY'])
@@ -831,7 +985,7 @@ def close_position_and_no_new_trade(trade, position, close, ts, config, user, ke
         logging.info(f"📥INTERVAL {config['INTERVAL']} | Exiting BUY: Buying back {trade['OptionSymbol']} | Qty: {trade['qty']}")
         
         if avg_price is None:
-            avg_price = get_quotes(trade["OptionSymbol"], user) or 0.0
+            avg_price = get_quotes_with_retry(trade["OptionSymbol"], user) or 0.0
             qty = config['QTY']
         trade.update({
             "OptionBuyPrice": avg_price,
@@ -1098,12 +1252,12 @@ def check_monthly_stoploss_hit(user,config):
     
 def check_trade_stoploss_hit(user, trade, config):
     print(f"ℹ️ Checking TRADE_STOPLOSS for {config['KEY']} interval on trade {trade['OptionSymbol']}")
-    current_ltp = get_quotes(trade["OptionSymbol"] ,user)
+    current_ltp = get_quotes_with_retry(trade["OptionSymbol"] ,user)
     entry_ltp = trade["OptionSellPrice"]
     total_pnl = None
     if config['HEDGE_TYPE'] != "NH":
         logging.info(f"Calculating total PnL including hedge for trade {trade['OptionSymbol']} and hedge {trade['hedge_option_symbol']}")
-        hedge_current_ltp = get_quotes(trade["hedge_option_symbol"] ,user)
+        hedge_current_ltp = get_quotes_with_retry(trade["hedge_option_symbol"] ,user)
         hedge_entry_ltp = trade["hedge_option_buy_price"]
         logging.info(f"Trade {trade['OptionSymbol']} | Entry LTP: {entry_ltp}, Current LTP: {current_ltp}")
         logging.info(f"Hedge {trade['hedge_option_symbol']} | Entry LTP: {hedge_entry_ltp}, Current LTP: {hedge_current_ltp}")

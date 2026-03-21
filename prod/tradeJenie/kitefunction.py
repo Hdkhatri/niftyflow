@@ -83,7 +83,7 @@ def get_historical_df(instrument_token, interval, days, user):
     data = kite.historical_data(instrument_token, from_date, to_date, interval)
     return pd.DataFrame(data)
 
-
+#old code with no retry
 def get_quotes(symbol, user):
     kite = get_kite_client(user)
     try:
@@ -95,7 +95,15 @@ def get_quotes(symbol, user):
         logging.error(f"{user['user']}  | Error fetching quote for {symbol}: {e}")
         return None
 
+def get_quotes_with_retry(symbol, user, retries=3, delay=1):
 
+    for attempt in range(retries):
+        ltp = get_quotes(symbol, user)
+        if ltp is not None and ltp > 0:
+            return ltp
+        print(f"⚠️ Attempt {attempt+1}: 503 Error or 0.0 for {symbol}. Retrying...")
+        time.sleep(delay)
+    return None
 
 def get_avgprice_from_positions(tradingsymbol, user):
     kite = get_kite_client(user)
@@ -144,12 +152,12 @@ def place_aggressive_limit_order(tradingsymbol, qty, ordertype, config, user, ti
             if ordertype.upper() == "SELL":
                 best_price = depth.get("buy", [{}])[0].get("price")
                 if best_price is None:
-                    best_price = get_quotes(tradingsymbol, user)
+                    best_price = get_quotes_with_retry(tradingsymbol, user)
                 limit_price = round(best_price - 0.05, 1)  # slightly aggressive
             else:
                 best_price = depth.get("sell", [{}])[0].get("price")
                 if best_price is None:
-                    best_price = get_quotes(tradingsymbol, user)
+                    best_price = get_quotes_with_retry(tradingsymbol, user)
                 limit_price = round(best_price + 0.05, 1)  # slightly aggressive
 
             if not order_id:  # first time, place order
@@ -274,7 +282,7 @@ def place_option_market_order(tradingsymbol, qty, ordertype, config, user):
     except Exception as e:
         print(f"❌{config['KEY']} | Market Order failed for {tradingsymbol}: {e} | avg_price: {avg_price} | filled_qty: {filled_qty}")
         logging.error(f"{config['KEY']} | Market Order failed for {tradingsymbol}: {e} | avg_price: {avg_price} | filled_qty: {filled_qty}")
-        send_telegram_message(f"❌{config['KEY']} | Market Order failed for {tradingsymbol}: {e} | avg_price: {avg_price} | filled_qty: {filled_qty}")
+        send_telegram_message(f"❌{config['KEY']} | Market Order failed for {tradingsymbol}: {e} | avg_price: {avg_price} | filled_qty: {filled_qty}", user['telegram_chat_id'], user['telegram_token'])
         return "SIMULATED_ORDER", None, 0
     
 def place_option_market_order_new(tradingsymbol, qty, ordertype, config, user, max_wait=20):
@@ -330,7 +338,7 @@ def place_option_market_order_new(tradingsymbol, qty, ordertype, config, user, m
                 print(f"⚠️ {config['KEY']} | Order Timeout | Filled: {filled_qty}/{qty}")
                 logging.warning(f"{config['KEY']} | Order Timeout")
                 send_telegram_message(
-                    f"⚠️ {config['KEY']} | Order Timeout for {tradingsymbol} | Filled {filled_qty}/{qty}"
+                    f"⚠️ {config['KEY']} | Order Timeout for {tradingsymbol} | Filled {filled_qty}/{qty}", user['telegram_chat_id'], user['telegram_token']
                 )
                 return order_id, avg_price, filled_qty
 
@@ -339,7 +347,7 @@ def place_option_market_order_new(tradingsymbol, qty, ordertype, config, user, m
     except Exception as e:
         logging.error(f"{config['KEY']} | Market Order failed for {tradingsymbol}: {str(e)}")
         send_telegram_message(
-            f"❌ {config['KEY']} | Market Order failed for {tradingsymbol}: {str(e)}"
+            f"❌ {config['KEY']} | Market Order failed for {tradingsymbol}: {str(e)}",user['telegram_chat_id'], user['telegram_token']
         )
         return None, 0.0, 0
     
@@ -451,14 +459,14 @@ def place_option_market_order_strict_one(
             )
             send_telegram_message(
                 f"❌ {config['KEY']} | Partial fill detected.\n"
-                f"Exited {total_filled} qty.")
+                f"Exited {total_filled} qty.",user['telegram_chat_id'], user['telegram_token'])
         return None, 0.0, 0
 
     except Exception as e:
         logging.error(f"{config['KEY']} | Order failed: {str(e)}")
 
         send_telegram_message(
-            f"❌ {config['KEY']} | Order failed: {str(e)}"
+            f"❌ {config['KEY']} | Order failed: {str(e)}",user['telegram_chat_id'], user['telegram_token']
         )
         return None, 0.0, 0
 
@@ -478,7 +486,7 @@ def place_option_hybrid_order(tradingsymbol, qty, ordertype,config , user):
         return order_id, avg_price, filled_qty
     else:
         logging.info(f"⚠️{config['KEY']} | market order not filled for {tradingsymbol}, {order_id}, {avg_price}, {filled_qty}")
-        send_telegram_message(f"⚠️{config['KEY']} | market order not filled for {tradingsymbol}, {order_id}, {avg_price}, {filled_qty}")
+        send_telegram_message(f"⚠️{config['KEY']} | market order not filled for {tradingsymbol}, {order_id}, {avg_price}, {filled_qty}",user['telegram_chat_id'], user['telegram_token'])
         # order_id, avg_price, filled_qty = place_aggressive_limit_order(tradingsymbol, qty, ordertype, config, user)
         return order_id, avg_price, filled_qty
    
@@ -715,7 +723,7 @@ def place_option_market_order_isolated(
                 # If cancelled/rejected → stop this attempt
                 if status in ["REJECTED", "CANCELLED"]:
                     logging.error(f"{config['KEY']} | OrderID {order_id} | Order {status}")
-                    send_telegram_message(f"{config['KEY']} | OrderID {order_id} | Order {status}")
+                    send_telegram_message(f"{config['KEY']} | OrderID {order_id} | Order {status}", user['telegram_chat_id'], user['telegram_token'])
                     break
 
                 if time.time() - start_time > max_wait:
@@ -764,7 +772,7 @@ def place_option_market_order_isolated(
 
     except Exception as e:
         logging.error(f"{config['KEY']} | OrderID {order_id} | Order failed: {str(e)}")
-        send_telegram_message(f"{config['KEY']} | OrderID {order_id} | Order failed: {str(e)}")
+        send_telegram_message(f"{config['KEY']} | OrderID {order_id} | Order failed: {str(e)}",user['telegram_chat_id'], user['telegram_token'])
         return None, 0.0, 0
 # 
 
@@ -810,7 +818,7 @@ def place_option_market_order_strict_isolated(
 
     if config['REAL_TRADE'].lower() != "yes":
         logging.info(f"{config['KEY']} | Simulated Order")
-        return "SIMULATED_ORDER", 0.0, 0
+        return "SIMULATED_ORDER", None, 0
 
     kite = get_kite_client(user)
 
@@ -930,12 +938,12 @@ def place_option_market_order_strict_isolated(
 
             send_telegram_message(
                 f"❌ {config['KEY']} | Partial execution detected.\n"
-                f"Exited {total_filled} qty.")
+                f"Exited {total_filled} qty.", user['telegram_chat_id'], user['telegram_token'])
 
         return None, 0.0, 0
 
     except Exception as e:
         logging.error( f"{config['KEY']} | Market Order Failed: {str(e)}")
-        send_telegram_message(f"❌ {config['KEY']} | Market Order Failed:\n{str(e)}" )
+        send_telegram_message(f"❌ {config['KEY']} | Market Order Failed:\n{str(e)}",user['telegram_chat_id'], user['telegram_token'] )
 
         return None, 0.0, 0

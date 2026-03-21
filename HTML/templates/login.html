@@ -278,8 +278,7 @@
                     name="username" 
                     placeholder="Enter your username"
                     required
-                    onchange="validateUsername()"
-                    oninput="validateUsername()"
+                    
                 >
                 <div class="error-message" id="usernameError"></div>
                 <div class="validation-feedback" id="usernameFeedback"></div>
@@ -294,8 +293,7 @@
                     name="password" 
                     placeholder="Enter your password"
                     required
-                    onchange="validatePassword()"
-                    oninput="validatePassword()"
+                    
                 >
                 <div class="error-message" id="passwordError"></div>
                 <div class="validation-feedback" id="passwordFeedback"></div>
@@ -496,11 +494,11 @@
             event.preventDefault();
 
             // Validate all fields
-            const usernameValid = validateUsername();
-            const passwordValid = validatePassword();
+            // const usernameValid = validateUsername();
+            // const passwordValid = validatePassword();
             const captchaValid = validateCaptcha();
 
-            if (!usernameValid || !passwordValid || !captchaValid) {
+            if (!captchaValid) {
                 showAlert('error', 'Please fix the errors above');
                 return;
             }
@@ -551,8 +549,8 @@
         }
 
         // Real-time validation on input
-        document.getElementById('username')?.addEventListener('blur', validateUsername);
-        document.getElementById('password')?.addEventListener('blur', validatePassword);
+        // document.getElementById('username')?.addEventListener('blur', validateUsername);
+        // document.getElementById('password')?.addEventListener('blur', validatePassword);
         document.getElementById('captchaInput')?.addEventListener('blur', validateCaptcha);
     </script>
 </body>

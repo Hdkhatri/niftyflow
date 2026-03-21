@@ -8,7 +8,7 @@ import sqlite3
 import logging
 from commonFunction import check_monthly_stoploss_hit, close_position_and_no_new_trade, convertIntoHeikinashi, delete_open_position, generate_god_signals, get_next_candle_time, get_optimal_option, get_trade_configs, hd_strategy, init_db, is_market_open, load_open_position, railway_track_strategy, record_trade, save_open_position, wait_until_next_candle, who_tried, will_market_open_within_minutes,get_hedge_option,get_lot_size,check_trade_stoploss_hit
 from config import  HEDGE_NEAREST_LTP, SYMBOL,SEGMENT, CANDLE_DAYS as DAYS, REQUIRED_CANDLES, LOG_FILE,INSTRUMENTS_FILE, OPTION_SYMBOL, SERVER
-from kitefunction import get_historical_df, place_option_hybrid_order, get_token_for_symbol, get_quotes
+from kitefunction import get_historical_df, place_option_hybrid_order, get_token_for_symbol, get_quotes_with_retry
 from telegrambot import send_telegram_message
 import importlib
 import threading
@@ -145,7 +145,7 @@ def live_trading(instruments_df, config, key, user):
                         trade.update({
                             "SpotExit": close,
                             "ExitTime": current_time,
-                            "OptionBuyPrice": get_quotes(trade["OptionSymbol"] , user),
+                            "OptionBuyPrice": get_quotes_with_retry(trade["OptionSymbol"] , user),
                         })
                         trade["PnL"] = trade["OptionSellPrice"] - trade["OptionBuyPrice"]
                         trade["qty"] = trade.get("qty",config['QTY'])
@@ -158,11 +158,11 @@ def live_trading(instruments_df, config, key, user):
                         logging.info(f"{key} | order_id : {order_id} | opt_symbol : {trade['OptionSymbol']} avg_price : {avg_price} | qty : {qty}")
 
                         if avg_price is None:
-                            avg_price = get_quotes(trade["OptionSymbol"], user)
+                            avg_price = get_quotes_with_retry(trade["OptionSymbol"], user)
                             qty = config['QTY']
 
                         if hedge_avg_price is None:
-                            hedge_avg_price = get_quotes(trade["hedge_option_symbol"], user)
+                            hedge_avg_price = get_quotes_with_retry(trade["hedge_option_symbol"], user)
                             hedge_qty = config['QTY']
 
                         trade.update({
@@ -250,7 +250,7 @@ def live_trading(instruments_df, config, key, user):
                         trade.update({
                             "SpotExit": close,
                             "ExitTime": current_time,
-                            "OptionBuyPrice": get_quotes(trade["OptionSymbol"], user),
+                            "OptionBuyPrice": get_quotes_with_retry(trade["OptionSymbol"], user),
                         })
                         trade["PnL"] = trade["OptionSellPrice"] - trade["OptionBuyPrice"]
                         trade["qty"] = trade.get("qty", config['QTY'])
@@ -263,10 +263,10 @@ def live_trading(instruments_df, config, key, user):
                         logging.info(f"{key} | order_id : {order_id} | opt_symbol : {trade['OptionSymbol']} avg_price : {avg_price} | qty : {qty}")
                         logging.info(f"📥INTERVAL {config['INTERVAL']} | Exiting BUY: Buying back {trade['OptionSymbol']} | Qty: {trade['qty']}")
                         if hedge_avg_price is None:
-                            hedge_avg_price = get_quotes(trade["hedge_option_symbol"], user) or 0.0
+                            hedge_avg_price = get_quotes_with_retry(trade["hedge_option_symbol"], user) or 0.0
                             hedge_qty = config['QTY']
                         if avg_price is None:
-                            avg_price = get_quotes(trade["OptionSymbol"], user) or 0.0
+                            avg_price = get_quotes_with_retry(trade["OptionSymbol"], user) or 0.0
                             qty = config['QTY']
                         trade.update({
                             "OptionBuyPrice": avg_price,
@@ -349,7 +349,7 @@ def live_trading(instruments_df, config, key, user):
                 while datetime.datetime.now() < next_candle_time:
                     # Actively monitor current position LTP
                     if trade and "OptionSymbol" in trade:
-                        current_ltp = get_quotes(trade["OptionSymbol"] ,user)
+                        current_ltp = get_quotes_with_retry(trade["OptionSymbol"] ,user)
                         entry_ltp = trade["OptionSellPrice"]
                         if current_ltp != None and entry_ltp != None:
                             yestime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -368,7 +368,7 @@ def live_trading(instruments_df, config, key, user):
                             break
 
                     if trade and "OptionSymbol" in trade and "OptionSellPrice" in trade and target_hit == False:
-                        current_ltp = get_quotes(trade["OptionSymbol"] ,user)
+                        current_ltp = get_quotes_with_retry(trade["OptionSymbol"] ,user)
                         entry_ltp = trade["OptionSellPrice"]
 
                         if check_trade_stoploss_hit(user, trade, config):
@@ -389,7 +389,7 @@ def live_trading(instruments_df, config, key, user):
                             logging.info(f"{key} | order_id : {order_id} | opt_symbol : {trade['OptionSymbol']} avg_price : {avg_price} | qty : {qty}")
                             logging.info(f"📥 StopLoss Exit: Buying back {trade['OptionSymbol']} | Qty: {trade['qty']}")
                             if hedge_position["hedge_option_symbol"] and hedge_position["hedge_qty"]:
-                                hedge_avg_price = get_quotes(hedge_position["hedge_option_symbol"], user)
+                                hedge_avg_price = get_quotes_with_retry(hedge_position["hedge_option_symbol"], user)
                                 hedge_position['hedge_option_buy_price'] = hedge_avg_price
                             if avg_price is None:
                                 avg_price = current_ltp
@@ -438,7 +438,7 @@ def live_trading(instruments_df, config, key, user):
                             logging.info(f"{key} | order_id : {order_id} | opt_symbol : {trade['OptionSymbol']} avg_price : {avg_price} | qty : {qty}")
                             logging.info(f"📥 Target Exit: Buying back {trade['OptionSymbol']} | Qty: {trade['qty']}")
                             if hedge_position["hedge_option_symbol"] and hedge_position["hedge_qty"]:
-                                hedge_avg_price = get_quotes(hedge_position["hedge_option_symbol"], user)
+                                hedge_avg_price = get_quotes_with_retry(hedge_position["hedge_option_symbol"], user)
                                 hedge_position['hedge_option_buy_price'] = hedge_avg_price
                             if avg_price is None:
                                 avg_price = current_ltp
@@ -504,7 +504,7 @@ def live_trading(instruments_df, config, key, user):
                                         hedge_opt_symbol, hedge_strike, hedge_expiry, hedge_ltp = hedge_result
                                         hedge_order_id, hedge_avg_price, hedge_qty = place_option_hybrid_order(hedge_opt_symbol, config['QTY'], "BUY", config, user)
                                         if hedge_avg_price is None:
-                                            hedge_avg_price = get_quotes(hedge_opt_symbol, user)
+                                            hedge_avg_price = get_quotes_with_retry(hedge_opt_symbol, user)
                                             hedge_qty = config['QTY']
                                         hedge_position['hedge_option_buy_price'] = hedge_avg_price
                                         hedge_position['hedge_option_symbol'] = hedge_opt_symbol
@@ -525,7 +525,7 @@ def live_trading(instruments_df, config, key, user):
                                             else:
                                                 qty_to_buy = config['QTY'] - hedge_position["hedge_qty"]
                                                 hedge_order_id , hedge_avg_price, hedge_qty = place_option_hybrid_order(hedge_position["hedge_option_symbol"], qty_to_buy, "BUY", config, user)
-                                                hedge_avg_price = get_quotes(hedge_position["hedge_option_symbol"], user)
+                                                hedge_avg_price = get_quotes_with_retry(hedge_position["hedge_option_symbol"], user)
                                                 logging.info(f" {key} | HEDGE_ROLLOVER_TYPE is SEMI. Hedge quantity mismatch. Bought additional qty: {qty_to_buy}")
                                                 logging.info(f" {key} | Previous hedge position {hedge_position['hedge_option_symbol']} bought at ₹{hedge_avg_price} | Qty: {hedge_qty}")
                                                 hedge_position["hedge_qty"] = config['QTY']
@@ -552,7 +552,7 @@ def live_trading(instruments_df, config, key, user):
                                     hedge_opt_symbol, hedge_strike, hedge_expiry, hedge_ltp = hedge_result
                                     hedge_order_id, hedge_avg_price, hedge_qty = place_option_hybrid_order(hedge_opt_symbol, config['QTY'], "BUY", config, user)
                                     if hedge_avg_price is None:
-                                        hedge_avg_price = get_quotes(hedge_opt_symbol, user)
+                                        hedge_avg_price = get_quotes_with_retry(hedge_opt_symbol, user)
                                         hedge_qty = config['QTY']
                                     hedge_position['hedge_option_buy_price'] = hedge_avg_price
                                     hedge_position['hedge_option_symbol'] = hedge_opt_symbol
@@ -614,7 +614,7 @@ def live_trading(instruments_df, config, key, user):
                         trade.update({
                             "SpotExit": close,
                             "ExitTime": current_time,
-                            "OptionBuyPrice": get_quotes(trade["OptionSymbol"] , user),
+                            "OptionBuyPrice": get_quotes_with_retry(trade["OptionSymbol"] , user),
                         })
                         trade["PnL"] = trade["OptionSellPrice"] - trade["OptionBuyPrice"]
                         trade["qty"] = trade.get("qty",config['QTY'])
@@ -627,7 +627,7 @@ def live_trading(instruments_df, config, key, user):
                         logging.info(f"{key} | order_id : {order_id} | opt_symbol : {trade['OptionSymbol']} avg_price : {avg_price} | qty : {qty}")
 
                         if avg_price is None:
-                            avg_price = get_quotes(trade["OptionSymbol"], user)
+                            avg_price = get_quotes_with_retry(trade["OptionSymbol"], user)
                             qty = config['QTY']
 
                         trade.update({
@@ -699,7 +699,7 @@ def live_trading(instruments_df, config, key, user):
                         trade.update({
                             "SpotExit": close,
                             "ExitTime": current_time,
-                            "OptionBuyPrice": get_quotes(trade["OptionSymbol"], user),
+                            "OptionBuyPrice": get_quotes_with_retry(trade["OptionSymbol"], user),
                         })
                         trade["PnL"] = trade["OptionSellPrice"] - trade["OptionBuyPrice"]
                         trade["qty"] = trade.get("qty", config['QTY'])
@@ -712,7 +712,7 @@ def live_trading(instruments_df, config, key, user):
                         logging.info(f"📥INTERVAL {config['INTERVAL']} | Exiting BUY: Buying back {trade['OptionSymbol']} | Qty: {trade['qty']}")
                         
                         if avg_price is None:
-                            avg_price = get_quotes(trade["OptionSymbol"], user) or 0.0
+                            avg_price = get_quotes_with_retry(trade["OptionSymbol"], user) or 0.0
                             qty = config['QTY']
                         trade.update({
                             "OptionBuyPrice": avg_price,
@@ -781,7 +781,7 @@ def live_trading(instruments_df, config, key, user):
                 while datetime.datetime.now() < next_candle_time:
                     # Actively monitor current position LTP
                     if trade and "OptionSymbol" in trade:
-                        current_ltp = get_quotes(trade["OptionSymbol"] ,user)
+                        current_ltp = get_quotes_with_retry(trade["OptionSymbol"] ,user)
                         entry_ltp = trade["OptionSellPrice"]
                         if current_ltp != None and entry_ltp != None:
                             yestime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -800,7 +800,7 @@ def live_trading(instruments_df, config, key, user):
                             break
                     # ✅ Target Achieved and Re-Entry
                     if trade and "OptionSymbol" in trade and "OptionSellPrice" in trade and target_hit == False:
-                        current_ltp = get_quotes(trade["OptionSymbol"] ,user)
+                        current_ltp = get_quotes_with_retry(trade["OptionSymbol"] ,user)
                         entry_ltp = trade["OptionSellPrice"]
 
                         if check_trade_stoploss_hit(user, trade, config):
