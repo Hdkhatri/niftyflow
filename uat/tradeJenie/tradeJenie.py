@@ -985,13 +985,19 @@ def _handle_hedged_buy_signal(trade, position, latest, close, current_time, conf
 
     # --- ENTRY CODE EXECUTION (BUY) :: START ---
     try:
+        # Predefine locals to avoid UnboundLocalError on partial flows
+        opt_symbol = None
+        strike = 0
+        expiry = ''
+        ltp = 0
+        hedge_opt_symbol = None
+        hedge_strike = None
         h_type = config['HEDGE_TYPE']
         h_required = h_type != "NH"
         h_offset = 200 if h_type == "H-M200" else 100
         
         result = (None, None, None, None, None)
-        hedge_result = (None, None, None, None, None)
-
+        hedge_result = None
 
 
         # opt_symbol, strike, expiry, ltp, _ = result
@@ -1030,24 +1036,34 @@ def _handle_hedged_buy_signal(trade, position, latest, close, current_time, conf
                 
         # CASE B: Offset-based Hedge (H-M100 / H-M200)
         elif h_type in ["H-M100", "H-M200"]:
-            signal="BUY"
-            result = _find_main_withhedge_with_retry(
-                signal=signal,
-                close=close,
-                instruments_df=instruments_df,
-                config=config,
-                user=user,
-                key=key,
-                strike=strike,
-                expiry=expiry,
-                h_offset=h_offset
+            # One call returns both main symbol and the computed hedge symbol at index 4
+            result = _find_option_with_retry(
+                search_fn=lambda: get_robust_optimal_option(
+                    signal="BUY",
+                    spot=close,
+                    nearest_price=config['NEAREST_LTP'],
+                    instruments_df=instruments_df,
+                    config=config,
+                    user=user,
+                    hedge_offset=h_offset,
+                    hedge_required=True
+                ),
+                max_attempts=3,
+                retry_print_msg=f"âš ï¸ {key}  | {user['user']} {SERVER} | Search Attempt {{attempt}} failed to find an option within tolerance. Retrying in 2s...",
+                retry_log_msg=f"âš ï¸{key}  |  Search Attempt {{attempt}} failed to find an option within tolerance. Retrying in 2s..."
             )
-            hedge_opt_symbol = result[4]
-            hedge_strike = strike + ((200 if config.get('HEDGE_TYPE') == "H-M200" else 100) * (-1 if signal == "BUY" else 1))
+
+            # Convert robust-return hedge symbol into the tuple shape used downstream:
+            # (hedge_symbol, hedge_strike, hedge_expiry, hedge_ltp, _)
+            if result and result[0] is not None:
+                opt_symbol, strike, expiry, ltp, hedge_opt_symbol = result
+                if hedge_opt_symbol is not None:
+                    hedge_strike = strike - h_offset
+                    hedge_result = (hedge_opt_symbol, hedge_strike, expiry, 0, None)
         # 3. VALIDATION & ERROR HANDLING
         if _handle_hedged_option_search_failure(
             result=result,
-            hedge_result = hedge_opt_symbol if hedge_result is None else hedge_result,
+            hedge_result=hedge_result,
             h_required=h_required,
             signal="BUY",
             key=key,
@@ -1059,7 +1075,10 @@ def _handle_hedged_buy_signal(trade, position, latest, close, current_time, conf
         else:
             # 4. EXECUTION
             opt_symbol, strike, expiry, ltp, _ = result
-            hedge_opt_symbol, hedge_strike, hedge_expiry, hedge_ltp, _ = hedge_result if hedge_result else (hedge_opt_symbol, hedge_strike, expiry, 0, None)
+            if h_required:
+                hedge_opt_symbol, hedge_strike, hedge_expiry, hedge_ltp, _ = hedge_result
+            else:
+                hedge_opt_symbol, hedge_strike, hedge_expiry, hedge_ltp = "-", "-", expiry, 0
 
             temp_trade_symbols = {
                 "OptionSymbol": opt_symbol,
@@ -1186,14 +1205,19 @@ def _handle_hedged_sell_signal(trade, position, latest, close, current_time, con
 
     # --- ENTRY CODE EXECUTION (SELL) :: START ---
     try:
+        # Predefine locals to avoid UnboundLocalError on partial flows
+        opt_symbol = None
+        strike = 0
+        expiry = ''
+        ltp = 0
+        hedge_opt_symbol = None
+        hedge_strike = None
         h_type = config['HEDGE_TYPE']
         h_required = h_type != "NH"
         h_offset = 200 if h_type == "H-M200" else 100
         
         result = (None, None, None, None, None)
-        hedge_result = (None, None, None, None, None)
-
-        
+        hedge_result = None
 
         # opt_symbol, strike, expiry, ltp, _ = result
         # print(f"📤 {key}  | {user['user']} {SERVER} | Signal Generated for Entry : Optimal option {opt_symbol} at LTP {ltp}")
@@ -1231,24 +1255,32 @@ def _handle_hedged_sell_signal(trade, position, latest, close, current_time, con
                 
         # CASE B: Offset-based Hedge (H-M100 / H-M200)
         elif h_type in ["H-M100", "H-M200"]:
-            signal = "SELL"
-            result = _find_main_withhedge_with_retry(
-                signal="SELL",
-                close=close,
-                instruments_df=instruments_df,
-                config=config,
-                user=user,
-                key=key,
-                strike=strike,
-                expiry=expiry,
-                h_offset=h_offset
+            # One call returns both main symbol and the computed hedge symbol at index 4
+            result = _find_option_with_retry(
+                search_fn=lambda: get_robust_optimal_option(
+                    signal="SELL",
+                    spot=close,
+                    nearest_price=config['NEAREST_LTP'],
+                    instruments_df=instruments_df,
+                    config=config,
+                    user=user,
+                    hedge_offset=h_offset,
+                    hedge_required=True
+                ),
+                max_attempts=3,
+                retry_print_msg=f"⚠️ {key}  | {user['user']} {SERVER} | Search Attempt {{attempt}} failed to find an option within tolerance. Retrying in 2s...",
+                retry_log_msg=f"⚠️ {key}   |  Search Attempt {{attempt}} failed to find an option within tolerance. Retrying in 2s..."
             )
-            hedge_opt_symbol = result[4]
-            hedge_strike = strike + ((200 if config.get('HEDGE_TYPE') == "H-M200" else 100) * (-1 if signal == "BUY" else 1))
+
+            if result and result[0] is not None:
+                opt_symbol, strike, expiry, ltp, hedge_opt_symbol = result
+                if hedge_opt_symbol is not None:
+                    hedge_strike = strike + h_offset
+                    hedge_result = (hedge_opt_symbol, hedge_strike, expiry, 0, None)
         # 3. VALIDATION & ERROR HANDLING
         if _handle_hedged_option_search_failure(
             result=result,
-            hedge_result = hedge_opt_symbol if hedge_result is None else hedge_result,
+            hedge_result=hedge_result,
             h_required=h_required,
             signal="SELL",
             key=key,
@@ -1260,7 +1292,10 @@ def _handle_hedged_sell_signal(trade, position, latest, close, current_time, con
         else:
             # 4. EXECUTION
             opt_symbol, strike, expiry, ltp, _ = result
-            hedge_opt_symbol, hedge_strike, hedge_expiry, hedge_ltp, _ = hedge_result if hedge_result else (hedge_opt_symbol, hedge_strike, expiry, 0, None)
+            if h_required:
+                hedge_opt_symbol, hedge_strike, hedge_expiry, hedge_ltp, _ = hedge_result
+            else:
+                hedge_opt_symbol, hedge_strike, hedge_expiry, hedge_ltp = "-", "-", expiry, 0
 
             temp_trade_symbols = {
                 "OptionSymbol": opt_symbol,
@@ -1955,14 +1990,14 @@ def execute_robust_exit(trade, config, user, expiry_match="DIFF"):
             if h_f > 0:
                 hedge_total_val = (h_avg * h_f)
                 hedge_filled_total = h_f
-                print(f"🚪 {config['KEY']} | {trade["hedge_option_symbol"]} h_orderid  {h_id} h_avg {h_avg} h_f {h_f}.")
-                logging.info(f"🚪 {config['KEY']} | {trade["hedge_option_symbol"]} h_orderid  {h_id} h_avg {h_avg} h_f {h_f}.")
+                print(f"🚪 {config['KEY']} | {trade['hedge_option_symbol']} h_orderid  {h_id} h_avg {h_avg} h_f {h_f}.")
+                logging.info(f"🚪 {config['KEY']} | {trade['hedge_option_symbol']} h_orderid  {h_id} h_avg {h_avg} h_f {h_f}.")
 
 
     # --- RECONCILIATION & KILL SWITCH ---
     # Case A: Hedge mismatch (Main filled 100, Hedge filled 50)
-    print(f"🚪 {config['KEY']} | Main {trade['OptionSymbol']} filled {main_filled_total} and {trade["hedge_option_symbol"]} filled {hedge_filled_total} ")
-    logging.info(f"🚪 {config['KEY']} | Main {trade['OptionSymbol']} filled {main_filled_total} and {trade["hedge_option_symbol"]} filled {hedge_filled_total} ")
+    print(f"🚪 {config['KEY']} | Main {trade['OptionSymbol']} filled {main_filled_total} and {trade['hedge_option_symbol']} filled {hedge_filled_total} ")
+    logging.info(f"🚪 {config['KEY']} | Main {trade['OptionSymbol']} filled {main_filled_total} and {trade['hedge_option_symbol']} filled {hedge_filled_total} ")
     
     mismatch = (not skip_hedge and main_filled_total != hedge_filled_total)
     # Case B: Incomplete exit (Target was 100, but only 80 filled)
