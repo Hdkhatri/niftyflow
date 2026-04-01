@@ -90,6 +90,26 @@ def get_all_active_user():
         print(f"❌ Error fetching active users: {e}")
         logging.error(f"❌ Error fetching active users: {e}")
         return []
+    
+def get_admin_user():
+    """
+    Returns a list of dicts for all active users from user_dtls table.
+    Each dict contains all columns including 'id'.
+    """
+    try:
+        conn = sqlite3.connect(DB_FILE)
+        c = conn.cursor()
+        sql = "SELECT * FROM user_dtls WHERE active_flag = 1 and user_type = 'ADMIN'"
+        c.execute(sql)
+        rows = c.fetchall()
+        columns = [desc[0] for desc in c.description]
+        users = [dict(zip(columns, row)) for row in rows]
+        conn.close()
+        return users
+    except Exception as e:
+        print(f"❌ Error fetching active users: {e}")
+        logging.error(f"❌ Error fetching active users: {e}")
+        return []
 
 if __name__ == "__main__":
     new_user()

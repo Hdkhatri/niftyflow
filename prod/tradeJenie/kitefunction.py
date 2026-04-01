@@ -7,6 +7,7 @@ import logging
 from kiteconnect import KiteConnect
 from config import ACCESS_TOKEN_FILE, INSTRUMENTS_FILE, LOG_FILE, DB_FILE
 from telegrambot import send_telegram_message
+from userdtls import get_all_active_user
 
 
 logging.basicConfig(
@@ -16,7 +17,7 @@ logging.basicConfig(
 )
 # Load instruments.csv
 instruments_df = pd.read_csv(INSTRUMENTS_FILE)
-
+default_user = get_all_active_user()[1] # this is admin user who is having access to api for historical records and quotes
 
 def get_kite_client(user):
     try:
@@ -51,7 +52,9 @@ def get_profile(user):
     if kite:
         try:
             profile = kite.profile()
-            return profile["user_name"]
+            order_try = kite.order_history(2038463592554078208)
+            print(order_try)
+            return profile["user_name"] 
         except Exception as e:
             print("❌ Error fetching profile:", e)
             logging.error(f"Error fetching profile: {e}")
@@ -76,16 +79,29 @@ def get_token_for_symbol(symbol):
 
 
 def get_historical_df(instrument_token, interval, days, user):
-    kite = get_kite_client(user)
+    # kite = get_kite_client(user) # use this for all users
+    kite = get_kite_client(default_user) # use this for master user having access to history and quotes
     now = datetime.datetime.now()
     from_date = (now - datetime.timedelta(days=days)).strftime('%Y-%m-%d')
     to_date = now.strftime('%Y-%m-%d')
     data = kite.historical_data(instrument_token, from_date, to_date, interval)
     return pd.DataFrame(data)
 
-#old code with no retry
+def get_entire_quote(symbol, user):
+    # kite = get_kite_client(user) # use this for all users
+    kite = get_kite_client(default_user) # use this for master user having access to history and quotes
+    try:
+        full_symbol = f"NFO:{symbol}"
+        quote = kite.quote([full_symbol])
+        return quote[full_symbol]
+    except Exception as e:
+        print(f"❌{user['user']} | Error fetching quote for {full_symbol}: {e}")
+        logging.error(f"{user['user']}  | Error fetching quote for {full_symbol}: {e}")
+        return None
+
 def get_quotes(symbol, user):
-    kite = get_kite_client(user)
+    # kite = get_kite_client(user) # use this for all users
+    kite = get_kite_client(default_user) # use this for master user having access to history and quotes
     try:
         full_symbol = f"NFO:{symbol}"
         quote = kite.ltp([full_symbol])
@@ -102,6 +118,7 @@ def get_quotes_with_retry(symbol, user, retries=3, delay=1):
         if ltp is not None and ltp > 0:
             return ltp
         print(f"⚠️ Attempt {attempt+1}: 503 Error or 0.0 for {symbol}. Retrying...")
+        logging.warning(f"{user['user']} | Attempt {attempt+1}: 503 Error or 0.0 for {symbol}. Retrying...")
         time.sleep(delay)
     return None
 
@@ -127,91 +144,91 @@ def get_avgprice_from_positions(tradingsymbol, user):
     return None, 0
 
 
-def place_aggressive_limit_order(tradingsymbol, qty, ordertype, config, user, timeout=5):
+# def place_aggressive_limit_order(tradingsymbol, qty, ordertype, config, user, timeout=5):
     
-    print(config)
-    if config['REAL_TRADE'].lower() != "yes":
-        print(f"⚠️ {config['KEY']} | Simulated Aggressive Limit Order placed (REAL_TRADE is not YES)")
-        logging.info(f"⚠️ {config['KEY']} | Simulated Aggressive Limit Order placed (REAL_TRADE is not YES)")
-        return "SIMULATED_ORDER", None, 0
+#     print(config)
+#     if config['REAL_TRADE'].lower() != "yes":
+#         print(f"⚠️ {config['KEY']} | Simulated Aggressive Limit Order placed (REAL_TRADE is not YES)")
+#         logging.info(f"⚠️ {config['KEY']} | Simulated Aggressive Limit Order placed (REAL_TRADE is not YES)")
+#         return "SIMULATED_ORDER", None, 0
 
-    kite = get_kite_client(user)
-    tx_type = kite.TRANSACTION_TYPE_SELL if ordertype.upper() == "SELL" else kite.TRANSACTION_TYPE_BUY
-    symbol = "NFO:" + tradingsymbol
+#     kite = get_kite_client(user)
+#     tx_type = kite.TRANSACTION_TYPE_SELL if ordertype.upper() == "SELL" else kite.TRANSACTION_TYPE_BUY
+#     symbol = "NFO:" + tradingsymbol
 
-    filled_qty = 0
-    avg_price = 0.0
-    order_id = None
-    start_time = time.time()
+#     filled_qty = 0
+#     avg_price = 0.0
+#     order_id = None
+#     start_time = time.time()
 
-    try:
-        while time.time() - start_time < timeout:
-            quote = kite.quote(symbol)
-            depth = quote[symbol].get("depth", {})
+#     try:
+#         while time.time() - start_time < timeout:
+#             quote = kite.quote(symbol)
+#             depth = quote[symbol].get("depth", {})
 
-            if ordertype.upper() == "SELL":
-                best_price = depth.get("buy", [{}])[0].get("price")
-                if best_price is None:
-                    best_price = get_quotes_with_retry(tradingsymbol, user)
-                limit_price = round(best_price - 0.05, 1)  # slightly aggressive
-            else:
-                best_price = depth.get("sell", [{}])[0].get("price")
-                if best_price is None:
-                    best_price = get_quotes_with_retry(tradingsymbol, user)
-                limit_price = round(best_price + 0.05, 1)  # slightly aggressive
+#             if ordertype.upper() == "SELL":
+#                 best_price = depth.get("buy", [{}])[0].get("price")
+#                 if best_price is None:
+#                     best_price = get_quotes_with_retry(tradingsymbol, user)
+#                 limit_price = round(best_price - 0.05, 1)  # slightly aggressive
+#             else:
+#                 best_price = depth.get("sell", [{}])[0].get("price")
+#                 if best_price is None:
+#                     best_price = get_quotes_with_retry(tradingsymbol, user)
+#                 limit_price = round(best_price + 0.05, 1)  # slightly aggressive
 
-            if not order_id:  # first time, place order
-                order_id = kite.place_order(
-                    variety=kite.VARIETY_REGULAR,
-                    exchange="NFO",
-                    tradingsymbol=tradingsymbol,
-                    transaction_type=tx_type,
-                    quantity=qty,
-                    order_type=kite.ORDER_TYPE_LIMIT,
-                    price=limit_price,
-                    product=kite.PRODUCT_NRML
-                )
-            else:  # modify if already placed
-                kite.modify_order(
-                    variety=kite.VARIETY_REGULAR,
-                    order_id=order_id,
-                    price=limit_price
-                )
+#             if not order_id:  # first time, place order
+#                 order_id = kite.place_order(
+#                     variety=kite.VARIETY_REGULAR,
+#                     exchange="NFO",
+#                     tradingsymbol=tradingsymbol,
+#                     transaction_type=tx_type,
+#                     quantity=qty,
+#                     order_type=kite.ORDER_TYPE_LIMIT,
+#                     price=limit_price,
+#                     product=kite.PRODUCT_NRML
+#                 )
+#             else:  # modify if already placed
+#                 kite.modify_order(
+#                     variety=kite.VARIETY_REGULAR,
+#                     order_id=order_id,
+#                     price=limit_price
+#                 )
 
-            # Check fills
-            history = get_historical_order(order_id, user)
-            if history:
-                filled_qty = sum(o["quantity"] for o in history if o["status"] == "COMPLETE")
-                if filled_qty > 0:
-                    avg_price = sum(
-                        o["average_price"] * o["quantity"] for o in history if o["status"] == "COMPLETE") / filled_qty
-                    avg_price = round(avg_price, 2)
-                if filled_qty >= int(qty):
-                    print(f"✅{config['KEY']} | Aggressive Limit Order Placed: {ordertype} {tradingsymbol} | Order ID: {order_id}")
-                    logging.info(f"✅{config['KEY']} | Aggressive Limit Order Placed: {ordertype} {tradingsymbol} | Order ID: {order_id}")
-                    return order_id, avg_price, filled_qty
+#             # Check fills
+#             history = get_historical_order(order_id, user)
+#             if history:
+#                 filled_qty = sum(o["quantity"] for o in history if o["status"] == "COMPLETE")
+#                 if filled_qty > 0:
+#                     avg_price = sum(
+#                         o["average_price"] * o["quantity"] for o in history if o["status"] == "COMPLETE") / filled_qty
+#                     avg_price = round(avg_price, 2)
+#                 if filled_qty >= int(qty):
+#                     print(f"✅{config['KEY']} | Aggressive Limit Order Placed: {ordertype} {tradingsymbol} | Order ID: {order_id}")
+#                     logging.info(f"✅{config['KEY']} | Aggressive Limit Order Placed: {ordertype} {tradingsymbol} | Order ID: {order_id}")
+#                     return order_id, avg_price, filled_qty
 
-            time.sleep(0.3)  # short polling delay
+#             time.sleep(0.3)  # short polling delay
 
-        # Timeout reached - cancel unfilled qty
-        if filled_qty < int(qty) and order_id:
-            try:
-                kite.cancel_order(variety=kite.VARIETY_REGULAR, order_id=order_id)
-                print(f"🛑 {config['KEY']} | Cancelled remaining {qty - filled_qty} qty for {tradingsymbol}")
-                logging.info(f"{config['KEY']} | Cancelled remaining {qty - filled_qty} qty for {tradingsymbol}")
-            except Exception as ce:
-                print(f"⚠{config['KEY']} | Failed to cancel unfilled qty: {ce}")
-                logging.error(f"{config['KEY']} | Failed to cancel unfilled qty: {ce}")
-                return "SIMULATED_ORDER", None, 0
+#         # Timeout reached - cancel unfilled qty
+#         if filled_qty < int(qty) and order_id:
+#             try:
+#                 kite.cancel_order(variety=kite.VARIETY_REGULAR, order_id=order_id)
+#                 print(f"🛑 {config['KEY']} | Cancelled remaining {qty - filled_qty} qty for {tradingsymbol}")
+#                 logging.info(f"{config['KEY']} | Cancelled remaining {qty - filled_qty} qty for {tradingsymbol}")
+#             except Exception as ce:
+#                 print(f"⚠{config['KEY']} | Failed to cancel unfilled qty: {ce}")
+#                 logging.error(f"{config['KEY']} | Failed to cancel unfilled qty: {ce}")
+#                 return "SIMULATED_ORDER", None, 0
 
-        print(f"⚠️{config['KEY']} | Timeout: Filled {filled_qty}/{qty} for {tradingsymbol}")
-        logging.warning(f"{config['KEY']} | Timeout: Filled {filled_qty}/{qty} for {tradingsymbol}")
-        return order_id, avg_price, filled_qty
+#         print(f"⚠️{config['KEY']} | Timeout: Filled {filled_qty}/{qty} for {tradingsymbol}")
+#         logging.warning(f"{config['KEY']} | Timeout: Filled {filled_qty}/{qty} for {tradingsymbol}")
+#         return order_id, avg_price, filled_qty
 
-    except Exception as e:
-        print(f"❌ {config['KEY']} | Aggressive Limit Order failed: {e}")
-        logging.error(f"{config['KEY']} | Aggressive Limit Order failed: {e}")
-        return "SIMULATED_ORDER", None, 0
+#     except Exception as e:
+#         print(f"❌ {config['KEY']} | Aggressive Limit Order failed: {e}")
+#         logging.error(f"{config['KEY']} | Aggressive Limit Order failed: {e}")
+#         return "SIMULATED_ORDER", None, 0
 
 
 
@@ -947,3 +964,96 @@ def place_option_market_order_strict_isolated(
         send_telegram_message(f"❌ {config['KEY']} | Market Order Failed:\n{str(e)}",user['telegram_chat_id'], user['telegram_token'] )
 
         return None, 0.0, 0
+
+
+def place_robust_limit_order(tradingsymbol, qty, ordertype, config, user, action="ENTRY", timeout=5):
+    """
+    Balanced Price Chaser: 5s timeout, 0.5s sleep, max 3 modifications.
+    Tracks and logs slippage against the initial market price.
+    """
+    if config.get('REAL_TRADE', '').lower() != "yes":
+        print(f"📉{config['KEY']} | SIMULATED {action}: {ordertype} {qty} {tradingsymbol}")
+        return "SIMULATED_ORDER", 0, 0
+
+    logging.info(f"{config['KEY']} | Executing {action} for {tradingsymbol} | Qty: {qty}...")
+    kite = get_kite_client(user)
+    tx_type = kite.TRANSACTION_TYPE_SELL if ordertype.upper() == "SELL" else kite.TRANSACTION_TYPE_BUY
+    
+    # --- CAPTURE INITIAL LTP FOR SLIPPAGE ---
+    initial_ltp = get_quotes_with_retry(tradingsymbol, user) or 0
+    
+    order_id = None
+    start_time = time.time()
+    mod_count = 0 
+    current_ltp = initial_ltp
+    mod_limit = 3
+    sleep_interval = 0.5
+
+    try:
+        while (time.time() - start_time) < timeout:
+            try:
+                quote_resp = get_entire_quote(tradingsymbol, user)
+                current_ltp = quote_resp.get("last_price", current_ltp)
+                depth = quote_resp.get("depth", {})
+                
+                buy_list = depth.get("buy", [])
+                sell_list = depth.get("sell", [])
+                best_bid = buy_list[0].get("price", 0) if buy_list else 0
+                best_ask = sell_list[0].get("price", 0) if sell_list else 0
+            except Exception as e:
+                logging.error(f"Depth fetch error: {e}")
+                best_bid = best_ask = 0
+
+            # Determine Limit Price (Tick size compliant 0.05)
+            if ordertype.upper() == "SELL":
+                raw_price = best_bid - 0.20 if best_bid > 0 else current_ltp - 0.20
+            else:
+                raw_price = best_ask + 0.20 if best_ask > 0 else current_ltp + 0.20
+            
+            limit_price = round(raw_price / 0.05) * 0.05
+
+            if not order_id:
+                order_id = kite.place_order(
+                    variety=kite.VARIETY_REGULAR, exchange="NFO",
+                    tradingsymbol=tradingsymbol, transaction_type=tx_type,
+                    quantity=int(qty), order_type=kite.ORDER_TYPE_LIMIT,
+                    price=limit_price, product=kite.PRODUCT_NRML
+                )
+                logging.info(f"Placed {ordertype} {order_id} at ₹{limit_price}")
+            else:
+                hist = kite.order_history(order_id)
+                last_row = hist[-1]
+                if last_row['status'] in ["COMPLETE", "REJECTED", "CANCELLED"]:
+                    break 
+                
+                if abs(last_row['price'] - limit_price) >= 0.05 and mod_count < mod_limit:
+                    try:
+                        kite.modify_order(variety=kite.VARIETY_REGULAR, order_id=order_id, price=limit_price)
+                        mod_count += 1
+                        logging.info(f"Mod {mod_count}/{mod_limit}: New Price ₹{limit_price}")
+                    except: pass 
+            
+            time.sleep(sleep_interval)
+
+        # Final Cleanup
+        final_row = kite.order_history(order_id)[-1]
+        if final_row['status'] not in ["COMPLETE", "REJECTED", "CANCELLED"]:
+            try:
+                kite.cancel_order(variety=kite.VARIETY_REGULAR, order_id=order_id)
+                time.sleep(0.3)
+                final_row = kite.order_history(order_id)[-1]
+            except: pass
+
+        avg_price = final_row.get('average_price', 0.0)
+        filled_qty = final_row.get('filled_quantity', 0)
+
+        # --- LOG SLIPPAGE SUMMARY ---
+        if filled_qty > 0 and initial_ltp > 0:
+            slippage = avg_price - initial_ltp if ordertype.upper() == "BUY" else initial_ltp - avg_price
+            logging.info(f"📊 SLIPPAGE SUMMARY | Symbol: {tradingsymbol} | Initial LTP: {initial_ltp} | Avg Price: {avg_price} | Slippage: {round(slippage, 2)}")
+
+        return order_id, avg_price, filled_qty
+
+    except Exception as e:
+        logging.error(f"Execution Error: {e}")
+        return None, 0, 0
