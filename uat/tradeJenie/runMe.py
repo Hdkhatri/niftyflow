@@ -14,11 +14,12 @@ def run_trade_genie(user):
     init_and_run(user)
 
 def run_script(script_name):
-    subprocess.run(['/home/harshilkhatri2808/uat/tradeJenie/venv/bin/python', script_name])
+    subprocess.run(['/home/harshilkhatri2808/prod/tradeJenie/venv/bin/python', script_name])
     #subprocess.run(['python', script_name])
 
 if __name__ == "__main__":
     print("Starting the process...")
+    from commonFunction import is_today_holiday
     if is_today_holiday():
         print("Today is a holiday. Exiting the process.")
         exit(0)
@@ -36,7 +37,7 @@ if __name__ == "__main__":
         print(f"{INSTRUMENTS_FILE} not found. Updating now...")
         run_script('updateinstrument.py')
 
-    from commonFunction import is_today_holiday,init_db
+    from commonFunction import init_db
     from kitelogin import do_login
     from tradeJenie import init_and_run
     from userdtls import get_all_active_user
