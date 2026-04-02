@@ -52,8 +52,8 @@ def get_profile(user):
     if kite:
         try:
             profile = kite.profile()
-            order_try = kite.order_history(2038463592554078208)
-            print(order_try)
+            #order_try = kite.order_history(2038463592554078208)
+            #print(order_try)
             return profile["user_name"] 
         except Exception as e:
             print("❌ Error fetching profile:", e)
@@ -111,6 +111,18 @@ def get_quotes(symbol, user):
         logging.error(f"{user['user']}  | Error fetching quote for {symbol}: {e}")
         return None
 
+def get_symbol_ltp(symbol, user):
+    # kite = get_kite_client(user) # use this for all users
+    kite = get_kite_client(default_user) # use this for master user having access to history and quotes
+    try:
+        #full_symbol = f"NFO:{symbol}"
+        ltp = kite.ltp([symbol])
+        return ltp
+    except Exception as e:
+        print(f"❌ Error fetching ltp for {symbol}: {e}")
+        logging.error(f"{user['user']}  | Error fetching ltp for {symbol}: {e}")
+        return None
+        
 def get_quotes_with_retry(symbol, user, retries=3, delay=1):
 
     for attempt in range(retries):

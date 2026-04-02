@@ -480,7 +480,7 @@ def get_lot_size(config, instruments_df):
         return None
 
 def get_robust_optimal_option(signal, spot, nearest_price, instruments_df, config, user, hedge_offset=200, hedge_required=True):
-    from kitefunction import get_entire_quote, get_kite_client
+    from kitefunction import get_entire_quote, get_kite_client,get_symbol_ltp
     kite = get_kite_client(user)
     print(f"{config['KEY']} | Start Search: {datetime.datetime.now()} | Target: {nearest_price}")
     logging.info(f"{config['KEY']} | Start Search: {datetime.datetime.now()} | Target: {nearest_price}")
@@ -528,8 +528,8 @@ def get_robust_optimal_option(signal, spot, nearest_price, instruments_df, confi
     candidate_symbols = ["NFO:" + s for s in fast_df.nsmallest(30, 'dist')['tradingsymbol'].tolist()]
     
 
-    all_quotes = kite.ltp(candidate_symbols)
-
+    #all_quotes = kite.ltp(candidate_symbols)
+    all_quotes = get_symbol_ltp(candidate_symbols,user)
     # --- 4. THE SEARCH LOOP (IN-MEMORY) ---
     strike = int(round(spot / 100.0) * 100)
     strike_step = -100 if signal == "BUY" else 100
