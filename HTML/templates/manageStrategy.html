@@ -119,6 +119,55 @@
             color: #999;
             margin-top: 4px;
         }
+
+        .alert-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: 0.3s ease;
+            z-index: 9999;
+        }
+
+        .alert-modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .alert-box {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 12px;
+            text-align: center;
+            min-width: 320px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transform: scale(0.9);
+            transition: 0.3s ease;
+        }
+
+        .alert-modal.show .alert-box {
+            transform: scale(1);
+        }
+
+        .alert-box i {
+            font-size: 28px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .alert-box button {
+            margin-top: 15px;
+            padding: 8px 18px;
+            border: none;
+            border-radius: 6px;
+            background: #111;
+            color: white;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -148,6 +197,17 @@
             </div>
         </div>
 
+        <!-- Popup Modal -->
+        <div id="alertModal" class="alert-modal">
+            <div class="alert-box" id="alertBox">
+                <i id="alertIcon"></i>
+                <span id="alertModalMessage"></span>
+                <div style="margin-top: 15px;">
+                <button onclick="closeAlert()">OK</button>
+                </div> 
+            </div>
+        </div>
+
         <!-- Strategy Configuration Section -->
         <div class="section-card">
             <div class="section-header">
@@ -170,16 +230,55 @@
         let currentConfig = {};
 
         // ===== UTILITY FUNCTIONS =====
+        // function showAlert(type, message) {
+        //     const alertElement = document.getElementById(type + 'Alert');
+        //     const messageElement = document.getElementById(type + 'Message');
+        //     if (alertElement && messageElement) {
+        //         messageElement.textContent = message;
+        //         alertElement.classList.add('show');
+        //         if (type !== 'error') {
+        //             setTimeout(() => alertElement.classList.remove('show'), 4000);
+        //         }
+        //     }
+        // }
+
         function showAlert(type, message) {
-            const alertElement = document.getElementById(type + 'Alert');
-            const messageElement = document.getElementById(type + 'Message');
-            if (alertElement && messageElement) {
-                messageElement.textContent = message;
-                alertElement.classList.add('show');
-                if (type !== 'error') {
-                    setTimeout(() => alertElement.classList.remove('show'), 4000);
-                }
+
+            const modal = document.getElementById('alertModal');
+            const alertBox = document.getElementById('alertBox');
+            const messageElement = document.getElementById('alertModalMessage');
+            const iconElement = document.getElementById('alertIcon');
+
+            messageElement.textContent = message;
+
+            // Reset classes
+            alertBox.className = 'alert-box';
+            iconElement.className = '';
+
+            // Apply styles based on type
+            if (type === 'success') {
+                iconElement.className = 'fas fa-check-circle';
+                iconElement.style.color = '#28a745';
+            } 
+            else if (type === 'error') {
+                iconElement.className = 'fas fa-exclamation-circle';
+                iconElement.style.color = '#dc3545';
+            } 
+            else {
+                iconElement.className = 'fas fa-info-circle';
+                iconElement.style.color = '#17a2b8';
             }
+
+            modal.classList.add('show');
+
+            // Auto-close except error
+            if (type !== 'error') {
+                setTimeout(() => modal.classList.remove('show'), 4000);
+            }
+        }
+
+        function closeAlert() {
+            document.getElementById('alertModal').classList.remove('show');
         }
 
         // ===== INITIALIZATION =====
@@ -426,7 +525,7 @@
             .then(data => {
                 if (data.success) {
                     showAlert('success', 'Strategy configuration saved successfully!');
-                    setTimeout(() => window.location.href = '/managestrategies', 2000);
+                    //setTimeout(() => window.location.href = '/managestrategies', 2000);
                 } else {
                     showAlert('error', data.message || 'Failed to save configuration');
                 }

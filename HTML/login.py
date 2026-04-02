@@ -11,6 +11,9 @@ from htmlconfig import PATH, DB_PATH
 
 login_bp = Blueprint('login_bp', __name__)
 
+# Session timeout configuration (in seconds)
+SESSION_TIMEOUT = 15 * 60  # 15 minutes (900 seconds)
+
 # Add parent directory to path for imports
 if PATH and PATH not in sys.path:
     sys.path.insert(0, PATH)
@@ -35,6 +38,42 @@ logger = logging.getLogger(__name__)
 
 # Store CAPTCHA codes temporarily (in production, use Redis or database)
 captcha_store = {}
+
+
+@login_bp.before_request
+def check_session_timeout():
+    """
+    Check if the user session has timed out due to inactivity.
+    If inactive for more than 15 minutes, clear session and redirect to login.
+    Updates last_activity timestamp on each request.
+    """
+    # Skip timeout check for login route itself
+    if request.endpoint and (request.endpoint == 'login_bp.login' or 'static' in request.path):
+        return
+
+    # Check if user is logged in
+    if 'user_id' in session and 'username' in session:
+        last_activity = session.get('last_activity')
+        current_time = datetime.now()
+
+        if last_activity:
+            try:
+                last_activity_time = datetime.fromisoformat(last_activity)
+                time_elapsed = (current_time - last_activity_time).total_seconds()
+
+                # Check if session has expired
+                if time_elapsed > SESSION_TIMEOUT:
+                    username = session.get('username', 'Unknown')
+                    logger.warning(f"Session timeout for user {username} after {time_elapsed:.0f} seconds of inactivity")
+                    session.clear()
+                    return redirect(url_for('login_bp.login'))
+
+            except ValueError:
+                # Invalid timestamp format, update it
+                pass
+        
+        # Update last_activity timestamp for this request
+        session['last_activity'] = current_time.isoformat()
 
 
 @login_bp.route('/login', methods=['GET', 'POST'])
@@ -120,18 +159,19 @@ def login():
 
             if login_success and user_data:
                 # Get user profile for additional info
-                try:
-                    profile = get_profile({'user': username})
-                    logger.info(f"User profile retrieved: {profile}")
-                except Exception as e:
-                    logger.warning(f"Could not retrieve profile for user {username}: {e}")
-                    profile = None
+                # try:
+                #     profile = get_profile({'user': user_data[0]})
+                #     logger.info(f"User profile retrieved: {profile}")
+                # except Exception as e:
+                #     logger.warning(f"Could not retrieve profile for user {username}: {e}")
+                #     profile = None
 
                 # Create session
                 try:
                     session['user_id'] = user_data[0] if isinstance(user_data, tuple) else user_data.get('id')
                     session['username'] = username
                     session['login_time'] = datetime.now().isoformat()
+                    session['last_activity'] = datetime.now().isoformat()  # Track inactivity
                     session.permanent = True
                     
                     logger.info(f"✅ Login successful for user: {username} at {datetime.now()}")
@@ -182,6 +222,9 @@ def dashboard():
     username = session.get('username', 'User')
     login_time = session.get('login_time', '')
     
+    # Update last activity timestamp
+    session['last_activity'] = datetime.now().isoformat()
+    
     logger.info(f"User {username} (ID: {user_id}) accessing dashboard")
     
     return render_template('dashboard.html', user_id=user_id, username=username, login_time=login_time)
@@ -190,17 +233,28 @@ def dashboard():
 @login_bp.route('/logout', methods=['POST'])
 def logout():
     """
-    Handle user logout and clear session properly
+    Handle user logout and clear session properly.
+    Also handles automatic logout due to session timeout.
     """
     from flask import make_response
     
     username = session.get('username', 'Unknown')
     user_id = session.get('user_id', 'Unknown')
+    login_time = session.get('login_time', '')
+    
+    # Calculate session duration
+    session_duration = 'Unknown'
+    if login_time:
+        try:
+            login_dt = datetime.fromisoformat(login_time)
+            session_duration = f"{(datetime.now() - login_dt).total_seconds() / 60:.1f} minutes"
+        except ValueError:
+            session_duration = 'Unknown'
     
     # Clear all session data
     session.clear()
     
-    logger.info(f"User {username} (ID: {user_id}) logged out at {datetime.now()}")
+    logger.info(f"User {username} (ID: {user_id}) logged out at {datetime.now()}. Session duration: {session_duration}")
     
     # Create response
     response = jsonify({
@@ -216,15 +270,86 @@ def logout():
     return response, 200
 
 
+@login_bp.route('/api/session-status', methods=['GET'])
+def get_session_status():
+    """
+    Get current session status and remaining time.
+    Useful for frontend to display session timeout warnings.
+    """
+    if 'user_id' not in session or 'username' not in session:
+        return jsonify({
+            'success': False,
+            'is_active': False,
+            'message': 'No active session'
+        }), 401
+    
+    username = session.get('username', 'Unknown')
+    remaining_time = get_remaining_session_time()
+    
+    logger.info(f"Session status checked for user: {username} - Remaining: {remaining_time:.0f}s")
+    
+    return jsonify({
+        'success': True,
+        'is_active': True,
+        'username': username,
+        'remaining_time_seconds': remaining_time,
+        'remaining_time_minutes': remaining_time / 60,
+        'session_timeout_minutes': SESSION_TIMEOUT // 60,
+        'session_timeout_seconds': SESSION_TIMEOUT,
+        'checked_at': datetime.now().isoformat()
+    }), 200
+
+
+@login_bp.route('/api/refresh-session', methods=['POST'])
+def refresh_session():
+    """
+    Refresh the session timeout by updating last_activity.
+    Allows users to extend their session while active.
+    Tracks user activity timestamp for audit purposes.
+    """
+    if 'user_id' not in session:
+        logger.warning("Attempted to refresh session without active session")
+        return jsonify({
+            'success': False,
+            'message': 'No active session to refresh'
+        }), 401
+    
+    username = session.get('username', 'Unknown')
+    user_id = session.get('user_id', 'Unknown')
+    
+    # Update last activity timestamp
+    session['last_activity'] = datetime.now().isoformat()
+    session.permanent = True
+    
+    remaining_time = get_remaining_session_time()
+    
+    logger.info(f"✅ Session refreshed for user: {username} (ID: {user_id}) - Remaining: {remaining_time:.0f}s")
+    
+    return jsonify({
+        'success': True,
+        'message': 'Session refreshed successfully',
+        'username': username,
+        'remaining_time_seconds': SESSION_TIMEOUT,
+        'refreshed_at': datetime.now().isoformat()
+    }), 200
+
+
 @login_bp.route('/api/user-profile', methods=['GET'])
 def get_user_profile():
     """
-    Get current user profile (POST method not shown as per requirement, but can be added)
+    Get current user profile and session timeout information.
+    Also includes user activity status.
     """
-    if 'user_id' not in session:
+    if 'user_id' not in session or 'username' not in session:
         return jsonify({'success': False, 'message': 'Unauthorized'}), 401
 
     username = session.get('username', '')
+    user_id = session.get('user_id', '')
+    login_time = session.get('login_time', '')
+    last_activity = session.get('last_activity', '')
+    
+    # Calculate remaining session time
+    remaining_time = get_remaining_session_time()
     
     try:
         # Query user from database
@@ -235,15 +360,36 @@ def get_user_profile():
         conn.close()
 
         if user_data:
-            logger.info(f"User profile retrieved for: {username}")
+            # Parse last activity time
+            last_activity_display = 'Just now'
+            if last_activity:
+                try:
+                    last_activity_time = datetime.fromisoformat(last_activity)
+                    time_diff = (datetime.now() - last_activity_time).total_seconds()
+                    if time_diff < 60:
+                        last_activity_display = f'{int(time_diff)} seconds ago'
+                    elif time_diff < 3600:
+                        last_activity_display = f'{int(time_diff / 60)} minutes ago'
+                    else:
+                        last_activity_display = last_activity_time.strftime('%H:%M:%S')
+                except ValueError:
+                    last_activity_display = last_activity
+
+            logger.info(f"User profile retrieved for: {username} (last activity: {last_activity_display})")
             return jsonify({
                 'success': True,
                 'user_id': user_data[0],
                 'username': user_data[1],
                 'email': user_data[2] if len(user_data) > 2 else '',
-                'login_time': session.get('login_time', '')
+                'login_time': login_time,
+                'last_activity': last_activity,
+                'last_activity_display': last_activity_display,
+                'remaining_session_time': remaining_time,
+                'session_timeout_minutes': SESSION_TIMEOUT // 60,
+                'is_active': True
             }), 200
         else:
+            logger.warning(f"User not found in database: {username}")
             return jsonify({'success': False, 'message': 'User not found'}), 404
 
     except Exception as e:
@@ -313,4 +459,23 @@ def clear_brute_force_attempt(username):
         }
 
 
+def get_remaining_session_time():
+    """
+    Calculate remaining session time in seconds before automatic logout.
+    Returns -1 if no session or no last_activity recorded.
+    """
+    if 'user_id' not in session or 'username' not in session:
+        return -1
+    
+    last_activity = session.get('last_activity')
+    if not last_activity:
+        return -1
+    
+    try:
+        last_activity_time = datetime.fromisoformat(last_activity)
+        time_elapsed = (datetime.now() - last_activity_time).total_seconds()
+        remaining_time = SESSION_TIMEOUT - time_elapsed
+        return max(0, remaining_time)  # Return 0 if negative
+    except ValueError:
+        return -1
 

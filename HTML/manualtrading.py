@@ -12,11 +12,11 @@ hk_bp = Blueprint('hk_bp', __name__)
 from htmlconfig import DB_PATH, PATH
 if PATH and PATH not in sys.path:
     sys.path.insert(0, PATH)
-from commonFunction import convertIntoHeikinashi, delete_open_position, generate_god_signals, get_hedge_option, get_lot_size, get_optimal_option, hd_strategy, is_market_open, railway_track_strategy, record_trade, save_open_position
+from commonFunction import convertIntoHeikinashi, delete_open_position, generate_god_signals, get_hedge_option, get_lot_size, get_optimal_option, hd_strategy, is_market_open, railway_track_strategy, record_trade, save_open_position, is_valid_trade_data,get_clean_trade
 from config import SYMBOL, SERVER, INSTRUMENTS_FILE,CANDLE_DAYS as DAYS, HEDGE_NEAREST_LTP
 from kitefunction import get_historical_df, get_quotes, get_token_for_symbol, place_option_hybrid_order
 from kitelogin import do_login
-from telegrambot import send_telegram_message
+from telegrambot import send_telegram_message, send_telegram_message_admin
 import time
 import datetime
 from datetime import timedelta
@@ -32,92 +32,324 @@ def get_db_connection():
     return conn
 
 
-def MANUAL_EXIT(user, trade, config):
-    logging.info(f"Inside Manual exit called for user: {user['user']} | trade: {trade} | config: {config}")
-    try:
-        current_ltp = get_quotes(trade["OptionSymbol"] ,user)
-        entry_ltp = trade["OptionSellPrice"]
-        instrument_token = get_token_for_symbol(SYMBOL)
-        lot_size = get_lot_size(config, instruments_df)
-        config['QTY'] = lot_size*int(config['LOT'])
-        key = config.get('KEY')
-        df = get_historical_df(instrument_token, config['INTERVAL'], DAYS, user)
-        latest = df.iloc[-1]
-        close = latest['close']
-        current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+# def MANUAL_EXIT_2026_03_14(user, trade, config):
+#     logging.info(f"Inside Manual exit called for user: {user['user']} | trade: {trade} | config: {config}")
+#     try:
+#         current_ltp = get_quotes(trade["OptionSymbol"] ,user)
+#         entry_ltp = trade["OptionSellPrice"]
+#         instrument_token = get_token_for_symbol(SYMBOL)
+#         lot_size = get_lot_size(config, instruments_df)
+#         config['QTY'] = lot_size*int(config['LOT'])
+#         key = config.get('KEY')
+#         df = get_historical_df(instrument_token, config['INTERVAL'], DAYS, user)
+#         latest = df.iloc[-1]
+#         close = latest['close']
+#         current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
             
+#         trade.update({
+#             "SpotExit": close,
+#             "ExitTime": current_time,
+#             "OptionBuyPrice": get_quotes(trade["OptionSymbol"] , user),
+#         })
+#         trade["PnL"] = trade["OptionSellPrice"] - trade["OptionBuyPrice"]
+#         trade["qty"] = trade.get("qty",config['QTY'])
+#         print(f"?? {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} Exiting SELL: Buying back {trade['OptionSymbol']} | Qty: {trade['qty']}")
+#         logging.info(f"??INTERVAL {config['INTERVAL']} | Exiting SELL: Buying back {trade['OptionSymbol']} | Qty: {trade['qty']}")
+        
+#         order_id ,avg_price,qty = place_option_hybrid_order(trade["OptionSymbol"], trade["qty"], "BUY",config, user)
+#         order_id ,avg_price,qty = None, None, None
+#         if config['HEDGE_TYPE'] != "NH":
+#             hedge_order_id , hedge_avg_price, hedge_qty = place_option_hybrid_order(trade["hedge_option_symbol"], trade["qty"], "SELL", config, user)
+#             hedge_order_id , hedge_avg_price, hedge_qty = None, None, None
+
+#         logging.info(f"order_id : {order_id} | opt_symbol : {trade['OptionSymbol']} avg_price : {avg_price} | qty : {qty}")
+
+#         if avg_price is None:
+#             avg_price = get_quotes(trade["OptionSymbol"], user)
+#             qty = config['QTY']
+#         if config['HEDGE_TYPE'] != "NH":
+#             if hedge_avg_price is None:
+#                 hedge_avg_price = get_quotes(trade["hedge_option_symbol"], user)
+#                 hedge_qty = config['QTY']
+
+#             trade.update({
+#                 "OptionBuyPrice": avg_price,
+#                 "ExitTime": current_time,
+#                 "PnL": trade["OptionSellPrice"] - avg_price,
+#                 "qty": qty,
+#                 "ExitReason": "MANUAL_EXIT",
+#                 "hedge_option_sell_price": hedge_avg_price,
+#                 "hedge_exit_time": current_time,
+#                 "hedge_pnl": hedge_avg_price - trade["hedge_option_buy_price"] ,
+#                 "total_pnl": (trade["OptionSellPrice"] - avg_price) + (hedge_avg_price - trade["hedge_option_buy_price"] )
+#             })  
+#         else:
+#             trade.update({
+#                 "OptionBuyPrice": avg_price,
+#                 "ExitTime": current_time,
+#                 "PnL": trade["OptionSellPrice"] - avg_price,
+#                 "qty": qty,
+#                 "ExitReason": "MANUAL_EXIT",
+#                 "hedge_option_sell_price": 0.0,
+#                 "hedge_exit_time": "-",
+#                 "hedge_pnl": 0.0 ,
+#                 "total_pnl": trade["OptionSellPrice"] - avg_price
+#             })  
+#         logging.info(f"??INTERVAL {config['INTERVAL']} | Exiting SELL: Buying back {trade['OptionSymbol']} | Qty: {trade['qty']}")
+#         record_trade(trade, config, user['id'])
+#         delete_open_position(trade["OptionSymbol"], config, trade, user['id'])
+#         if config['HEDGE_TYPE'] != "NH":
+#             send_telegram_message(f"INTERVAL {config['INTERVAL']} | {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} Exit SELL\n{trade['OptionSymbol']} @ ?{trade['OptionBuyPrice']:.2f}. Hedge Exit Symbol {trade['hedge_option_symbol']} | @ ?{trade['hedge_option_sell_price']:.2f} | profit per quantity :{trade['total_pnl']}",user['telegram_chat_id'], user['telegram_token'])
+#         else:
+#             send_telegram_message(f"INTERVAL {config['INTERVAL']} | {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} Exit SELL\n{trade['OptionSymbol']} @ ?{trade['OptionBuyPrice']:.2f}. profit per quantity :{trade['total_pnl']}",user['telegram_chat_id'], user['telegram_token'])
+#     except Exception as e:
+#         logging.error(f"Error in MANUAL_EXIT: {e}")
+#         return {'status': 'error', 'message': str(e)}
+
+
+# def manual_entry_2026_03_14(config, user):
+#     logging.info(f"Inside manual_entry called for user: {user['user']} | config: {config}")
+#     do_login(user)
+#     # placeholder for actual manual order handling
+#     # `config` is expected to be a dict of trade_config columns for the requested key
+#     instrument_token = get_token_for_symbol(SYMBOL)
+#     lot_size = get_lot_size(config, instruments_df)
+#     config['QTY'] = lot_size*int(config['LOT'])
+#     key = config.get('KEY')
+#     df = get_historical_df(instrument_token, config['INTERVAL'], DAYS, user)
+#     if config['STRATEGY'] == "GOD":
+#         df = generate_god_signals(df)
+#     elif config['STRATEGY'] == "HDSTRATEGY":
+#         df = convertIntoHeikinashi(df)
+#         df = hd_strategy(df)
+#     elif config['STRATEGY'] == "RAILWAY_TRACK":
+#         df = railway_track_strategy(df)
+#     latest = df.iloc[-1]
+#     close = latest['close']
+#     current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+#     signal = "BUY" if latest['trend'] == 1 else "SELL"
+
+#     result = get_optimal_option(signal, close, config['NEAREST_LTP'], instruments_df, config, user)
+#     strike = result[1]
+#     if config['HEDGE_TYPE'] != "NH":
+#         if(config['HEDGE_TYPE'] == "H-P10" ):
+#             hedge_result = get_optimal_option(signal, close, HEDGE_NEAREST_LTP, instruments_df, config, user)
+#         elif(config['HEDGE_TYPE'] == "H-M100" or config['HEDGE_TYPE'] == "H-M200"):
+#             hedge_result = get_hedge_option(signal, close, strike, instruments_df, config, user)
+#     if result is None or result[0] is None:
+#         logging.error(f"?INTERVAL {config['INTERVAL']} | {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']}: No suitable option found for BUY signal.")
+#         send_telegram_message(f"?INTERVAL {config['INTERVAL']} | {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']}: No suitable option found for BUY signal.",user['telegram_chat_id'], user['telegram_token'])
+        
+#     else:
+#         opt_symbol, strike, expiry, ltp = result
+#         if config['HEDGE_TYPE'] != "NH":
+#             hedge_opt_symbol, hedge_strike, hedge_expiry, hedge_ltp = hedge_result
+#             print(f"??INTERVAL {config['INTERVAL']} | {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} Entering HEDGE BUY: {hedge_opt_symbol} | Strike: {hedge_strike} | Expiry: {hedge_expiry} | LTP: ?{hedge_ltp:.2f}")
+#             logging.info(f"??INTERVAL {config['INTERVAL']} | {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} Entering HEDGE BUY: {hedge_opt_symbol} | Strike: {hedge_strike} | Expiry: {hedge_expiry} | LTP: ?{hedge_ltp:.2f}")
+#             logging.info(f"Placing Hedge BUY order for {hedge_opt_symbol} | Qty: {config['QTY']} | User: {user} | Key: {key}")
+#             hedge_order_id, hedge_avg_price, hedge_qty = place_option_hybrid_order(hedge_opt_symbol, config['QTY'], "BUY", config, user)
+#             hedge_order_id , hedge_avg_price, hedge_qty = None, None, None
+#             logging.info(f"hedge_order_id : {hedge_order_id} | hedge_opt_symbol : {hedge_opt_symbol} hedge_avg_price : {hedge_avg_price} | hedge_qty : {hedge_qty}")
+
+#         print(f"??INTERVAL {config['INTERVAL']} | {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']}  {opt_symbol} | Strike: {strike} | Expiry: {expiry} | LTP: ?{ltp:.2f}")
+#         logging.info(f"??INTERVAL {config['INTERVAL']} | {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']}  {opt_symbol} | Strike: {strike} | Expiry: {expiry} | LTP: ?{ltp:.2f}")
+
+#         logging.info(f"Placing Sell order for {opt_symbol} | Qty: {config['QTY']} | User: {user['user']} | Key: {key}")
+#         order_id ,avg_price,qty = place_option_hybrid_order(opt_symbol, config['QTY'], "SELL", config, user)
+#         order_id ,avg_price,qty = None, None, None
+#         logging.info(f"{key} | order_id : {order_id} | opt_symbol : {opt_symbol} avg_price : {avg_price} | qty : {qty}")
+#         time.sleep(2)
+        
+#         if config['HEDGE_TYPE'] != "NH":
+#             if hedge_avg_price is None:
+#                 hedge_avg_price = hedge_ltp
+#                 hedge_qty = config['QTY']
+        
+#         if avg_price is None:
+#             avg_price = ltp
+#             qty = config['QTY']
+
+#         logging.info(f"??INTERVAL {config['INTERVAL']} | Avg price for {opt_symbol}: ?{avg_price:.2f} | Qty: {qty}")
+
+#         if config['HEDGE_TYPE'] != "NH":
+#             trade = {
+#                 "Signal": signal, "SpotEntry": close, "OptionSymbol": opt_symbol,
+#                 "Strike": strike, "Expiry": expiry,
+#                 "OptionSellPrice": avg_price, "EntryTime": current_time,
+#                 "qty": qty, "interval": config['INTERVAL'], "real_trade": config['REAL_TRADE'],
+#                 "EntryReason":"MANUAL_ENTRY", "ExpiryType":config['EXPIRY'],
+#                 "Strategy":config['STRATEGY'], "Key":key, "hedge_option_symbol":hedge_opt_symbol,
+#                 "hedge_strike":hedge_strike, "hedge_option_buy_price":hedge_avg_price,
+#                 "hedge_qty":hedge_qty, "hedge_entry_time": current_time
+#             }
+#             send_telegram_message(f"??INTERVAL {config['INTERVAL']} | {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} \n{opt_symbol} | Avg ?{avg_price:.2f} | Qty: {qty}. \n Hedge Symbol {trade['hedge_option_symbol']} | @ ?{trade['hedge_option_buy_price']:.2f}",user['telegram_chat_id'], user['telegram_token'])
+#         else:
+#             trade = {
+#                 "Signal": signal, "SpotEntry": close, "OptionSymbol": opt_symbol,
+#                 "Strike": strike, "Expiry": expiry,
+#                 "OptionSellPrice": avg_price, "EntryTime": current_time,
+#                 "qty": qty, "interval": config['INTERVAL'], "real_trade": config['REAL_TRADE'],
+#                 "EntryReason":"MANUAL_ENTRY", "ExpiryType":config['EXPIRY'],
+#                 "Strategy":config['STRATEGY'], "Key":key, "hedge_option_symbol":"-",
+#                 "hedge_strike":"-", "hedge_option_buy_price":0.0,
+#                 "hedge_qty":"-", "hedge_entry_time": "-"
+#             }
+#             send_telegram_message(f"??INTERVAL {config['INTERVAL']} | {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} \n{opt_symbol} | Avg ?{avg_price:.2f} | Qty: {qty}.",user['telegram_chat_id'], user['telegram_token'])
+#         save_open_position(trade, config, user['id'])
+    
+#     return {'status': 'ok', 'message': f"MANUAL_ENTRY processed for key {key}"}
+
+def MANUAL_EXIT(user, trade, config):
+    from tradeJenie import execute_robust_exit
+    logging.info(f"Inside Manual exit called for user: {user['user']} | trade: {trade} | config: {config}")
+
+    try:
+        
+        instrument_token = get_token_for_symbol(SYMBOL)
+        lot_size = get_lot_size(config, instruments_df)
+
+        config['QTY'] = lot_size * int(config['LOT'])
+        
+        key = config.get('KEY')
+
+        df = get_historical_df(instrument_token, config['INTERVAL'], DAYS, user)
+
+        latest = df.iloc[-1]
+        close = latest['close']
+
+        current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        entry_ltp = trade["OptionSellPrice"]
+
+        # =========================
+        # EXECUTE ROBUST EXIT
+        # =========================
+        logging.info(f"trade: {trade}")
+        logging.info(f"config: {config}")
+        logging.info(f"user: {user}")
+        
+        exit_qty, exit_avg_price, hedge_exit_avg_price = execute_robust_exit(
+            trade,
+            config,
+            user
+        )
+
+        # exit_qty, exit_avg_price, hedge_exit_avg_price = 65,40,20--For testing
+        # =========================
+        # FALLBACK SAFETY
+        # =========================
+
+        if exit_avg_price == 0:
+            exit_avg_price = get_quotes(trade["OptionSymbol"], user)
+
+        if config['HEDGE_TYPE'] != "NH":
+            if hedge_exit_avg_price == 0:
+                hedge_exit_avg_price = get_quotes(trade["hedge_option_symbol"], user)
+
+        # =========================
+        # UPDATE TRADE
+        # =========================
+
         trade.update({
             "SpotExit": close,
             "ExitTime": current_time,
-            "OptionBuyPrice": get_quotes(trade["OptionSymbol"] , user),
+            "OptionBuyPrice": exit_avg_price,
+            "qty": exit_qty,
+            "ExitReason": "MANUAL_EXIT"
         })
-        trade["PnL"] = trade["OptionSellPrice"] - trade["OptionBuyPrice"]
-        trade["qty"] = trade.get("qty",config['QTY'])
-        print(f"?? {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} Exiting SELL: Buying back {trade['OptionSymbol']} | Qty: {trade['qty']}")
-        logging.info(f"??INTERVAL {config['INTERVAL']} | Exiting SELL: Buying back {trade['OptionSymbol']} | Qty: {trade['qty']}")
-        
-        order_id ,avg_price,qty = place_option_hybrid_order(trade["OptionSymbol"], trade["qty"], "BUY",config, user)
-        order_id ,avg_price,qty = None, None, None
-        if config['HEDGE_TYPE'] != "NH":
-            hedge_order_id , hedge_avg_price, hedge_qty = place_option_hybrid_order(trade["hedge_option_symbol"], trade["qty"], "SELL", config, user)
-            hedge_order_id , hedge_avg_price, hedge_qty = None, None, None
 
-        logging.info(f"order_id : {order_id} | opt_symbol : {trade['OptionSymbol']} avg_price : {avg_price} | qty : {qty}")
+        # =========================
+        # PNL CALCULATION
+        # =========================
 
-        if avg_price is None:
-            avg_price = get_quotes(trade["OptionSymbol"], user)
-            qty = config['QTY']
+        main_pnl = trade["OptionSellPrice"] - exit_avg_price
+
         if config['HEDGE_TYPE'] != "NH":
-            if hedge_avg_price is None:
-                hedge_avg_price = get_quotes(trade["hedge_option_symbol"], user)
-                hedge_qty = config['QTY']
+
+            hedge_pnl = hedge_exit_avg_price - trade["hedge_option_buy_price"]
+
+            total_pnl = main_pnl + hedge_pnl
 
             trade.update({
-                "OptionBuyPrice": avg_price,
-                "ExitTime": current_time,
-                "PnL": trade["OptionSellPrice"] - avg_price,
-                "qty": qty,
-                "ExitReason": "MANUAL_EXIT",
-                "hedge_option_sell_price": hedge_avg_price,
+
+                "PnL": main_pnl,
+                "hedge_option_sell_price": hedge_exit_avg_price,
                 "hedge_exit_time": current_time,
-                "hedge_pnl": hedge_avg_price - trade["hedge_option_buy_price"] ,
-                "total_pnl": (trade["OptionSellPrice"] - avg_price) + (hedge_avg_price - trade["hedge_option_buy_price"] )
-            })  
+                "hedge_pnl": hedge_pnl,
+                "total_pnl": total_pnl
+
+            })
+
         else:
+
             trade.update({
-                "OptionBuyPrice": avg_price,
-                "ExitTime": current_time,
-                "PnL": trade["OptionSellPrice"] - avg_price,
-                "qty": qty,
-                "ExitReason": "MANUAL_EXIT",
+
+                "PnL": main_pnl,
                 "hedge_option_sell_price": 0.0,
                 "hedge_exit_time": "-",
-                "hedge_pnl": 0.0 ,
-                "total_pnl": trade["OptionSellPrice"] - avg_price
-            })  
-        logging.info(f"??INTERVAL {config['INTERVAL']} | Exiting SELL: Buying back {trade['OptionSymbol']} | Qty: {trade['qty']}")
+                "hedge_pnl": 0.0,
+                "total_pnl": main_pnl
+
+            })
+
+        # =========================
+        # DATABASE UPDATE
+        # =========================
+        trade = get_clean_trade(trade)
+
         record_trade(trade, config, user['id'])
+
         delete_open_position(trade["OptionSymbol"], config, trade, user['id'])
+
+        # =========================
+        # TELEGRAM MESSAGE
+        # =========================
+
         if config['HEDGE_TYPE'] != "NH":
-            send_telegram_message(f"INTERVAL {config['INTERVAL']} | {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} Exit SELL\n{trade['OptionSymbol']} @ ?{trade['OptionBuyPrice']:.2f}. Hedge Exit Symbol {trade['hedge_option_symbol']} | @ ?{trade['hedge_option_sell_price']:.2f} | profit per quantity :{trade['total_pnl']}",user['telegram_chat_id'], user['telegram_token'])
+
+            msg = (
+                f"INTERVAL {config['INTERVAL']} | {user['user']} {SERVER} | {key}\n"
+                f"Exit SELL\n"
+                f"{trade['OptionSymbol']} @ ₹{exit_avg_price:.2f}\n"
+                f"Hedge Exit {trade['hedge_option_symbol']} @ ₹{hedge_exit_avg_price:.2f}\n"
+                f"Profit per qty : {trade['total_pnl']}"
+            )
+
         else:
-            send_telegram_message(f"INTERVAL {config['INTERVAL']} | {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} Exit SELL\n{trade['OptionSymbol']} @ ?{trade['OptionBuyPrice']:.2f}. profit per quantity :{trade['total_pnl']}",user['telegram_chat_id'], user['telegram_token'])
+
+            msg = (
+                f"INTERVAL {config['INTERVAL']} | {user['user']} {SERVER} | {key}\n"
+                f"Exit SELL\n"
+                f"{trade['OptionSymbol']} @ ₹{exit_avg_price:.2f}\n"
+                f"Profit per qty : {trade['total_pnl']}"
+            )
+
+        send_telegram_message(msg, user['telegram_chat_id'], user['telegram_token'])
+
+        return {"status": "ok", "message": "Manual exit completed"}
+
     except Exception as e:
+
         logging.error(f"Error in MANUAL_EXIT: {e}")
+
         return {'status': 'error', 'message': str(e)}
 
 
 def manual_entry(config, user):
+    from tradeJenie import execute_robust_entry
     logging.info(f"Inside manual_entry called for user: {user['user']} | config: {config}")
+
     do_login(user)
-    # placeholder for actual manual order handling
-    # `config` is expected to be a dict of trade_config columns for the requested key
+
     instrument_token = get_token_for_symbol(SYMBOL)
     lot_size = get_lot_size(config, instruments_df)
-    config['QTY'] = lot_size*int(config['LOT'])
+    config['QTY'] = lot_size * int(config['LOT'])
     key = config.get('KEY')
+
     df = get_historical_df(instrument_token, config['INTERVAL'], DAYS, user)
+
+    # Strategy selection
     if config['STRATEGY'] == "GOD":
         df = generate_god_signals(df)
     elif config['STRATEGY'] == "HDSTRATEGY":
@@ -125,81 +357,169 @@ def manual_entry(config, user):
         df = hd_strategy(df)
     elif config['STRATEGY'] == "RAILWAY_TRACK":
         df = railway_track_strategy(df)
+
     latest = df.iloc[-1]
     close = latest['close']
     current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
     signal = "BUY" if latest['trend'] == 1 else "SELL"
 
+    # =========================
+    # MAIN OPTION
+    # =========================
     result = get_optimal_option(signal, close, config['NEAREST_LTP'], instruments_df, config, user)
-    strike = result[1]
-    if config['HEDGE_TYPE'] != "NH":
-        if(config['HEDGE_TYPE'] == "H-P10" ):
-            hedge_result = get_optimal_option(signal, close, HEDGE_NEAREST_LTP, instruments_df, config, user)
-        elif(config['HEDGE_TYPE'] == "H-M100" or config['HEDGE_TYPE'] == "H-M200"):
-            hedge_result = get_hedge_option(signal, close, strike, instruments_df, config, user)
+
     if result is None or result[0] is None:
-        logging.error(f"?INTERVAL {config['INTERVAL']} | {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']}: No suitable option found for BUY signal.")
-        send_telegram_message(f"?INTERVAL {config['INTERVAL']} | {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']}: No suitable option found for BUY signal.",user['telegram_chat_id'], user['telegram_token'])
-        
-    else:
-        opt_symbol, strike, expiry, ltp = result
-        if config['HEDGE_TYPE'] != "NH":
-            hedge_opt_symbol, hedge_strike, hedge_expiry, hedge_ltp = hedge_result
-            print(f"??INTERVAL {config['INTERVAL']} | {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} Entering HEDGE BUY: {hedge_opt_symbol} | Strike: {hedge_strike} | Expiry: {hedge_expiry} | LTP: ?{hedge_ltp:.2f}")
-            logging.info(f"??INTERVAL {config['INTERVAL']} | {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} Entering HEDGE BUY: {hedge_opt_symbol} | Strike: {hedge_strike} | Expiry: {hedge_expiry} | LTP: ?{hedge_ltp:.2f}")
-            logging.info(f"Placing Hedge BUY order for {hedge_opt_symbol} | Qty: {config['QTY']} | User: {user} | Key: {key}")
-            hedge_order_id, hedge_avg_price, hedge_qty = place_option_hybrid_order(hedge_opt_symbol, config['QTY'], "BUY", config, user)
-            hedge_order_id , hedge_avg_price, hedge_qty = None, None, None
-            logging.info(f"hedge_order_id : {hedge_order_id} | hedge_opt_symbol : {hedge_opt_symbol} hedge_avg_price : {hedge_avg_price} | hedge_qty : {hedge_qty}")
 
-        print(f"??INTERVAL {config['INTERVAL']} | {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']}  {opt_symbol} | Strike: {strike} | Expiry: {expiry} | LTP: ?{ltp:.2f}")
-        logging.info(f"??INTERVAL {config['INTERVAL']} | {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']}  {opt_symbol} | Strike: {strike} | Expiry: {expiry} | LTP: ?{ltp:.2f}")
+        msg = f"❌INTERVAL {config['INTERVAL']} | {user['user']} {SERVER} | {key} | No suitable option found."
+        logging.error(msg)
 
-        logging.info(f"Placing Sell order for {opt_symbol} | Qty: {config['QTY']} | User: {user['user']} | Key: {key}")
-        order_id ,avg_price,qty = place_option_hybrid_order(opt_symbol, config['QTY'], "SELL", config, user)
-        order_id ,avg_price,qty = None, None, None
-        logging.info(f"{key} | order_id : {order_id} | opt_symbol : {opt_symbol} avg_price : {avg_price} | qty : {qty}")
-        time.sleep(2)
-        
-        if config['HEDGE_TYPE'] != "NH":
-            if hedge_avg_price is None:
-                hedge_avg_price = hedge_ltp
-                hedge_qty = config['QTY']
-        
-        if avg_price is None:
-            avg_price = ltp
-            qty = config['QTY']
+        send_telegram_message(msg, user['telegram_chat_id'], user['telegram_token'])
 
-        logging.info(f"??INTERVAL {config['INTERVAL']} | Avg price for {opt_symbol}: ?{avg_price:.2f} | Qty: {qty}")
+        return {'status': 'error', 'message': 'No suitable option found'}
 
-        if config['HEDGE_TYPE'] != "NH":
-            trade = {
-                "Signal": signal, "SpotEntry": close, "OptionSymbol": opt_symbol,
-                "Strike": strike, "Expiry": expiry,
-                "OptionSellPrice": avg_price, "EntryTime": current_time,
-                "qty": qty, "interval": config['INTERVAL'], "real_trade": config['REAL_TRADE'],
-                "EntryReason":"MANUAL_ENTRY", "ExpiryType":config['EXPIRY'],
-                "Strategy":config['STRATEGY'], "Key":key, "hedge_option_symbol":hedge_opt_symbol,
-                "hedge_strike":hedge_strike, "hedge_option_buy_price":hedge_avg_price,
-                "hedge_qty":hedge_qty, "hedge_entry_time": current_time
-            }
-            send_telegram_message(f"??INTERVAL {config['INTERVAL']} | {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} \n{opt_symbol} | Avg ?{avg_price:.2f} | Qty: {qty}. \n Hedge Symbol {trade['hedge_option_symbol']} | @ ?{trade['hedge_option_buy_price']:.2f}",user['telegram_chat_id'], user['telegram_token'])
+    opt_symbol, strike, expiry, ltp = result
+
+    hedge_opt_symbol = None
+    hedge_strike = None
+    hedge_expiry = None
+    hedge_ltp = None
+    hedge_required=False
+
+    # =========================
+    # HEDGE OPTION
+    # =========================
+    if config['HEDGE_TYPE'] != "NH":
+        hedge_required=True
+        if config['HEDGE_TYPE'] == "H-P10":
+            hedge_result = get_optimal_option(signal, close, HEDGE_NEAREST_LTP, instruments_df, config, user)
+
+        elif config['HEDGE_TYPE'] in ["H-M100", "H-M200"]:
+            hedge_result = get_hedge_option(signal, close, strike, ltp, instruments_df, config, user)
+
         else:
-            trade = {
-                "Signal": signal, "SpotEntry": close, "OptionSymbol": opt_symbol,
-                "Strike": strike, "Expiry": expiry,
-                "OptionSellPrice": avg_price, "EntryTime": current_time,
-                "qty": qty, "interval": config['INTERVAL'], "real_trade": config['REAL_TRADE'],
-                "EntryReason":"MANUAL_ENTRY", "ExpiryType":config['EXPIRY'],
-                "Strategy":config['STRATEGY'], "Key":key, "hedge_option_symbol":"-",
-                "hedge_strike":"-", "hedge_option_buy_price":0.0,
-                "hedge_qty":"-", "hedge_entry_time": "-"
-            }
-            send_telegram_message(f"??INTERVAL {config['INTERVAL']} | {user['user']} {SERVER}  |  {key}  |  {config['INTERVAL']} \n{opt_symbol} | Avg ?{avg_price:.2f} | Qty: {qty}.",user['telegram_chat_id'], user['telegram_token'])
-        save_open_position(trade, config, user['id'])
-    
-    return {'status': 'ok', 'message': f"MANUAL_ENTRY processed for key {key}"}
+            hedge_result = None
 
+        if hedge_result is None or hedge_result[0] is None:
+
+            msg = f"❌ {key} | Hedge option not found. Aborting manual entry."
+
+            logging.error(msg)
+            send_telegram_message(msg, user['telegram_chat_id'], user['telegram_token'])
+
+            return {'status': 'error', 'message': 'Hedge option not found'}
+
+        hedge_opt_symbol, hedge_strike, hedge_expiry, hedge_ltp = hedge_result
+
+    # =========================
+    # BUILD TRADE OBJECT
+    # =========================
+    trade = {
+        "Signal": signal,
+        "SpotEntry": close,
+        "OptionSymbol": opt_symbol,
+        "Strike": strike,
+        "Expiry": expiry,
+        "interval": config['INTERVAL'],
+        "real_trade": config['REAL_TRADE'],
+        "Strategy": config['STRATEGY'],
+        "ExpiryType": config['EXPIRY'],
+        "Key": key
+    }
+
+    if config['HEDGE_TYPE'] != "NH":
+
+        trade.update({
+            "hedge_option_symbol": hedge_opt_symbol,
+            "hedge_strike": hedge_strike
+        })
+
+    # =========================
+    # EXECUTE ENTRY
+    # =========================
+    main_qty, main_avg_price, hedge_avg_price = execute_robust_entry(
+        trade,
+        config,
+        user
+    )
+
+    # main_qty, main_avg_price, hedge_avg_price = 65,60,45 --- for testing only
+    if not is_valid_trade_data(main_qty, main_avg_price, hedge_avg_price, hedge_required):
+        err_msg = f"⚠️ {key} | FAILED Entry: Qty ({main_qty}) or Price ({main_avg_price}) or ({hedge_avg_price}) is 0. Database NOT updated."
+        logging.error(err_msg)
+        send_telegram_message_admin(err_msg)
+        return {'status': 'error', 'message': 'Failed to execute manual entry.'}
+
+    # =========================
+    # SAVE TRADE
+    # =========================
+    if config['HEDGE_TYPE'] != "NH":
+
+        trade_record = {
+
+            "Signal": signal,
+            "SpotEntry": close,
+            "OptionSymbol": opt_symbol,
+            "Strike": strike,
+            "Expiry": expiry,
+            "OptionSellPrice": main_avg_price,
+            "EntryTime": current_time,
+            "qty": main_qty,
+            "interval": config['INTERVAL'],
+            "real_trade": config['REAL_TRADE'],
+            "EntryReason": "MANUAL_ENTRY",
+            "ExpiryType": config['EXPIRY'],
+            "Strategy": config['STRATEGY'],
+            "Key": key,
+            "hedge_option_symbol": hedge_opt_symbol,
+            "hedge_strike": hedge_strike,
+            "hedge_option_buy_price": hedge_avg_price,
+            "hedge_qty": main_qty,
+            "hedge_entry_time": current_time
+        }
+
+        msg = (
+            f"🚀 MANUAL ENTRY\n"
+            f"{opt_symbol} | Avg ₹{main_avg_price:.2f} | Qty {main_qty}\n"
+            f"Hedge: {hedge_opt_symbol} @ ₹{hedge_avg_price:.2f}"
+        )
+
+    else:
+
+        trade_record = {
+
+            "Signal": signal,
+            "SpotEntry": close,
+            "OptionSymbol": opt_symbol,
+            "Strike": strike,
+            "Expiry": expiry,
+            "OptionSellPrice": main_avg_price,
+            "EntryTime": current_time,
+            "qty": main_qty,
+            "interval": config['INTERVAL'],
+            "real_trade": config['REAL_TRADE'],
+            "EntryReason": "MANUAL_ENTRY",
+            "ExpiryType": config['EXPIRY'],
+            "Strategy": config['STRATEGY'],
+            "Key": key,
+            "hedge_option_symbol": "-",
+            "hedge_strike": "-",
+            "hedge_option_buy_price": 0.0,
+            "hedge_qty": "-",
+            "hedge_entry_time": "-"
+        }
+
+        msg = (
+            f"🚀 MANUAL ENTRY\n"
+            f"{opt_symbol} | Avg ₹{main_avg_price:.2f} | Qty {main_qty}"
+        )
+
+    send_telegram_message(msg, user['telegram_chat_id'], user['telegram_token'])
+
+    trade_record = get_clean_trade(trade_record)
+    save_open_position(trade_record, config, user['id'])
+
+    return {'status': 'ok', 'message': f"MANUAL_ENTRY processed for key {key}"}
 
 
 # Helper to read trades from a given DB
@@ -958,6 +1278,7 @@ def api_close_trade():
                 "OptionSellPrice": trade.get('option_sell_price'),
                 "EntryReason": trade.get('entry_reason'),
                 "ExpiryType": trade.get('expiry_type'),
+                "qty": trade.get('qty'),
                 "hedge_option_symbol": trade.get('hedge_option_symbol'),
                 "hedge_option_buy_price": trade.get('hedge_option_buy_price'),
                 "Signal": trade.get('signal'),
@@ -1235,6 +1556,20 @@ def update_strategy_config():
         traceback.print_exc()
         return jsonify({'success': False, 'message': f'Error: {str(e)}'}), 500
 
+
+
+@hk_bp.route('/api/kite-holdings')
+def api_kite_holdings():
+    try:
+        # Fetch holdings from Kite Connect
+        holdings = kite.holdings()
+        return jsonify({
+            'success': True, 
+            'holdings': holdings
+        })
+    except Exception as e:
+        logging.error(f"Kite Holdings API Error: {e}")
+        return jsonify({'success': False, 'message': str(e)}), 500
 
 
 

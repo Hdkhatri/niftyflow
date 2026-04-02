@@ -48,6 +48,10 @@ from login import login_bp
 app.register_blueprint(login_bp)
 from manualtrading import hk_bp
 app.register_blueprint(hk_bp)
+from getkite import getkite_bp
+app.register_blueprint(getkite_bp)
+from tradingReport import trading_report_bp
+app.register_blueprint(trading_report_bp)
 
 # ===== Session Management =====
 from flask import session
@@ -502,7 +506,7 @@ if __name__ == '__main__':
     sys.stderr.flush()
 
     try:
-        app.run(host='0.0.0.0', port=8000, debug=False, use_reloader=False, threaded=True)
+        app.run(host='0.0.0.0', port=8000, debug=True, use_reloader=False, threaded=True)
     except KeyboardInterrupt:
         print("\n✅ Trade Report Server stopped")
         sys.exit(0)

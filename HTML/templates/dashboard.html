@@ -310,7 +310,7 @@
                 <div class="card-content">
                     View detailed trading reports, performance analytics, and historical data.
                 </div>
-                <button class="card-button" onclick="navigateTo('/reports')">View Reports</button>
+                <button class="card-button" onclick="navigateTo('/trading-report')">View Reports</button>
             </div>
 
             <!-- Account Settings Card -->
@@ -526,5 +526,8 @@
             }
         });
     </script>
+
+    <!-- Session Management and Activity Tracking -->
+    <script src="{{ url_for('static', filename='js/session-manager.js') }}"></script>
 </body>
 </html>

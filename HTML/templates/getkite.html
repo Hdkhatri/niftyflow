@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kite Portfolio Sync - TradeJenie</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/manageStrategies.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/getKite.css') }}">
+    <style>
+    </style>
+</head>
+<body>
+    {% include 'header.html' %}
+
+    <div class="container-main">
+        <div class="breadcrumb-nav">
+            <a href="/dashboard"><i class="fas fa-home"></i> Dashboard</a>
+            <span> / Kite Portfolio Sync</span>
+        </div>
+
+        <div class="page-toolbar">
+            <div class="page-title">
+                <h2><i class="fas fa-satellite-dish"></i> Command Center</h2>
+                <p>Compare tracked database trades with live Kite positions and holdings.</p>
+            </div>
+
+            <div class="user-select-wrap">
+                <label for="userSelect">Active User</label>
+                <select id="userSelect" class="user-select" onchange="refresh()">
+                    <option value="">-- Choose Active User --</option>
+                    {% for user in users %}
+                    <option value="{{ user.id }}">{{ user.user }} ({{ user.name }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="portfolio-summary">
+            <div class="summary-card">
+                <span>DB Open Trades</span>
+                <strong id="dbCount">0</strong>
+            </div>
+            <div class="summary-card">
+                <span>Live Positions</span>
+                <strong id="positionCount">0</strong>
+            </div>
+            <div class="summary-card">
+                <span>Demat Holdings</span>
+                <strong id="holdingCount">0</strong>
+            </div>
+        </div>
+
+        <div class="section-card">
+            <div class="section-header">
+                <h2><i class="fas fa-database"></i> Database Open Trades</h2>
+            </div>
+            <div class="section-content" id="dbBox">
+                <div class="empty-copy">Select a user to load tracked trades.</div>
+            </div>
+        </div>
+
+        <div class="section-card">
+            <div class="section-header">
+                <h2><i class="fas fa-chart-line"></i> Kite Live Net Positions</h2>
+            </div>
+            <div class="section-content" id="posBox">
+                <div class="empty-copy">No positions loaded yet.</div>
+            </div>
+        </div>
+
+        <div class="section-card">
+            <div class="section-header">
+                <h2><i class="fas fa-wallet"></i> Kite Demat Holdings</h2>
+            </div>
+            <div class="section-content" id="holdBox">
+                <div class="empty-copy">No holdings loaded yet.</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function updateCounts(dbTrades, positions, holdings) {
+            document.getElementById('dbCount').textContent = dbTrades?.length || 0;
+            document.getElementById('positionCount').textContent = positions?.length || 0;
+            document.getElementById('holdingCount').textContent = holdings?.length || 0;
+        }
+
+        async function refresh() {
+            const uid = document.getElementById('userSelect').value;
+            if (!uid) {
+                updateCounts([], [], []);
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/portfolio/${uid}`).then(r => r.json());
+                if (res.success) {
+                    const dbTrades = res.db_open_trades || [];
+                    const positions = res.kite_positions || [];
+                    const holdings = res.kite_holdings || [];
+
+                    updateCounts(dbTrades, positions, holdings);
+                    renderDB(dbTrades);
+                    renderKite(positions, 'posBox');
+                    renderKite(holdings, 'holdBox');
+                } else {
+                    alert(res.message || 'Failed to load portfolio data');
+                }
+            } catch (e) {
+                alert('Fetch failed');
+            }
+        }
+
+        function renderDB(trades) {
+            const container = document.getElementById('dbBox');
+            if (!trades?.length) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon"><i class="fas fa-folder-open"></i></div><p>No tracked trades found for this user.</p></div>';
+                return;
+            }
+
+            let html = `
+                <div class="data-table-wrap">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Symbol</th>
+                                <th>Hedge</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            trades.forEach(t => {
+                const badge = t.is_live
+                    ? '<span class="status-chip live"><i class="fas fa-check-circle"></i> Live on Kite</span>'
+                    : '<span class="status-chip orphan"><i class="fas fa-exclamation-triangle"></i> Orphan</span>';
+
+                html += `
+                    <tr>
+                        <td><span class="symbol-strong">${t.option_symbol}</span></td>
+                        <td>${t.hedge_option_symbol || '-'}</td>
+                        <td>${badge}</td>
+                        <td><button onclick="exitTrade(${t.id})" class="action-btn">Square Off</button></td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        }
+
+        function renderKite(items, boxId) {
+            const container = document.getElementById(boxId);
+            if (!items?.length) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon"><i class="fas fa-inbox"></i></div><p>No records available.</p></div>';
+                return;
+            }
+
+            let html = `
+                <div class="data-table-wrap">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Symbol</th>
+                                <th>Qty</th>
+                                <th>Avg</th>
+                                <th>P&amp;L</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            items.forEach(i => {
+                const averagePrice = Number(i.average_price || 0).toFixed(2);
+                const pnlValue = Number(i.pnl || 0);
+
+                html += `
+                    <tr>
+                        <td><span class="symbol-strong">${i.tradingsymbol}</span></td>
+                        <td>${i.quantity ?? 0}</td>
+                        <td>${averagePrice}</td>
+                        <td class="${pnlValue >= 0 ? 'pnl-pos' : 'pnl-neg'}">${pnlValue.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        }
+
+        async function exitTrade(tid) {
+            if (!confirm('This will execute MARKET orders on Kite to close ALL legs and update Database. Proceed?')) {
+                return;
+            }
+
+            const res = await fetch(`/api/exit-trade/${tid}`, { method: 'POST' }).then(r => r.json());
+            if (res.success) {
+                refresh();
+            } else {
+                alert('Exit Failed: ' + res.message);
+            }
+        }
+    </script>
+</body>
+</html>
