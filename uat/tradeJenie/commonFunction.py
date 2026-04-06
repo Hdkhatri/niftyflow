@@ -5,10 +5,11 @@ import numpy as np
 import pandas as pd
 import sqlite3
 import logging
-from kitefunction import  get_historical_df, place_option_hybrid_order, get_avgprice_from_positions, get_token_for_symbol, get_quotes_with_retry, get_profile
+from kitefunction import  get_historical_df, place_option_hybrid_order, get_avgprice_from_positions, get_token_for_symbol, get_quotes_with_retry, get_profile, get_symbol_quote, get_entire_quote
 from telegrambot import send_telegram_message, send_telegram_message_admin
 from config import  DB_FILE, HARDLIMIT, HEDGE_NEAREST_LTP, HEDGE_STRIKE_DIFF,SYMBOL,SEGMENT, CANDLE_DAYS as DAYS, REQUIRED_CANDLES, LOG_FILE,INSTRUMENTS_FILE, OPTION_SYMBOL, SERVER
 import os
+
 
 # pd.set_option('future.no_silent_downcasting', True)
 
@@ -479,7 +480,8 @@ def get_lot_size(config, instruments_df):
         logging.error(f"❌{config['KEY']} | Error getting lot size: {e}")
         return None
 
-def get_robust_optimal_option(signal, spot, nearest_price, instruments_df, config, user, hedge_offset=200, hedge_required=True):
+#Without Depth Check
+def get_robust_optimal_option_without_depth(signal, spot, nearest_price, instruments_df, config, user, hedge_offset=200, hedge_required=True):
     from kitefunction import get_entire_quote, get_kite_client,get_symbol_ltp
     kite = get_kite_client(user)
     print(f"{config['KEY']} | Start Search: {datetime.datetime.now()} | Target: {nearest_price}")
@@ -552,6 +554,7 @@ def get_robust_optimal_option(signal, spot, nearest_price, instruments_df, confi
         if m_ltp == 0:
             m_ltp = get_entire_quote(opt_symbol, user).get('last_price', 0)
 
+        print(f"m_ltp : {m_ltp}")
         if m_ltp > 0:
             effective_price = m_ltp
             hedge_symbol, hedge_price = None, None
@@ -565,8 +568,14 @@ def get_robust_optimal_option(signal, spot, nearest_price, instruments_df, confi
                     h_ltp = all_quotes.get("NFO:"+hedge_symbol, {}).get('last_price', 0)
                     if h_ltp == 0:
                         h_quote = get_entire_quote(hedge_symbol, user)
+                        print(f"h_quote.get('last_price', 0) : {h_quote.get('last_price', 0)}")
+                        print(f"(h_quote.get('buy_price', 0) : {h_quote.get('buy_price', 0)}")
+                        print(f"h_quote.get('sell_price', 0) : {h_quote.get('sell_price', 0)}")
+
                         h_ltp = h_quote.get('last_price', 0) or (h_quote.get('buy_price', 0) + h_quote.get('sell_price', 0)) / 2
                     
+                    
+
                     if h_ltp > 0:
                         hedge_liquid, hedge_price = True, h_ltp
                 else:
@@ -1319,7 +1328,7 @@ def will_market_open_within_minutes(minutes=60):
     return minutes_until_open <= minutes
 
 
-def close_position_and_no_new_trade(trade, position, close, ts, config, user, key):
+def close_position_and_no_new_trade(trade, position, close, ts, config, user, key, reason="Nothing"):
     from tradeJenie import execute_robust_exit
     """
     Unified Exit Function:
@@ -1327,8 +1336,8 @@ def close_position_and_no_new_trade(trade, position, close, ts, config, user, ke
     - Forces expiry_match="DIFF" for a total exit.
     - Updates DB and kills thread on any mismatch or partial fill.
     """
-    print(f"📥 {user['user']} {SERVER} | {key} | Final Exit: Closing {trade['OptionSymbol']}")
-    logging.info(f"📥 {user['user']} {SERVER} | {key} | Final Exit: Closing {trade['OptionSymbol']}")
+    print(f"📥 {key} | Final Exit: Closing {trade['OptionSymbol']} | reason : {reason}")
+    logging.info(f"📥 {key} | Final Exit: Closing {trade['OptionSymbol']}")
 
     if config['HEDGE_TYPE'] != "NH":
         hedge_required = True
@@ -1342,7 +1351,8 @@ def close_position_and_no_new_trade(trade, position, close, ts, config, user, ke
         trade, 
         config, 
         user, 
-        expiry_match="DIFF"
+        expiry_match="DIFF",
+        reason=reason
     )
     if hedge_required:
         logging.info(f"📤{key} | Exited position {trade['OptionSymbol']} with Avg price: ₹{avg_price:.2f} | Qty: {exit_qty} | {trade['hedge_option_symbol']} with Avg price: ₹{hedge_avg_price:.2f} | Qty: {exit_qty}")
@@ -1724,6 +1734,8 @@ def update_trade_config_on_failure(config_key, kill_reason, user):
 
 def is_valid_trade_data(qty, avg_price, hedge_price=0, hedge_required=False):
     """Returns True only if critical trade values are non-zero."""
+    logging.info(f"INSIDE is_valid_trade_data")
+    logging.info(f"Qty : {qty} | avg_price : {avg_price} | hedge_price :{hedge_price} | hedge_required : {hedge_required}")
     if qty <= 0 or avg_price <= 0:
         return False
     if hedge_required and hedge_price <= 0:
@@ -1771,3 +1783,154 @@ def get_clean_trade(trade):
             # If no, just keep it as it is (Number or Text)
             clean_trade[key] = value
     return clean_trade
+
+
+def get_robust_optimal_option(signal, spot, nearest_price, instruments_df, config, user, hedge_offset=200, hedge_required=True):
+    """
+    Institutional-grade option selector with Hybrid Liquidity logic.
+    Prevents rejection of tight spreads (0.05/0.10) while maintaining slippage control.
+    """
+    logging.info(f" {config['KEY']} | INSIDE get_robust_optimal_option")
+    logging.info(f"  {config['KEY']} | signal : {signal} | spot : {spot} | nearest_price :{nearest_price} | hedge_offset : {hedge_offset} | hedge_required : {hedge_required}")
+
+    
+    # 1. CONFIGURATION
+    OPTION_SYMBOL = config.get('SYMBOL', 'NIFTY')
+    MIN_HEDGE_PRICE = 2.0
+    
+    lot_size = get_lot_size(config, instruments_df)
+    config['QTY'] = lot_size * int(config['LOT'])
+   
+    REQUIRED_QTY = config['QTY']
+    MAX_SPREAD_PCT = 0.05  # 5% limit
+    MIN_POINT_BUFFER = 0.15 # Allow any spread below 0.50 points regardless of %
+
+    print(f"\n--- 🛡️ {config['KEY']} | Finding OPTIMAL OPTION | Target: {nearest_price} | Qty: {REQUIRED_QTY} ---")
+    logging.info(f"\n--- 🛡️ {config['KEY']} | Finding OPTIMAL OPTION | Target: {nearest_price} | Qty: {REQUIRED_QTY} ---")
+
+    # 2. EXPIRY LOGIC
+    today = pd.Timestamp.today().normalize()
+    days = 7 if config.get('EXPIRY') == "NEXT_WEEK" else 14 if config.get('EXPIRY') == "NEXT_TO_NEXT_WEEK" else 0 
+    
+    if config.get('EXPIRY') == "LAST":
+        month_ref = today if today.day <= 15 else (today + pd.DateOffset(months=1)).replace(day=1)
+        next_month = month_ref.replace(day=28) + datetime.timedelta(days=4)
+        last_day = next_month - datetime.timedelta(days=next_month.day)
+        target_expiry = last_day - datetime.timedelta(days=(last_day.weekday() - 1) % 7)
+    else:
+        days_until_tuesday = (1 - today.weekday() + 7) % 7
+        target_expiry = today + datetime.timedelta(days=days_until_tuesday + days)
+
+    week_start = target_expiry - datetime.timedelta(days=target_expiry.weekday())
+    week_end = week_start + datetime.timedelta(days=6)
+    opt_type = "PE" if signal == "BUY" else "CE"
+    
+    df = instruments_df.copy()
+    df['expiry'] = pd.to_datetime(df['expiry'])
+    fast_df = df[(df['name'] == OPTION_SYMBOL) & 
+                 (df['tradingsymbol'].str.endswith(opt_type)) & 
+                 (df['expiry'] >= week_start) & (df['expiry'] <= week_end)].copy()
+    
+    if fast_df.empty: return None, None, None, None, None
+    strike_map = fast_df.set_index('strike').to_dict('index')
+
+    # 3. FETCH DATA
+    fast_df['dist'] = (fast_df['strike'] - spot).abs()
+    candidate_symbols = ["NFO:" + s for s in fast_df.nsmallest(80, 'dist')['tradingsymbol'].tolist()]
+    all_quotes = get_symbol_quote(candidate_symbols, user) or {}
+
+    # 4. SEARCH LOOP
+    strike = int(round(spot / 100.0) * 100)
+    strike_step = -100 if signal == "BUY" else 100
+    hedge_direction = -1 if signal == "BUY" else 1 
+    best_option, best_diff = None, float('inf')
+
+    for i in range(100):
+        if strike not in strike_map:
+            strike += strike_step; continue
+            
+        opt = strike_map[strike]
+        tsym = opt['tradingsymbol']
+        q = all_quotes.get("NFO:" + tsym, {})
+        
+        # --- DEPTH ANALYSIS ---
+        depth = q.get('depth', {})
+        book_side = depth.get('sell' if signal == "BUY" else 'buy', [])
+        opp_side = depth.get('buy' if signal == "BUY" else 'sell', [])
+        
+        if book_side and opp_side:
+            # VWAP Calculation
+            accum_qty, total_cost = 0, 0
+            for level in book_side:
+                take = min(level['quantity'], REQUIRED_QTY - accum_qty)
+                total_cost += (take * level['price'])
+                accum_qty += take
+                if accum_qty >= REQUIRED_QTY: break
+            
+            if accum_qty < REQUIRED_QTY:
+                strike += strike_step; continue
+            
+            m_effective_price = total_cost / REQUIRED_QTY
+            
+            # --- HYBRID SPREAD CHECK ---
+            best_ask = book_side[0]['price']
+            best_bid = opp_side[0]['price']
+            spread_pts = abs(best_ask - best_bid)
+            
+            # Reject ONLY if spread is > 5% AND > 0.50 points
+            if spread_pts > (best_ask * MAX_SPREAD_PCT) and spread_pts > MIN_POINT_BUFFER:
+                print(f"⚠️{config['KEY']} | {tsym}: Spread too wide ({spread_pts:.2f} pts)") 
+                logging.info(f"⚠️ {config['KEY']} | {tsym}: Spread too wide ({spread_pts:.2f} pts)")
+                strike += strike_step
+                
+                continue
+        else:
+            m_ltp = q.get('last_price', 0)
+            if m_ltp <= 0: strike += strike_step; continue
+            m_effective_price = m_ltp
+
+        # 5. HEDGE VALIDATION
+        h_sym, h_ltp, h_valid = None, 0, False
+        if hedge_required:
+            h_strike = strike + (hedge_offset * hedge_direction)
+            if h_strike in strike_map:
+                h_tsym = strike_map[h_strike]['tradingsymbol']
+                hq = all_quotes.get("NFO:" + h_tsym, {})
+                h_ltp = hq.get('last_price', 0)
+                
+                # Fallback if bulk missed hedge
+                if h_ltp <= 0:
+                    h_ltp = get_entire_quote(h_tsym, user).get('last_price', 0)
+
+                # Logical Check: Hedge > Min Price AND Hedge cheaper than Main
+                if MIN_HEDGE_PRICE < h_ltp < m_effective_price:
+                    h_sym, h_valid = h_tsym, True
+        else:
+            h_valid = True
+
+        # 6. EVALUATE MATCH
+        if h_valid:
+            diff = abs(m_effective_price - nearest_price)
+            if diff <= HARDLIMIT:
+                if diff < best_diff:
+                    best_diff = diff
+                    best_option = (tsym, strike, opt['expiry'], round(m_effective_price, 2), h_sym, h_ltp)
+                
+                if diff <= 1: break # Exit early on perfect match
+            
+            # Stop if price moves significantly away
+            if i > 0 and diff > (best_diff + 20): break
+
+        strike += strike_step
+
+    # 7. FINAL RETURN
+    if best_option:
+        tsym, strike, expiry, eff_p, h_sym, h_ltp = best_option
+        print(f"✅ {config['KEY']} | MATCH: {tsym} @ {eff_p} | Hedge: {h_sym} @ {h_ltp}")
+        logging.info(f"✅ {config['KEY']} | MATCH: {tsym} @ {eff_p} | Hedge: {h_sym} @ {h_ltp}")
+        return tsym, strike, expiry, eff_p, h_sym
+
+    print(f"❌{config['KEY']} | NO VALID PAIR FOUND")
+    logging.info(f"❌{config['KEY']} | NO VALID PAIR FOUND")
+
+    return None, None, None, None, None

@@ -90,6 +90,7 @@ def get_historical_df(instrument_token, interval, days, user):
 def get_entire_quote(symbol, user):
     # kite = get_kite_client(user) # use this for all users
     kite = get_kite_client(default_user) # use this for master user having access to history and quotes
+    print(f" kite: {kite} and Symbol :{symbol}")
     try:
         full_symbol = f"NFO:{symbol}"
         quote = kite.quote([full_symbol])
@@ -501,9 +502,9 @@ def place_option_market_order_strict_one(
 
 
 #Only limit order 
-def place_option_hybrid_order_old(tradingsymbol, qty, ordertype,config , user):
+# def place_option_hybrid_order_old(tradingsymbol, qty, ordertype,config , user):
 
-    return place_aggressive_limit_order(tradingsymbol, qty, ordertype, config, user)
+#     return place_aggressive_limit_order(tradingsymbol, qty, ordertype, config, user)
 
 
 #Hybrid order: Try market first, then aggressive limit if not filled
@@ -1069,3 +1070,17 @@ def place_robust_limit_order(tradingsymbol, qty, ordertype, config, user, action
     except Exception as e:
         logging.error(f"Execution Error: {e}")
         return None, 0, 0
+    
+
+
+def get_symbol_quote(symbol, user):
+    # kite = get_kite_client(user) # use this for all users
+    kite = get_kite_client(default_user) # use this for master user having access to history and quotes
+    try:
+        #full_symbol = f"NFO:{symbol}"
+        quote = kite.quote([symbol])
+        return quote
+    except Exception as e:
+        print(f"❌{user['user']} | Error fetching quote for {symbol}: {e}")
+        logging.error(f"{user['user']}  | Error fetching quote for {symbol}: {e}")
+        return None

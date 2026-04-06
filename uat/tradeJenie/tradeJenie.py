@@ -365,6 +365,9 @@ def _monitor_nh_position_until_next_candle(
     current_time,
     instruments_df
 ):
+    logging.info(f" {config['KEY']} | INSIDE _monitor_nh_position_until_next_candle")
+    logging.info(f"  {config['KEY']} | position : {position} | close : {close}")
+
     next_candle_time = get_next_candle_time(config['INTERVAL'])
     target_hit = False
     while datetime.datetime.now() < next_candle_time:
@@ -378,7 +381,7 @@ def _monitor_nh_position_until_next_candle(
         if now.time().hour == 15 and now.time().minute >= 15 and trade and position:
             if config['INTRADAY'] == "yes":
                 trade, position = close_position_and_no_new_trade(
-                    trade, position, close, ts, config, user, key
+                    trade, position, close, ts, config, user, key, reason="Intraday exit of current position"
                 )
 
                 msg = f"⏰ {key} | {user['user']} {SERVER} |  Intraday exit triggered at 3:15 PM. Exited Main {trade['OptionSymbol']} at ₹{trade.get('OptionBuyPrice',0):.2f} | PnL: ₹{trade.get('PnL',0):.2f}"
@@ -404,7 +407,7 @@ def _monitor_nh_position_until_next_candle(
             # STOPLOSS
             if check_trade_stoploss_hit(user, trade, config):
                 trade, position = close_position_and_no_new_trade(
-                    trade, position, close, ts, config, user, key
+                    trade, position, close, ts, config, user, key, reason="Stoploss hit so exiting position."
                 )
                 break
 
@@ -420,7 +423,8 @@ def _monitor_nh_position_until_next_candle(
                     trade,
                     config,
                     user,
-                    expiry_match="DIFF"
+                    expiry_match="DIFF",
+                    reason="Target hit so exiting current position."
                 )
                 logging.info(f"📤{key} | Exited without Hedge position {trade['OptionSymbol']} with Avg price: ₹{avg_price:.2f} | Qty: {exit_qty}" )
 
@@ -529,7 +533,8 @@ def _monitor_nh_position_until_next_candle(
                 new_qty, avg_price, hedge_avg = execute_robust_entry(
                     symbols,
                     config,
-                    user
+                    user,
+                    reason="Rollover entry in same direction."
                 )
                 print(f"📤{key} | Entered without Hedge position {opt_symbol} with Avg price: ₹{avg_price:.2f} | Qty: {new_qty}.")
                 logging.info(f"📤{key} | Entered without Hedge position {opt_symbol} with Avg price: ₹{avg_price:.2f} | Qty: {new_qty}.")
@@ -600,6 +605,8 @@ def _monitor_hedged_position_until_next_candle(
     current_time,
     instruments_df
 ):
+    logging.info(f" {config['KEY']} | INSIDE _monitor_hedged_position_until_next_candle")
+    logging.info(f"  {config['KEY']} | position : {position} | close : {close} ")
     next_candle_time = get_next_candle_time(config['INTERVAL'])
     target_hit = False
     while datetime.datetime.now() < next_candle_time:
@@ -610,7 +617,7 @@ def _monitor_hedged_position_until_next_candle(
         
         if now.time().hour == 15 and now.time().minute >= 15 and trade and "OptionSymbol" in trade and position:
             if config['INTRADAY'] == "yes":
-                trade, position = close_position_and_no_new_trade(trade, position, close, ts,config, user, key)
+                trade, position = close_position_and_no_new_trade(trade, position, close, ts,config, user, key, reason="Intraday exit current position")
                 print(f"⏰ {key}  | {user['user']} {SERVER}  | Intraday mode: No new trades after 3:15 PM. Waiting for market close.")
                 logging.info(f"⏰ {key}  | {user['user']} {SERVER}  | Intraday mode: No new trades after 3:15 PM. Waiting for market close.")
                 send_telegram_message(f"⏰ {key}  | {user['user']} {SERVER}  | Intraday mode: No new trades after 3:15 PM. Waiting for market close.",user['telegram_chat_id'], user['telegram_token'])
@@ -631,7 +638,8 @@ def _monitor_hedged_position_until_next_candle(
                     trade, 
                     config, 
                     user, 
-                    expiry_match="DIFF" 
+                    expiry_match="DIFF",
+                    reason="Stoploss hit so exiting position."
                 )
                 print(f"📤{key} | StopLoss Exit executed for {trade['OptionSymbol']} with Avg price: ₹{avg_price:.2f} | Qty: {exit_qty} And {trade['hedge_option_symbol']} with Avg price: ₹{hedge_avg_price:.2f} | Qty: {exit_qty}" )
                 logging.info(f"📤{key} | StopLoss Exit executed for {trade['OptionSymbol']} with Avg price: ₹{avg_price:.2f} | Qty: {exit_qty} And {trade['hedge_option_symbol']} with Avg price: ₹{hedge_avg_price:.2f} | Qty: {exit_qty}" )
@@ -697,7 +705,8 @@ def _monitor_hedged_position_until_next_candle(
                         trade, 
                         config, 
                         user, 
-                        expiry_match="DIFF"
+                        expiry_match="DIFF",
+                        reason="Target hit so exiting position."
                     )
                     print(f"📤{key} | Exited from {trade['OptionSymbol']} with Avg price: ₹{avg_price:.2f} | Qty: {exit_qty} And {trade['hedge_option_symbol']} with Avg price: ₹{hedge_avg_price:.2f} | Qty: {exit_qty}" )
                     logging.info(f"📤{key} | Exited from {trade['OptionSymbol']} with Avg price: ₹{avg_price:.2f} | Qty: {exit_qty} And {trade['hedge_option_symbol']} with Avg price: ₹{hedge_avg_price:.2f} | Qty: {exit_qty}" )
@@ -809,7 +818,7 @@ def _monitor_hedged_position_until_next_candle(
                             hedge_opt_symbol = trade.get('hedge_option_symbol')  # Force same hedge if expiry is same, even if search found a different one
 
                         # 3. EXECUTE ROBUST EXIT
-                        exit_qty, exit_avg, exit_h_avg = execute_robust_exit(trade, config, user, expiry_match=expiry_match)
+                        exit_qty, exit_avg, exit_h_avg = execute_robust_exit(trade, config, user, expiry_match=expiry_match, reason="Target hit so exiting position.")
                         if expiry_match == "SAME" and not qty_changed:
                             exit_h_avg = hedge_ltp
 
@@ -881,7 +890,7 @@ def _monitor_hedged_position_until_next_candle(
                             skip_h_entry = True
 
                         # 5. EXECUTE ROBUST ENTRY
-                        new_qty, new_avg, new_h_avg = execute_robust_entry(temp_trade_symbols, config, user, skip_hedge_override=skip_h_entry)
+                        new_qty, new_avg, new_h_avg = execute_robust_entry(temp_trade_symbols, config, user, skip_hedge_override=skip_h_entry, reason="Rollover re-entry in same direction.")
 
                         if not is_valid_trade_data(new_qty, new_avg, new_h_avg, hedge_required=True):
                             err_msg = f"⚠️ {key} | FAILED Entry: {opt_symbol} or {hedge_opt_symbol} Qty or Price is 0."
@@ -917,6 +926,9 @@ def _monitor_hedged_position_until_next_candle(
 
 
 def _handle_hedged_buy_signal(trade, position, latest, close, current_time, config, user, key, instruments_df):
+    logging.info(f" {config['KEY']} | INSIDE _handle_hedged_buy_signal")
+    logging.info(f"  {config['KEY']} | position : {position} | close : {close} | latest :{latest}")
+
     if not (latest['buySignal'] and position != "BUY"):
         return trade, position, "none", False
 
@@ -932,7 +944,7 @@ def _handle_hedged_buy_signal(trade, position, latest, close, current_time, conf
         # 2. EXECUTE ROBUST EXIT (Replaces manual hybrid orders)
         # This function handles NH/SEMI/FULL and Qty Changes internally.
         # It will KILL the thread if a mismatch or partial fill occurs.
-        exit_qty, avg_price, hedge_avg_price = execute_robust_exit( trade, config, user)
+        exit_qty, avg_price, hedge_avg_price = execute_robust_exit( trade, config, user, reason="Buy signal generated so exiting current position.")
         print(f"📤{key} | Exited from {trade['OptionSymbol']} with Avg price: ₹{avg_price:.2f} | Qty: {exit_qty} And {trade['hedge_option_symbol']} with Avg price: ₹{hedge_avg_price:.2f} | Qty: {exit_qty}" )
         logging.info(f"📤{key} | Exited from {trade['OptionSymbol']} with Avg price: ₹{avg_price:.2f} | Qty: {exit_qty} And {trade['hedge_option_symbol']} with Avg price: ₹{hedge_avg_price:.2f} | Qty: {exit_qty}" )
 
@@ -1088,7 +1100,7 @@ def _handle_hedged_buy_signal(trade, position, latest, close, current_time, conf
             print(f"📤{key} | Entering BUY Sequence for {opt_symbol} with Hedge {hedge_opt_symbol}")
             logging.info(f"📤 {key} | Entering BUY Sequence for {opt_symbol} with Hedge {hedge_opt_symbol}")
 
-            qty, avg_price, hedge_avg_price = execute_robust_entry(temp_trade_symbols, config, user)
+            qty, avg_price, hedge_avg_price = execute_robust_entry(temp_trade_symbols, config, user, reason = "Buy signal generated.")
 
             print(f"📤{key} | BUY Entry Executed: {opt_symbol} @ ₹{avg_price:.2f} | Qty: {qty}. Hedge {hedge_opt_symbol} @ ₹{hedge_avg_price:.2f}")
             logging.info(f"📤{key} | Entered in {opt_symbol} @ ₹{avg_price:.2f} | Qty: {qty}. Hedge {hedge_opt_symbol} @ ₹{hedge_avg_price:.2f}")
@@ -1134,6 +1146,8 @@ def _handle_hedged_buy_signal(trade, position, latest, close, current_time, conf
 
 
 def _handle_hedged_sell_signal(trade, position, latest, close, current_time, config, user, key, instruments_df):
+    logging.info(f" {config['KEY']} | INSIDE _handle_hedged_sell_signal")
+    logging.info(f"  {config['KEY']} | position : {position} | close : {close} | latest :{latest}")
     if not (latest['sellSignal'] and position != "SELL"):
         return trade, position, "none", False
 
@@ -1149,7 +1163,8 @@ def _handle_hedged_sell_signal(trade, position, latest, close, current_time, con
         exit_qty, avg_price, hedge_avg_price = execute_robust_exit(
             trade,
             config,
-            user
+            user,
+            reason="Sell signal generated so exiting current position."
         )
         print(f"📤{key} | Exited from {trade['OptionSymbol']} with Avg price: ₹{avg_price:.2f} | Qty: {exit_qty} And {trade['hedge_option_symbol']} with Avg price: ₹{hedge_avg_price:.2f} | Qty: {exit_qty}" )
         logging.info(f"📤{key} | Exited from {trade['OptionSymbol']} with Avg price: ₹{avg_price:.2f} | Qty: {exit_qty} And {trade['hedge_option_symbol']} with Avg price: ₹{hedge_avg_price:.2f} | Qty: {exit_qty}" )
@@ -1305,7 +1320,7 @@ def _handle_hedged_sell_signal(trade, position, latest, close, current_time, con
             print(f"📤{key} | Entering SELL Sequence for {opt_symbol} with Hedge {hedge_opt_symbol}")
             logging.info(f"📤 {key} | Entering SELL Sequence for {opt_symbol} with Hedge {hedge_opt_symbol}")
 
-            qty, avg_price, hedge_avg_price = execute_robust_entry(temp_trade_symbols, config, user)
+            qty, avg_price, hedge_avg_price = execute_robust_entry(temp_trade_symbols, config, user, reason="Sell signal generated.")
 
             print(f"📤{key} | SELL Entry Executed: {opt_symbol} @ ₹{avg_price:.2f} | Qty: {qty}. Hedge {hedge_opt_symbol} @ ₹{hedge_avg_price:.2f}")
             logging.info(f"📤{key} | Entered in {opt_symbol} @ ₹{avg_price:.2f} | Qty: {qty}. Hedge {hedge_opt_symbol} @ ₹{hedge_avg_price:.2f}")
@@ -1350,6 +1365,8 @@ def _handle_hedged_sell_signal(trade, position, latest, close, current_time, con
 
 
 def _handle_nh_buy_signal(trade, position, latest, close, current_time, config, user, key, instruments_df):
+    logging.info(f" {config['KEY']} | INSIDE _handle_nh_buy_signal")
+    logging.info(f"  {config['KEY']} | position : {position} | close : {close} | latest :{latest}")
     if not (latest['buySignal'] and position != "BUY"):
         return trade, position, "none", False
 
@@ -1365,7 +1382,8 @@ def _handle_nh_buy_signal(trade, position, latest, close, current_time, config, 
             trade,
             config,
             user,
-            expiry_match="DIFF"  # Standard signal flip forces full exit
+            expiry_match="DIFF",
+            reason="Buy signal generated so exiting current position."
         )
         print(f"📤{key} | Exited without Hedge position {trade['OptionSymbol']} with Avg price: ₹{avg_price:.2f} | Qty: {exit_qty}" )
         logging.info(f"📤{key} | Exited without Hedge position {trade['OptionSymbol']} with Avg price: ₹{avg_price:.2f} | Qty: {exit_qty}" )
@@ -1448,7 +1466,8 @@ def _handle_nh_buy_signal(trade, position, latest, close, current_time, config, 
     new_qty, avg_price, hedge_avg_price = execute_robust_entry(
         temp_trade_symbols,
         config,
-        user
+        user,
+        reason="Buy signal generated"
     )
 
     print(f"📤{key} | Entered without Hedge position {opt_symbol} with Avg price: ₹{avg_price:.2f} | Qty: {new_qty}.")
@@ -1493,6 +1512,8 @@ def _handle_nh_buy_signal(trade, position, latest, close, current_time, config, 
 
 
 def _handle_nh_sell_signal(trade, position, latest, close, current_time, config, user, key, instruments_df):
+    logging.info(f" {config['KEY']} | INSIDE _handle_nh_sell_signal")
+    logging.info(f"  {config['KEY']} | position : {position} | close : {close} | latest :{latest}")
     if not (latest['sellSignal'] and position != "SELL"):
         return trade, position, "none", False
 
@@ -1506,7 +1527,8 @@ def _handle_nh_sell_signal(trade, position, latest, close, current_time, config,
             trade,
             config,
             user,
-            expiry_match="DIFF"
+            expiry_match="DIFF",
+            reason="Sell signal generated so exiting current position."
         )
 
         logging.info(f"📤{key} | Exited without Hedge position {trade['OptionSymbol']} with Avg price: ₹{avg_price:.2f} | Qty: {exit_qty}" )
@@ -1591,7 +1613,8 @@ def _handle_nh_sell_signal(trade, position, latest, close, current_time, config,
     new_qty, avg_price, hedge_avg_price = execute_robust_entry(
         temp_trade_symbols,
         config,
-        user
+        user,
+        reason="Sell signal generated."
     )
 
     print(f"📤{key} | Entered without Hedge position {opt_symbol} with Avg price: ₹{avg_price:.2f} | Qty: {new_qty}.")
@@ -1856,11 +1879,14 @@ def init_and_run(user):
             time.sleep(10)
 
 
-def execute_robust_entry(trade, config, user, skip_hedge_override=None):
+def execute_robust_entry(trade, config, user, skip_hedge_override=None, reason="Nothing"):
     """
     SINGLE-SHOT ENTRY:
     Executes Hedge and Main Leg with mismatch recovery logic.
     """
+    logging.info(f" {config['KEY']} | INSIDE execute_robust_entry")
+    logging.info(f"  {config['KEY']} | Trying to execute trade : {trade} | skip_hedge_override : {skip_hedge_override} | reason : {reason}")
+
     target_qty = int(config.get('QTY', 0))
     h_type = str(config.get('HEDGE_TYPE', 'FULL')).upper()
     skip_hedge = skip_hedge_override if skip_hedge_override is not None else (h_type == "NH")
@@ -1931,14 +1957,14 @@ def execute_robust_entry(trade, config, user, skip_hedge_override=None):
     return main_filled_total, final_m_avg, final_h_avg
 
 
-def execute_robust_exit(trade, config, user, expiry_match="DIFF"):
+def execute_robust_exit(trade, config, user, expiry_match="DIFF", reason="Nothing"):
     """
     SINGLE-SHOT STRICT EXIT:
     - Removes 3-attempt loop; relies on 5s robust price chasing.
     - If Main exits and Hedge fails (or vice versa), triggers KILL THREAD.
     """
     print(f"🚪 {config['KEY']} | Starting EXIT of Symbol {trade['OptionSymbol']}")
-    logging.info(f"🚪 {config['KEY']} | Starting EXIT of Symbol {trade['OptionSymbol']}")
+    logging.info(f"🚪 {config['KEY']} | Starting EXIT of Symbol {trade['OptionSymbol']} | Reason : {reason}")
     target_qty_new = int(config.get('QTY', 0))
     existing_qty = int(trade.get('qty', 0))
     hr_type = str(config.get('HEDGE_ROLLOVER_TYPE', 'FULL')).upper()
