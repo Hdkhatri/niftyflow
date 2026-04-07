@@ -379,6 +379,7 @@ def _monitor_nh_position_until_next_candle(
         now = datetime.datetime.now()
 
         if now.time().hour == 15 and now.time().minute >= 15 and trade and position:
+            config = _refresh_runtime_config(key, instruments_df)
             if config['INTRADAY'] == "yes":
                 trade, position = close_position_and_no_new_trade(
                     trade, position, close, ts, config, user, key, reason="Intraday exit of current position"
@@ -616,6 +617,7 @@ def _monitor_hedged_position_until_next_candle(
         now = datetime.datetime.now()
         
         if now.time().hour == 15 and now.time().minute >= 15 and trade and "OptionSymbol" in trade and position:
+            config = _refresh_runtime_config(key, instruments_df)
             if config['INTRADAY'] == "yes":
                 trade, position = close_position_and_no_new_trade(trade, position, close, ts,config, user, key, reason="Intraday exit current position")
                 print(f"⏰ {key}  | {user['user']} {SERVER}  | Intraday mode: No new trades after 3:15 PM. Waiting for market close.")
