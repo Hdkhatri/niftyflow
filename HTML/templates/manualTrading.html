@@ -6,6 +6,7 @@
     <title>Manual Trading - TradeJenie</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/loading-spinner.css') }}">
     <style>
         :root {
             --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -688,11 +689,7 @@
 <body>
     <!-- Header (Reusable) -->
     {% include 'header.html' %}
-
-
-    
-       
-    
+    {% include 'loading-spinner.html' %}
 
     <!-- Main Container -->
     <div class="container-main">
@@ -801,6 +798,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/loading-spinner.js') }}"></script>
     <script>
         // ===== GLOBAL STATE =====
         let currentUserId = "{{ user_id }}";
@@ -884,7 +882,12 @@
 
         // ===== DATA LOADING =====
         function loadStrategies() {
-            fetch(`/api/user-strategies?user_id=${currentUserId}`)
+            fetchWithLoading(
+                `/api/user-strategies?user_id=${currentUserId}`,
+                {},
+                'Loading strategies',
+                'Please wait while strategy data loads.'
+            )
                 .then(r => {
                     if (!r.ok) throw new Error('Failed to load strategies');
                     return r.json();
@@ -892,7 +895,6 @@
                 .then(data => {
                     allStrategies = data.success ? data.strategies || [] : [];
                     renderStrategies();
-                    //populateStrategyDropdown();
                     updateStats();
                 })
                 .catch(err => {
@@ -903,7 +905,12 @@
         }
 
         function loadOpenTrades() {
-            fetch(`/api/open-trades?user_id=${currentUserId}`)
+            fetchWithLoading(
+                `/api/open-trades?user_id=${currentUserId}`,
+                {},
+                'Loading open trades',
+                'Please wait while open trades are fetched.'
+            )
                 .then(r => r.json())
                 .then(data => {
                     const container = document.getElementById('openTradesContainer');
@@ -1018,15 +1025,20 @@
 
         function triggerManualEntry(strategyId, strategyName) {
             if (confirm(`Trigger manual entry for strategy: ${strategyName}?`)) {
-                fetch('/api/manual-entry', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({user_id: currentUserId, strategy_id: strategyId})
-                })
+                fetchWithLoading(
+                    '/api/manual-entry',
+                    {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({user_id: currentUserId, strategy_id: strategyId})
+                    },
+                    'Triggering manual entry',
+                    'Please wait while the manual order is submitted.'
+                )
                 .then(r => r.json())
                 .then(d => {
                     if (d.success) {
-                        showAlert('success', `Manual entry triggered successfully! ${d.message}....`);
+                        showAlert('success', `Manual entry triggered successfully! ${d.message || ''}`);
                         setTimeout(() => {
                             loadStrategies();
                             loadOpenTrades();
@@ -1051,11 +1063,16 @@
 
         function closeStrategy(id) {
             if (confirm('Close this strategy?')) {
-                fetch('/api/close-strategy', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({strategy_id: id, user_id: currentUserId})
-                })
+                fetchWithLoading(
+                    '/api/close-strategy',
+                    {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({strategy_id: id, user_id: currentUserId})
+                    },
+                    'Closing strategy',
+                    'Please wait while the strategy is closed.'
+                )
                 .then(r => r.json())
                 .then(d => {
                     if (d.success) {
@@ -1071,11 +1088,16 @@
 
         function closeTrade(id) {
             if (confirm('Close this trade?')) {
-                fetch('/api/close-trade', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({trade_id: id, user_id: currentUserId})
-                })
+                fetchWithLoading(
+                    '/api/close-trade',
+                    {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({trade_id: id, user_id: currentUserId})
+                    },
+                    'Closing trade',
+                    'Please wait while the trade is closed.'
+                )
                 .then(r => r.json())
                 .then(d => {
                     if (d.success) {

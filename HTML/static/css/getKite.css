@@ -159,10 +159,36 @@
     transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
-.action-btn:hover {
+.action-btn:not(.secondary):not(.warn):hover {
     background: #c0392b;
     transform: translateY(-1px);
     box-shadow: 0 8px 18px rgba(231, 76, 60, 0.18);
+}
+
+.action-btn.secondary {
+    background: var(--primary-color);
+}
+
+.action-btn.secondary:hover {
+    background: #4f67d3;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(102, 126, 234, 0.18);
+}
+
+.action-btn.warn {
+    background: #f39c12;
+}
+
+.action-btn.warn:hover {
+    background: #d68910;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(243, 156, 18, 0.18);
+}
+
+.muted {
+    color: #888;
+    font-size: 12px;
+    margin-top: 4px;
 }
 
 .empty-copy {

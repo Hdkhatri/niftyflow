@@ -8,11 +8,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/manageStrategies.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/getKite.css') }}">
-    <style>
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/loading-spinner.css') }}">
 </head>
 <body>
     {% include 'header.html' %}
+
+    <!-- Loading Spinner (Reusable Component) -->
+    {% include 'loading-spinner.html' %}
 
     <div class="container-main">
         <div class="breadcrumb-nav">
@@ -81,6 +83,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/loading-spinner.js') }}"></script>
     <script>
         function updateCounts(dbTrades, positions, holdings) {
             document.getElementById('dbCount').textContent = dbTrades?.length || 0;
@@ -94,6 +97,8 @@
                 updateCounts([], [], []);
                 return;
             }
+
+            showLoading('Loading Portfolio Data', 'Fetching trades and positions...');
 
             try {
                 const res = await fetch(`/api/portfolio/${uid}`).then(r => r.json());
@@ -111,6 +116,8 @@
                 }
             } catch (e) {
                 alert('Fetch failed');
+            } finally {
+                hideLoading();
             }
         }
 
@@ -136,16 +143,33 @@
             `;
 
             trades.forEach(t => {
-                const badge = t.is_live
-                    ? '<span class="status-chip live"><i class="fas fa-check-circle"></i> Live on Kite</span>'
-                    : '<span class="status-chip orphan"><i class="fas fa-exclamation-triangle"></i> Orphan</span>';
+                const mainOpen = !!t.kite_position_open;
+                const hedgeOpen = !!t.hedge_kite_position_open;
+
+                let badge = '<span class="status-chip orphan"><i class="fas fa-exclamation-triangle"></i> No Kite Position</span>';
+                if (mainOpen || hedgeOpen) {
+                    badge = t.can_exit_both
+                        ? '<span class="status-chip live"><i class="fas fa-check-circle"></i> Matched (Qty OK)</span>'
+                        : '<span class="status-chip orphan"><i class="fas fa-exclamation-triangle"></i> Kite Mismatch</span>';
+                }
+
+                const actions = [];
+                if (t.can_exit_both) actions.push(`<button onclick="exitTrade(${t.id}, 'both')" class="action-btn">Exit Both</button>`);
+                if (t.can_exit_kite_only) actions.push(`<button onclick="exitTrade(${t.id}, 'kite_only')" class="action-btn secondary">Exit Kite</button>`);
+                if (t.can_exit_db_only) actions.push(`<button onclick="exitTrade(${t.id}, 'db_only')" class="action-btn warn">Close DB</button>`);
+                const actionHtml = actions.length ? actions.join(' ') : '<span class="muted">No action</span>';
 
                 html += `
                     <tr>
-                        <td><span class="symbol-strong">${t.option_symbol}</span></td>
-                        <td>${t.hedge_option_symbol || '-'}</td>
+                        <td>
+                            <span class="symbol-strong">${t.option_symbol}</span>
+                            <div class="muted">DB Qty: ${t.qty ?? 0} | Kite Qty: ${t.kite_qty_raw ?? 0}</div>
+                        </td>
+                        <td>
+                            ${t.hedge_option_symbol ? `<span class="symbol-strong">${t.hedge_option_symbol}</span><div class="muted">DB Qty: ${t.hedge_qty ?? 0} | Kite Qty: ${t.hedge_kite_qty_raw ?? 0}</div>` : '-'}
+                        </td>
                         <td>${badge}</td>
-                        <td><button onclick="exitTrade(${t.id})" class="action-btn">Square Off</button></td>
+                        <td>${actionHtml}</td>
                     </tr>
                 `;
             });
@@ -193,16 +217,29 @@
             container.innerHTML = html;
         }
 
-        async function exitTrade(tid) {
-            if (!confirm('This will execute MARKET orders on Kite to close ALL legs and update Database. Proceed?')) {
-                return;
-            }
+        async function exitTrade(tid, action) {
+            let msg = '';
+            if (action === 'both') msg = 'Exit BOTH: place LIMIT orders on Kite and remove open trade from DB. Proceed?';
+            if (action === 'kite_only') msg = 'Exit KITE ONLY: place LIMIT orders on Kite but keep the open trade in DB. Proceed?';
+            if (action === 'db_only') msg = 'Close DB ONLY: move open trade to completed in DB (no Kite orders). Proceed?';
+            if (!confirm(msg || 'Proceed?')) return;
 
-            const res = await fetch(`/api/exit-trade/${tid}`, { method: 'POST' }).then(r => r.json());
-            if (res.success) {
-                refresh();
-            } else {
-                alert('Exit Failed: ' + res.message);
+            try {
+                const res = await fetchWithLoading(
+                    `/api/exit-trade/${tid}`,
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action })
+                    },
+                    'Closing trade',
+                    'Please wait while the exit trade request completes.'
+                ).then(r => r.json());
+
+                if (res.success) refresh();
+                else alert('Exit Failed: ' + (res.message || 'Unknown error'));
+            } catch (error) {
+                alert('Exit Failed: ' + (error.message || 'Unknown error'));
             }
         }
     </script>

@@ -8,13 +8,23 @@ CANDLE_DAYS = 11
 REQUIRED_CANDLES = 20
 SEGMENT = "NFO-OPT"
 
+#UAT
+#PATH = "/home/harshilkhatri2808/uat/tradeJenie/"
+#PROD
+PATH = "/home/harshilkhatri2808/prod/tradeJenie/"
+#Local
+# PATH = "C:/Users/Hdkhatri/Desktop/ALGOTRADE/GCP/backup/2026_04_06/uat/tradeJenie - working copy/"
+
+
+
 ACCESS_TOKEN_FILE = "access_token.json"
-INSTRUMENTS_FILE = "/home/harshilkhatri2808/prod/tradeJenie/nifty_instruments.csv"
+INSTRUMENTS_FILE = PATH + "nifty_instruments.csv"
 
 
 TODAY_DATE = datetime.now().strftime("%Y-%m-%d")
-LOG_FILE = f"/home/harshilkhatri2808/prod/tradeJenie/log/live_trading_{TODAY_DATE}.log"
-DB_FILE = "/home/harshilkhatri2808/prod/tradeJenie/Trading.db"
+LOG_FILE = PATH + f"log/live_trading_{TODAY_DATE}.log"
+DB_FILE = PATH + "Trading.db"
+
 os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
 
 #SERVER = "LOCAL - HEDGE"

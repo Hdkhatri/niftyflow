@@ -10,7 +10,6 @@ if htmlconfig.PATH not in sys.path:
 
 from kitefunction import get_kite_client
 from kitelogin import do_login
-from htmlconfig import DB_PATH
 
 app = Flask(__name__)
 
@@ -23,7 +22,7 @@ def get_all_active_user():
     Returns a list of dicts for all active users from user_dtls table.
     """
     try:
-        conn = sqlite3.connect(DB_PATH)
+        conn = sqlite3.connect(htmlconfig.DB_PATH)
         c = conn.cursor()
         sql = "SELECT * FROM user_dtls WHERE active_flag = 1"
         c.execute(sql)
@@ -64,9 +63,10 @@ def get_logged_in_admin():
         username = session.get('username')
 
         if not user_id or not username:
+            logging.warning(f"No session data: user_id={user_id}, username={username}")
             return None
 
-        conn = sqlite3.connect(DB_PATH)
+        conn = sqlite3.connect(htmlconfig.DB_PATH)
         conn.row_factory = sqlite3.Row
         admin_user = conn.execute(
             """
@@ -80,15 +80,21 @@ def get_logged_in_admin():
         ).fetchone()
         conn.close()
 
+        if not admin_user:
+            logging.warning(f"User {user_id} is not an active ADMIN")
+        
         return admin_user
     except Exception as e:
         logging.error(f"Error validating admin session: {e}")
+        import traceback
+        traceback.print_exc()
         return None
 
 @getkite_bp.route('/kiteadmin')
 def index():
     admin_user = get_logged_in_admin()
     if not admin_user:
+        logging.warning(f"Admin user not found or not logged in. Redirecting to login.")
         session.clear()
         return redirect(url_for('login_bp.login'))
 

@@ -8,7 +8,29 @@ import plotly.express as px
 import sys
 from flask_cors import CORS
 import requests
+import htmlconfig
+from flask import current_app
+import multiprocessing
 
+
+def run_instance(port, env_name):
+    htmlconfig.set_path(env_name)
+    app.config['DB_PATH'] = htmlconfig.DB_PATH
+    app.config['PATH'] = htmlconfig.PATH
+    print(f"Configured for {env_name}: DB_PATH={htmlconfig.DB_PATH}")
+    print("=" * 60)
+    print(f"🚀 Starting {env_name} Trade Report Server on port {port}")
+    print(f"📊 Trading Report: http://localhost:{port}/")
+    print(f"📈 Hedge Report: http://localhost:{port}/hedge_report")
+    print("=" * 60)
+    sys.stdout.flush()
+    sys.stderr.flush()
+
+    try:
+        app.run(host='0.0.0.0', port=port, debug=True, use_reloader=False, threaded=True)
+    except KeyboardInterrupt:
+        print(f"\n✅ {env_name} Trade Report Server stopped")
+        sys.exit(0)
 
 
 app = Flask(__name__)
@@ -52,6 +74,9 @@ from getkite import getkite_bp
 app.register_blueprint(getkite_bp)
 from tradingReport import trading_report_bp
 app.register_blueprint(trading_report_bp)
+# Register blueprint
+from proxy_kitefunction import proxy_bp
+app.register_blueprint(proxy_bp)
 
 # ===== Session Management =====
 from flask import session
@@ -417,7 +442,7 @@ def render_trade_report(db_path, page_title, investment_amount, pnl_column='pnl'
 @app.route('/pmk')
 def report():
     return render_trade_report(
-        '/home/harshilkhatri2808/pmk_all_in_one/Trading.db',
+        current_app.config['DB_PATH'],
         'Completed Trades Analytics',
         TRADING_INVESTMENT,
         pnl_column='pnl'
@@ -427,7 +452,7 @@ def report():
 @app.route('/hedge_report')
 def hedge_report():
     user_id = request.args.get('id', type=int)
-    users_df = get_users('/home/harshilkhatri2808/prod/tradeJenie/Trading.db')
+    users_df = get_users(current_app.config['DB_PATH'])
     users_list = users_df[['id', 'user']].values.tolist() if not users_df.empty else []
 
     # Build user selector HTML with user name only (ID hidden as value)
@@ -454,7 +479,7 @@ def hedge_report():
         user_name = next((uname for uid, uname in users_list if uid == user_id), 'Unknown')
         # Get report for selected user
         report_html = render_trade_report(
-            '/home/harshilkhatri2808/prod/tradeJenie/Trading.db',
+            current_app.config['DB_PATH'],
             f'Trading Hedge Analytics - {user_name}',
             HEDGE_INVESTMENT,
             pnl_column='total_pnl',
@@ -497,16 +522,10 @@ def hedge_report():
 
 import manualtrading
 if __name__ == '__main__':
-    print("=" * 60)
-    print("🚀 Starting Trade Report Server")
-    print("📊 Trading Report: http://localhost:8000/")
-    print("📈 Hedge Report: http://localhost:8000/hedge_report")
-    print("=" * 60)
-    sys.stdout.flush()
-    sys.stderr.flush()
-
-    try:
-        app.run(host='0.0.0.0', port=8000, debug=True, use_reloader=False, threaded=True)
-    except KeyboardInterrupt:
-        print("\n✅ Trade Report Server stopped")
-        sys.exit(0)
+    multiprocessing.freeze_support()
+    p1 = multiprocessing.Process(target=run_instance, args=(8000, 'PROD'))
+    p2 = multiprocessing.Process(target=run_instance, args=(8002, 'UAT'))
+    p1.start()
+    p2.start()
+    p1.join()
+    p2.join()

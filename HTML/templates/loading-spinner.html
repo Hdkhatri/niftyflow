@@ -1,0 +1,18 @@
+{# Reusable Loading Spinner Overlay
+   Usage: Include this partial in any template
+
+   Then in your JS:
+   - showLoading() to display
+   - hideLoading() to hide
+
+   Optional: Pass loadingMessage and loadingSubtext context variables
+   Example: {% include 'loading-spinner.html' with context %}
+#}
+
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-container">
+        <div class="spinner"></div>
+        <div class="loading-text">{{ loadingMessage | default('Loading...') }}</div>
+        <div class="loading-subtext">{{ loadingSubtext | default('Please wait') }}</div>
+    </div>
+</div>

@@ -1366,17 +1366,23 @@ def close_position_and_no_new_trade(trade, position, close, ts, config, user, ke
         send_telegram_message_admin(err_msg)
         update_trade_config_on_failure(config['KEY'], err_msg, user)
         return    
+    current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    if config['NEW_TRADE'].lower() == "no":
+        exit_reason = "INTRADAY_EXIT"
+    else:
+        exit_reason = "STOPLOSS_HIT"
 
     # UPDATE DATA
     trade.update({
         "SpotExit": close,
         "OptionBuyPrice": avg_price,
-        "ExitTime": ts,
+        "ExitTime": current_time,
         "PnL": trade["OptionSellPrice"] - avg_price,
         "qty": exit_qty,
         "ExitReason": "FORCE_CLOSE_NO_NEW_TRADE",
         "hedge_option_sell_price": hedge_avg_price,
-        "hedge_exit_time": ts,
+        "hedge_exit_time": current_time,
         "hedge_pnl": (hedge_avg_price - trade.get("hedge_option_buy_price", 0)) if hedge_avg_price > 0 else 0.0,
     })
     
