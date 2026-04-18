@@ -404,7 +404,7 @@
                 <select id="expiry" name="expiry" required>
                     <option value="">-- Select Expiry --</option>
                     <option value="NEXT_WEEK" ${currentConfig.EXPIRY === 'NEXT_WEEK' ? 'selected' : ''}>Next Week</option>
-                    <option value="NEXT_MONTH" ${currentConfig.EXPIRY === 'NEXT_MONTH' ? 'selected' : ''}>Next Month</option>
+                    <option value="NEXT_MONTH" ${currentConfig.EXPIRY === 'LAST' ? 'selected' : ''}>Next Month</option>
                 </select>
                 <div class="help-text">Option expiry type</div>
             </div>`;

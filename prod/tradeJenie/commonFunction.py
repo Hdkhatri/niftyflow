@@ -1934,7 +1934,7 @@ def get_robust_optimal_option(signal, spot, nearest_price, instruments_df, confi
         tsym, strike, expiry, eff_p, h_sym, h_ltp = best_option
         print(f"✅ {config['KEY']} | MATCH: {tsym} @ {eff_p} | Hedge: {h_sym} @ {h_ltp}")
         logging.info(f"✅ {config['KEY']} | MATCH: {tsym} @ {eff_p} | Hedge: {h_sym} @ {h_ltp}")
-        return tsym, strike, expiry, eff_p, h_sym
+        return tsym, strike, expiry.strftime('%Y-%m-%d %H:%M:%S'), eff_p, h_sym
 
     print(f"❌{config['KEY']} | NO VALID PAIR FOUND")
     logging.info(f"❌{config['KEY']} | NO VALID PAIR FOUND")
