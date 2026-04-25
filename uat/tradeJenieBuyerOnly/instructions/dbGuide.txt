@@ -1,0 +1,40 @@
+=In trade_config======================
+
+Column - TRADE_BASE_ON
+Values - 
+MAIN_SYMBOL
+OPTION_SYMBOL
+------------
+
+Column - INTERVAL
+Values - 
+1minute
+5minute
+30minute
+60minute
+------------
+
+Column - TRADE_BASE_ON
+Values - 
+MAIN_SYMBOL
+OPTION_SYMBOL
+------------
+
+Column - INTRADAY,NEW_TRADE,REAL_TRADE
+Values - 
+yes
+no
+------------
+
+Column - EXPIRY
+Values - 
+NEXT_WEEK
+LAST
+------------
+
+Column - STRATEGY
+Values - 
+RAILWAY_TRACK
+HDSTRATEGY
+GOD
+------------

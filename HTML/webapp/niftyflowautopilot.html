@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>NiftyFlow AutoPilot - Automated Nifty Options Trading System</title>
+
+<meta name="description"
+content="NiftyFlow AutoPilot is a rule-based automated Nifty options trading system focused on disciplined execution and managed risk. Try free for 3 months.">
+
+<meta name="keywords" content="automated Nifty options, Nifty options trading, rule-based trading system, systematic options trading, algorithmic trading, derivatives trading">
+
+<meta name="author" content="NiftyFlow">
+
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+
+<!-- Open Graph Tags -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="NiftyFlow AutoPilot - Automated Nifty Options Trading">
+<meta property="og:description" content="Systematic automated Nifty options trading with discipline and rule-based execution. 3-month free trial. No emotional trading, just consistent rules.">
+<meta property="og:image" content="assets/images/logo.svg">
+<meta property="og:url" content="">
+
+<!-- Twitter Tags -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="NiftyFlow AutoPilot - Automated Nifty Options Trading">
+<meta name="twitter:description" content="Systematic automated Nifty options trading with discipline. 3-month free trial.">
+<meta name="twitter:image" content="assets/images/logo.svg">
+
+<!-- Canonical -->
+<link rel="canonical" href="">
+
+<!-- Preconnect to external resources -->
+<link rel="preconnect" href="https://wa.me">
+<link rel="preconnect" href="https://www.instagram.com">
+
+<!-- Favicon -->
+<link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
+
+<style>
+* { box-sizing: border-box; }
+
+/* GLOBAL */
+body {
+  margin: 0;
+  padding-top: 72px;
+  font-family: "Inter","Segoe UI",Roboto,Arial,sans-serif;
+  background: radial-gradient(ellipse at top,#2b1c5c 0%,#140a2e 45%,#08040f 100%);
+  color: #eae7ff;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 1150px;
+  margin: auto;
+  padding: 24px;
+}
+
+/* HEADER */
+.header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background: rgba(10,6,25,0.9);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  z-index: 1000;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.logo span {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #c7b9ff;
+}
+
+/* HERO */
+.hero {
+  padding: 90px 0 60px;
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: 3rem;
+  font-weight: 900;
+  margin-bottom: 20px;
+  color: #ffffff;
+}
+
+.hero p {
+  font-size: 1.15rem;
+  max-width: 850px;
+  margin: 0 auto 30px;
+  color: #cfc8ff;
+}
+
+/* CTA */
+.cta {
+  display: inline-block;
+  background: #4ade80;
+  color: #04210f;
+  padding: 16px 38px;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 800;
+  text-decoration: none;
+  box-shadow: 0 10px 30px rgba(74,222,128,0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(74,222,128,0.45);
+}
+
+.email {
+  margin-top: 16px;
+  font-size: 0.95rem;
+  color: #b9b3e6;
+}
+
+/* SCROLL HINT */
+.scroll-hint {
+  margin-top: 42px;
+  font-size: 0.95rem;
+  color: #b3abdd;
+}
+
+/* SECTIONS */
+section {
+  padding: 80px 0;
+  transform: translateZ(0);
+}
+
+h2 {
+  text-align: center;
+  font-size: 2.3rem;
+  margin-bottom: 16px;
+  color: #ffffff;
+}
+
+.sub {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto 42px;
+  color: #bcb6eb;
+}
+
+/* SINGLE LINE, NO SCROLL */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 26px;
+}
+
+/* CARDS */
+.card {
+  background: rgba(255,255,255,0.06);
+  padding: 28px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.08);
+  min-width: 0;
+}
+
+.card.info {
+  border-left: 4px solid #3b82f6;
+}
+
+.card.metrics {
+  border-left: 4px solid #8b5cf6;
+}
+
+.card.process {
+  border-left: 4px solid #06b6d4;
+}
+
+.card.pricing {
+  border-left: 4px solid #ec4899;
+}
+
+.card.success {
+  border-left: 4px solid #10b981;
+}
+
+.card.warning {
+  border-left: 4px solid #f59e0b;
+}
+
+/* TESTIMONIALS */
+.testimonial-card {
+  background: rgba(255,255,255,0.08);
+  padding: 32px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.1);
+  text-align: center;
+}
+
+.testimonial-card .name {
+  font-weight: 700;
+  color: #ffffff;
+  margin-top: 16px;
+}
+
+.testimonial-card .title {
+  font-size: 0.85rem;
+  color: #b9b3e6;
+  margin-bottom: 12px;
+}
+
+.testimonial-card .quote {
+  font-style: italic;
+  color: #cfc8ff;
+  margin: 16px 0;
+  line-height: 1.8;
+}
+
+.testimonial-card .result {
+  background: rgba(74,222,128,0.1);
+  border-left: 4px solid #4ade80;
+  padding: 12px 16px;
+  margin-top: 16px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #b3eb9d;
+}
+
+/* FAQ */
+.faq-item {
+  background: rgba(255,255,255,0.04);
+  padding: 24px;
+  margin-bottom: 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.faq-item.open {
+  background: rgba(74,222,128,0.08);
+  border-color: rgba(74,222,128,0.2);
+}
+
+.faq-item h3 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 1.05rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.faq-item .toggle {
+  font-size: 1.5rem;
+  color: #4ade80;
+  transition: transform 0.3s ease;
+}
+
+.faq-item.open .toggle {
+  transform: rotate(180deg);
+}
+
+.faq-item p {
+  margin: 16px 0 0 0;
+  color: #bcb6eb;
+  display: none;
+  line-height: 1.8;
+}
+
+.faq-item.open p {
+  display: block;
+}
+
+/* EMAIL OPTIN */
+.email-optin {
+  background: linear-gradient(135deg, rgba(74,222,128,0.1), rgba(109,94,252,0.1));
+  border: 2px solid rgba(74,222,128,0.3);
+  padding: 40px;
+  border-radius: 20px;
+  text-align: center;
+  margin: 40px 0;
+}
+
+.email-optin h3 {
+  color: #ffffff;
+  font-size: 1.4rem;
+  margin-bottom: 12px;
+}
+
+.email-optin p {
+  color: #bcb6eb;
+  margin-bottom: 24px;
+  font-size: 0.95rem;
+}
+
+.email-optin input {
+  padding: 14px 18px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.06);
+  border-radius: 8px;
+  color: #ffffff;
+  width: 100%;
+  max-width: 400px;
+  font-size: 1rem;
+  margin-bottom: 16px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.email-optin input:focus {
+  border-color: #4ade80;
+  background: rgba(255,255,255,0.08);
+}
+
+.email-optin button {
+  background: #4ade80;
+  color: #04210f;
+  border: none;
+  padding: 12px 32px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.email-optin button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(74,222,128,0.3);
+}
+
+/* VIDEO SECTION */
+.video-container {
+  position: relative;
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto;
+  aspect-ratio: 16 / 9;
+  background: rgba(0,0,0,0.3);
+  border-radius: 16px;
+  overflow: hidden;
+  border: 2px solid rgba(74,222,128,0.2);
+}
+
+.video-container iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* BACK TO TOP */
+#topBtn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #6d5efc;
+  color: white;
+  border: none;
+  padding: 12px 14px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 13px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  will-change: opacity;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#topBtn.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* WHATSAPP FLOATING BUTTON */
+.whatsapp-btn {
+  position: fixed;
+  bottom: 150px;
+  right: 24px;
+  background: #25d366;
+  color: white;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  z-index: 999;
+  font-size: 28px;
+  line-height: 1;
+}
+
+.whatsapp-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(37, 211, 102, 0.6);
+}
+
+/* INSTAGRAM FLOATING BUTTON */
+.instagram-btn {
+  position: fixed;
+  bottom: 220px;
+  right: 24px;
+  background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+  color: white;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(224, 148, 51, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  z-index: 999;
+  font-size: 26px;
+  line-height: 1;
+}
+
+.instagram-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(224, 148, 51, 0.6);
+}
+
+/* EMAIL FLOATING BUTTON */
+.email-btn {
+  position: fixed;
+  bottom: 90px;
+  right: 24px;
+  background: #3b82f6;
+  color: white;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  z-index: 999;
+  font-size: 24px;
+  line-height: 1;
+}
+
+.email-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.6);
+}
+
+@media (max-width: 768px) {
+  .whatsapp-btn {
+    bottom: 130px;
+    right: 16px;
+    width: 50px;
+    height: 50px;
+    font-size: 24px;
+  }
+  
+  .instagram-btn {
+    bottom: 190px;
+    right: 16px;
+    width: 50px;
+    height: 50px;
+    font-size: 22px;
+  }
+  
+  .email-btn {
+    bottom: 70px;
+    right: 16px;
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+  }
+
+  .video-container {
+    aspect-ratio: auto;
+    min-height: 300px;
+  }
+
+  .testimonial-card {
+    padding: 20px;
+  }
+
+  .email-optin {
+    padding: 30px 20px;
+  }
+
+  .email-optin input {
+    max-width: 100%;
+  }
+
+  .faq-item {
+    padding: 18px;
+  }
+
+  .faq-item h3 {
+    font-size: 0.95rem;
+  }
+
+  /* Comparison grid responsive */
+  div[style*=\"grid-template-columns: 1fr 1fr\"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Table responsive */
+  table {
+    font-size: 0.85rem !important;
+  }
+}
+
+/* FOOTER */
+footer {
+  padding: 32px;
+  text-align: center;
+  font-size: 0.85rem;
+  color: #9b94c7;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+@media (max-width: 768px) {
+  body {
+    padding-top: 60px;
+  }
+  
+  .hero h1 { 
+    font-size: 2.3rem; 
+    margin-bottom: 16px;
+  }
+  
+  .hero p {
+    font-size: 1rem;
+    margin-bottom: 24px;
+  }
+  
+  h2 {
+    font-size: 1.8rem;
+    margin-bottom: 12px;
+  }
+  
+  .sub {
+    margin-bottom: 32px;
+    font-size: 0.95rem;
+  }
+  
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .card {
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+  }
+  
+  .metric {
+    font-size: 1.5rem;
+  }
+  
+  .cta {
+    padding: 14px 32px;
+    font-size: 1rem;
+    width: 100%;
+    text-align: center;
+  }
+  
+  section {
+    padding: 60px 0;
+  }
+  
+  .container {
+    padding: 16px;
+  }
+  
+  .logo span:last-child {
+    font-size: 9px !important;
+    margin-left: 6px !important;
+  }
+  
+  #topBtn {
+    padding: 10px 12px;
+    font-size: 12px;
+    bottom: 16px;
+    right: 16px;
+  }
+  
+  footer {
+    padding: 24px 16px;
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    padding: 100px 0 80px;
+  }
+  
+  .hero h1 {
+    font-size: 1.8rem;
+  }
+  
+  .hero p {
+    font-size: 0.95rem;
+    max-width: 100%;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+  }
+  
+  .metric {
+    font-size: 1.3rem;
+  }
+  
+  .card {
+    padding: 16px;
+    font-size: 0.9rem;
+  }
+  
+  .email {
+    font-size: 0.9rem;
+  }
+  
+  .scroll-hint {
+    font-size: 0.9rem;
+  }
+  
+  .cta {
+    padding: 12px 28px;
+    font-size: 0.95rem;
+    border-radius: 8px;
+  }
+  
+  section {
+    padding: 50px 0;
+  }
+  
+  .header {
+    height: auto;
+    padding: 12px 0;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="container">
+    <div class="logo">
+      <img src="assets/images/logo.svg" alt="NiftyFlow logo" style="width:32px;height:32px;">
+      <span>NiftyFlow</span>
+      <span style="font-size:13px;color:#a89ff5;margin-left:12px;">
+        Simple &bull; Steady &bull; Automated
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- HERO -->
+<!-- <div class="hero">
+  <div class="container">
+    <h1>Automate Your Investment.</h1>
+    <h1>Grow Without Stress.</h1>
+
+    <p style="color: #cfc8ff; font-size: 1rem; margin-bottom: 24px;">
+      <strong>NiftyFlow AutoPilot</strong> is an automated, rule-based Nifty options trading system designed to help your money grow in a systematic way - <strong>without constant monitoring or emotional decisions.</strong>
+    </p>
+
+    <p style="color: #4ade80; font-weight: 700; margin-bottom: 8px;">
+      ✓ 3 Months FREE • No Card Required • Cancel Anytime
+    </p>
+
+    <a class="cta"
+       href="https://wa.me/918087616404?text=Hi%20I%20want%20to%20start%20the%203-month%20free%20trial%20of%20NiftyFlow%20AutoPilot"
+       target="_blank">
+      Start 3-Month Free Trial
+    </a>
+
+    <div class="email">
+      Email: <strong>niftyflow.service@gmail.com</strong>
+    </div>
+
+    <div class="scroll-hint">
+      Explore how the system works & what you'll learn below ↓
+    </div>
+  </div>
+</div> -->
+
+<!-- HERO -->
+<div class="hero">
+  <div class="container">
+    <h1>Automated. Rule-Based.</h1>
+    <h1>Disciplined Nifty Options Trading.</h1>
+
+    <p style="color: #cfc8ff; font-size: 1rem; margin-bottom: 24px;">
+      <strong>NiftyFlow AutoPilot</strong> is a fully automated Nifty options system that follows fixed rules for entries, exits, and risk control.
+      It uses structured option positions with built-in protection to manage both profits and losses — 
+      <strong>without constant monitoring or emotional decisions.</strong>
+    </p>
+
+    <p style="color: #4ade80; font-weight: 700; margin-bottom: 8px;">
+      ✓ 3 Months FREE • No Card Required • Cancel Anytime
+    </p>
+
+    <a class="cta"
+       href="https://wa.me/918087616404?text=Hi%20I%20want%20to%20start%20the%203-month%20free%20trial%20of%20NiftyFlow%20AutoPilot"
+       target="_blank">
+      Start 3-Month Free Trial
+    </a>
+
+    <div class="email">
+      Email: <strong>niftyflow.service@gmail.com</strong>
+    </div>
+
+    <div class="scroll-hint">
+      See how the system works and whether it fits your trading style ↓
+    </div>
+  </div>
+</div>
+<!-- How NiftyFlow AutoPilot Works -->
+<section>
+  <div class="container">
+
+
+    <h2>How NiftyFlow AutoPilot Works</h2>
+    <p class="sub">A step-by-step process for disciplined, automated trading.</p>
+
+    <div class="grid">
+      <div class="card process" style="text-align:center">
+        <div style="font-size:2.2rem;font-weight:900;color:#4ade80;margin-bottom:10px;">01</div>
+        <h3 style="margin:0 0 10px 0; color:#fff; font-size:1.15rem;">Identifies Market Direction</h3>
+        <p style="color:#bcb6eb; font-size:0.98rem;">Evaluates Nifty market movement using predefined rules to determine directional bias.</p>
+      </div>
+      <div class="card process" style="text-align:center">
+        <div style="font-size:2.2rem;font-weight:900;color:#4ade80;margin-bottom:10px;">02</div>
+        <h3 style="margin:0 0 10px 0; color:#fff; font-size:1.15rem;">Executes Structured Option Positions</h3>
+        <p style="color:#bcb6eb; font-size:0.98rem;">Executes structured Nifty option trades using fixed, rule-based logic based on market conditions.</p>
+      </div>
+      <div class="card process" style="text-align:center">
+        <div style="font-size:2.2rem;font-weight:900;color:#4ade80;margin-bottom:10px;">03</div>
+        <h3 style="margin:0 0 10px 0; color:#fff; font-size:1.15rem;">Applies Automated Risk Controls</h3>
+        <p style="color:#bcb6eb; font-size:0.98rem;">Follows predefined sizing and exit rules. Uses protective structures to manage exposure during volatility.</p>
+      </div>
+      <div class="card process" style="text-align:center">
+        <div style="font-size:2.2rem;font-weight:900;color:#4ade80;margin-bottom:10px;">04</div>
+        <h3 style="margin:0 0 10px 0; color:#fff; font-size:1.15rem;">Operates Within Your Broker Account</h3>
+        <p style="color:#bcb6eb; font-size:0.98rem;">Trades are executed directly in your account. You retain full capital control and can enable or disable automation anytime.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- WHO IT WORKS FOR -->
+<section>
+  <div class="container">
+    <h2>Who NiftyFlow Works For</h2>
+    <p class="sub">
+      The ideal person for this system.
+    </p>
+
+    <div class="grid">
+      <div class="card success">People who want discipline over emotion in trading</div>
+      <div class="card success">Those comfortable with systematic options strategies</div>
+      <div class="card success">People who prefer rules, not gut feel or tips</div>
+      <div class="card success">People with steady capital to deploy</div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST -->
+<section>
+  <div class="container">
+    <h2>Why People Trust NiftyFlow</h2>
+    <p class="sub">
+      No tips. No capital pooling. Every trade executes transparently in your own broker account.
+    </p>
+
+    <div class="grid">
+      <div class="card info">✓ Your money stays in YOUR Zerodha account (not ours)</div>
+      <div class="card info">✓ Automated, unemotional execution every single time</div>
+      <div class="card info">✓ See every trade live as it happens</div>
+      <div class="card info">✓ Cancel anytime - no contracts, no lock-in</div>
+    </div>
+  </div>
+</section>
+
+<!-- PERFORMANCE -->
+<section>
+  <div class="container">
+    <h2>How It Has Performed (Backtested Strategy)</h2>
+    <p class="sub">
+      Based on systematic backtesting with disciplined risk management and rule-based position sizing. Actual live results will vary.
+    </p>
+
+    <div class="grid">
+      <div class="card metrics">
+        <div class="metric">10% - 25% CAGR*</div>
+        Projected yearly return range
+      </div>
+      <div class="card metrics">
+        <div class="metric">&lt; 10%</div>
+        Maximum drawdown observed in backtest*
+      </div>
+      <div class="card metrics">
+        <div class="metric">Rule-Based</div>
+        Entries, exits and risk management
+      </div>
+      <div class="card metrics">
+        <div class="metric">Consistency</div>
+        Focus on consistent growth, not chasing highs
+      </div>
+    </div>
+
+    <p class="sub" style="font-size:0.9rem;">
+      *Backtested performance ≠ Future results. Live performance depends on market conditions, execution, and individual discipline. No guarantees provided.
+    </p>
+  </div>
+</section>
+
+<!-- YOUR JOURNEY -->
+<!-- 
+<section>
+  <div class="container">
+    <h2>What Happens In Your First 3 Months</h2>
+    <p class="sub">
+      A clear roadmap of your trial experience.
+    </p>
+
+    <div class="grid">
+      <div class="card process">
+        <strong style="color: #4ade80;">Month 1: One-Time Setup Complete & Observe</strong><br><br>
+        Setup complete. System starts trading. You watch patterns and build confidence in automated execution.
+      </div>
+      <div class="card process">
+        <strong style="color: #4ade80;">Month 2: Understand</strong><br><br>
+        See how the system handles market swings. Experience a losing trade (if they happen). Learn why discipline matters.
+      </div>
+      <div class="card process">
+        <strong style="color: #4ade80;">Month 3: Decide</strong><br><br>
+        Full 3 months of data. Real P&L. Then choose: continue with ₹1000/month + 10% on profits, or cancel anytime.
+      </div>
+      <div class="card process">
+        <strong style="color: #06b6d4;">After Trial</strong><br><br>
+        Simple pricing: ₹1000/month + 10% on profits only. In loss months, pay just ₹1000.
+      </div>
+    </div>
+  </div>
+</section>
+
+
+*/ -->
+<!-- PRICING -->
+<!-- <section>
+  <div class="container">
+    <h2>Pricing After Free Trial</h2>
+    <p class="sub">
+      Only if you choose to continue after the 3-month free trial.
+    </p>
+
+    <div class="grid">
+      <div class="card pricing">
+        <div class="metric">&#8377;1000</div>
+        Monthly subscription
+      </div>
+      <div class="card pricing">
+        <div class="metric">10%</div>
+        Profit sharing (only on profits)
+      </div>
+      <div class="card pricing">
+        No lock-in period
+      </div>
+      <div class="card pricing">
+        Cancel anytime
+      </div>
+    </div>
+    <p class="sub" style="font-size: 0.9rem; margin-top: 32px; color: #c9c0e6;">
+        <strong>Pricing Model</strong><br>
+        <strong>NiftyFlow AutoPilot Subscription:</strong> ₹1000/month (charged every month)<br>
+        <strong>Profit Share:</strong> 10% of profits earned (only charged if you make profits)<br>
+        <br>
+        <strong>How It Breaks Down:</strong><br>
+        <strong>Every Month:</strong> ₹1000 subscription<br>
+        <strong>If You Make Profit:</strong> ₹1000 + 10% of profits<br>
+        <strong>If You Have Loss:</strong> ₹1000 only (no extra charges)<br>
+        <br>
+        <strong>Real Examples:</strong><br>
+        • Profit month (₹15,000 earned): Pay ₹1000 (subscription) + ₹1500 (10% profit share) = ₹2500 total. You keep ₹12,500<br>
+        • Loss month (₹3,000 lost): Pay ₹1000 subscription only
+    </p>
+  </div>
+</section> -->
+
+<!-- PRICING -->
+<section>
+  <div class="container">
+    <h2>Pricing After Free Trial</h2>
+    <p class="sub">
+      Continue only if you find value in the system.
+    </p>
+
+    <div class="grid">
+      <div class="card pricing">
+        <div class="metric">&#8377;2000</div>
+        Per month
+      </div>
+      <div class="card pricing">
+        No profit sharing
+      </div>
+      <div class="card pricing">
+        No lock-in period
+      </div>
+      <div class="card pricing">
+        Cancel anytime
+      </div>
+    </div>
+
+    <p class="sub" style="font-size: 0.9rem; margin-top: 32px; color: #c9c0e6;">
+      A simple monthly subscription for access to the fully automated NiftyFlow AutoPilot system.
+      No hidden charges. No percentage of profits. You pay only the fixed subscription fee.
+    </p>
+
+  </div>
+</section>
+
+
+<!-- WHAT THIS REQUIRES -->
+<section>
+  <div class="container">
+    <h2>What You Need to Succeed With NiftyFlow</h2>
+    <p class="sub">
+      This system works best for traders who have these qualities.
+    </p>
+
+    <div class="grid">
+      <div class="card warning">Patience with the system - let rules work, not your emotions</div>
+      <div class="card warning">Understanding that losses happen - but rules keep them small</div>
+      <div class="card warning">Commitment to NOT override the automation once started</div>
+      <div class="card warning">Realistic expectations - 10-25% yearly, not lottery wins</div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section>
+  <div class="container">
+    <h2>Frequently Asked Questions</h2>
+    <p class="sub">
+      Everything you need to know before starting the free trial.
+    </p>
+
+    <div style="max-width: 800px; margin: 0 auto;">
+      <div class="faq-item">
+        <h3>
+          How long does setup take?
+          <span class="toggle">+</span>
+        </h3>
+        <p>Setup is a one-time process. You need: (1) Active Zerodha account, (2) F&O section enabled, (3) API key created and authorized, (4) Telegram account setup for notifications. Once all are ready, we configure NiftyFlow AutoPilot and you're set to start trading. The entire process typically takes a few hours to complete all prerequisites.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>
+          Can I see trades in trial period?
+          <span class="toggle">+</span>
+        </h3>
+        <p>Yes. During the 3-month free trial, you'll see every single trade in real-time in your Zerodha account. You observe performance, drawdowns, everything.. Then decide if it's for you.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>
+          What if I have a losing month?
+          <span class="toggle">+</span>
+        </h3>
+        <p>Losing months happen. Even the best systems have them. We show you worst-case scenarios upfront. Your job: trust the system during drawdowns. That's where discipline separates winners from quitters.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>
+          Do I need trading experience?
+          <span class="toggle">+</span>
+        </h3>
+        <p>Not really, But it is always if you understand basic options concepts (calls, puts, premiums). If you're completely new to options, spend 2-3 hours on YouTube learning basics .. This system handles execution, not education.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>
+          What if I don't like it after 1 month?
+          <span class="toggle">+</span>
+        </h3>
+        <p>You can pause or cancel after month 1. No penalties. We understand not every system works for everyone. The free trial is specifically designed so you can test risk-free.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>
+          Can I withdraw money during the trial?
+          <span class="toggle">+</span>
+        </h3>
+        <p>Yes. Your money is always yours. But for accurate trial results, we recommend keeping capital intact for 3 months so the system can execute uninterrupted. You can withdraw afterward.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>
+          What if you go out of business?
+          <span class="toggle">+</span>
+        </h3>
+        <p>Your funds are always in your Zerodha account, never with us. If NiftyFlow shuts down, your money doesn't disappear. You simply stop receiving automated signals. That's why full control matters.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>
+          Will this work with my current capital?
+          <span class="toggle">+</span>
+        </h3>
+        <p>We recommend ₹1,00,000 - ₹5,00,000 as the ideal range. Less capital limits position sizing. More capital means larger absolute profits but need a bigger risk appetite. Contact us about your specific capital.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>
+          Is this better than manual trading?
+          <span class="toggle">+</span>
+        </h3>
+        <p>Manual trading gives you freedom but requires discipline. AutoPilot gives you discipline automatically. Most traders lose money because of emotions - over-trading, revenge trading, FOMO. AutoPilot eliminates that. You'll have inconsistency if emotions guide you; consistency if rules guide you.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>
+          How often do trades happen?
+          <span class="toggle">+</span>
+        </h3>
+        <p>Depending on market conditions. The system is always in market hence you will always have 1 trade running. Consistency is key.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>
+          Can I use this with other trading?
+          <span class="toggle">+</span>
+        </h3>
+        <p>We recommend against mixing NiftyFlow with manual trading. The system is designed to work standalone. If you're doing your own trades too, you might sabotage the discipline that makes AutoPilot work.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EMAIL OPTIN -->
+<section>
+  <div class="container">
+    <div class="email-optin">
+      <h3>💫 Insider: The Options Trading Checklist</h3>
+      <p>Our framework to prevent costly mistakes in options trading. 5-minute read. Built from real market lessons.</p>
+      <form onsubmit="handleEmailSubmit(event)">
+        <input type="email" placeholder="Enter your email" required>
+        <br>
+        <button type="submit">Send Me The Checklist</button>
+      </form>
+      <p style="margin-top: 16px; font-size: 0.8rem; color: #a89ff5;">We never spam. Unsubscribe anytime.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CLARIFICATION: WHO IT'S FOR & WHO IT'S NOT -->
+<section>
+  <div class="container">
+    <h2>Be Honest With Yourself</h2>
+    <p class="sub">
+      This works if you match these criteria.
+    </p>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 26px; max-width: 900px; margin: 0 auto;">
+      <div>
+        <h3 style="color: #4ade80; margin-bottom: 16px; font-size: 1.1rem; text-align: center;">NiftyFlow IS FOR YOU:</h3>
+        <ul style="list-style: none; padding: 0;">
+          <li style="color: #eae7ff; margin-bottom: 12px; padding-left: 24px; position: relative;">
+            <span style="position: absolute; left: 0; color: #4ade80;">✓</span> You want discipline, not tips
+          </li>
+          <li style="color: #eae7ff; margin-bottom: 12px; padding-left: 24px; position: relative;">
+            <span style="position: absolute; left: 0; color: #4ade80;">✓</span> You have steady capital (₹1L - ₹5L,>5L after trial)
+          </li>
+          <li style="color: #eae7ff; margin-bottom: 12px; padding-left: 24px; position: relative;">
+            <span style="position: absolute; left: 0; color: #4ade80;">✓</span> You won't override the system
+          </li>
+          <li style="color: #eae7ff; margin-bottom: 12px; padding-left: 24px; position: relative;">
+            <span style="position: absolute; left: 0; color: #4ade80;">✓</span> You can handle losing months
+          </li>
+          <li style="color: #eae7ff; margin-bottom: 12px; padding-left: 24px; position: relative;">
+            <span style="position: absolute; left: 0; color: #4ade80;">✓</span> You want consistency > high risk
+          </li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="color: #f59e0b; margin-bottom: 16px; font-size: 1.1rem; text-align: center;">NOT A FIT IF:</h3>
+        <ul style="list-style: none; padding: 0;">
+          <li style="color: #eae7ff; margin-bottom: 12px; padding-left: 24px; position: relative;">
+            <span style="position: absolute; left: 0; color: #f59e0b;">✗</span> You want to get rich quick
+          </li>
+          <li style="color: #eae7ff; margin-bottom: 12px; padding-left: 24px; position: relative;">
+            <span style="position: absolute; left: 0; color: #f59e0b;">✗</span> You want profits without learning the basics
+          </li>
+          <li style="color: #eae7ff; margin-bottom: 12px; padding-left: 24px; position: relative;">
+            <span style="position: absolute; left: 0; color: #f59e0b;">✗</span> You panic during drawdowns
+          </li>
+          <li style="color: #eae7ff; margin-bottom: 12px; padding-left: 24px; position: relative;">
+            <span style="position: absolute; left: 0; color: #f59e0b;">✗</span> You can't let rules work
+          </li>
+          <li style="color: #eae7ff; margin-bottom: 12px; padding-left: 24px; position: relative;">
+            <span style="position: absolute; left: 0; color: #f59e0b;">✗</span> You need guaranteed returns
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="sub" style="margin-top: 40px; font-size: 1rem; color: #b9b3e6; font-style: italic;">
+      We're honest about limitations because traders who trust the system outperform everyone else.
+    </p>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section>
+  <div class="container" style="text-align:center">
+    <h2 style="color: #4ade80; font-size: 2.5rem;">⚡ 3-Month Free Trial Starts Today</h2>
+    <p class="sub" style="font-size: 1.1rem;">
+      Zero risk. Zero payment. Just pure results.<br>
+      <strong>Try the system. Keep the profits. Never override the rules.</strong>
+    </p>
+
+    <p style="color: #b9b3e6; margin-bottom: 24px; font-size: 0.95rem;">
+      Start your 3-month free trial and make your own decision.
+    </p>
+
+    <a class="cta"
+       href="https://wa.me/918087616404?text=Hi%20I%20want%20to%20start%20the%203-month%20free%20trial%20of%20NiftyFlow%20AutoPilot"
+       target="_blank"
+       style="font-size: 1.2rem; padding: 18px 45px;">
+      🚀 Reserve Your Free Trial Spot Now
+    </a>
+
+    <p style="color: #9b94c7; margin-top: 32px; font-size: 0.9rem;">
+      Most traders decide in Month 1. If it's working, you'll know. If not, pause anytime.
+    </p>
+  </div>
+</section>
+
+<footer>
+  <div style="margin-bottom: 16px;">
+    <strong style="color: #c7b9ff;">Support & Contact</strong><br>
+    WhatsApp: <strong>+91 80876 16404</strong> | Email: <strong>niftyflow.service@gmail.com</strong>
+  </div>
+  <p style="margin: 12px 0; font-size: 0.8rem; color: #7d78a8;">
+    Disclaimer: Nifty options trading involves market risk and leverage. Trade only with capital you can afford to lose. Past performance is not indicative of future results. Always understand the risks before trading derivatives. We provide tools for execution, not financial advice.
+  </p>
+  <p style="margin-top: 16px; font-size: 0.75rem; color: #6b6799;">
+    © 2026 NiftyFlow. All rights reserved. | Built for traders who value discipline over emotion.
+  </p>
+</footer>
+
+<button id="topBtn" onclick="window.scrollTo({top:0, behavior:'smooth'})">Top</button>
+
+<a href="https://www.instagram.com/niftyflow.in/" 
+   target="_blank" 
+   class="instagram-btn" 
+   title="Follow us on Instagram">
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37"></path>
+    <circle cx="17.5" cy="6.5" r="1.5"></circle>
+  </svg>
+</a>
+
+<a href="https://wa.me/918087616404?text=Hi%20I%20want%20to%20start%20the%203-month%20free%20trial%20of%20NiftyFlow%20AutoPilot" 
+   target="_blank" 
+   class="whatsapp-btn" 
+   title="Contact us on WhatsApp">
+  <img src="assets/images/whatsapp.svg" alt="WhatsApp" width="28" height="28">
+</a>
+
+<a href="mailto:niftyflow.service@gmail.com" 
+   class="email-btn" 
+   title="Email us">
+  &#x2709;
+</a>
+
+<script>
+// Schema.org Structured Data
+const schemaData = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "NiftyFlow AutoPilot",
+  "description": "Rule-based automated Nifty options trading system focused on disciplined execution and systematic risk management",
+  "applicationCategory": "FinanceApplication",
+  "offers": {
+    "@type": "Offer",
+    "price": "1000",
+    "priceCurrency": "INR"
+  },
+
+};
+
+document.head.appendChild(
+  Object.assign(document.createElement('script'), {
+    type: 'application/ld+json',
+    textContent: JSON.stringify(schemaData)
+  })
+);
+
+const topBtn = document.getElementById("topBtn");
+window.addEventListener("scroll", () => {
+  if (window.scrollY > 400) topBtn.classList.add("show");
+  else topBtn.classList.remove("show");
+}, { passive: true });
+
+// FAQ Toggle
+const faqItems = document.querySelectorAll('.faq-item h3');
+faqItems.forEach(item => {
+  item.addEventListener('click', () => {
+    const parent = item.parentElement;
+    parent.classList.toggle('open');
+  });
+});
+
+// Email Submission
+function handleEmailSubmit(e) {
+  e.preventDefault();
+  const email = e.target.querySelector('input[type="email"]').value;
+  const whatsappMessage = `Hi, I'd like to receive the Options Trading Checklist. My email is: ${email}`;
+  window.open(`https://wa.me/918087616404?text=${encodeURIComponent(whatsappMessage)}`, '_blank');
+  e.target.reset();
+}
+</script>
+
+</body>
+</html>

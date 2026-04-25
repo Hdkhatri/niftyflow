@@ -1,723 +1,1560 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>NiftyFlow AutoPilot - Rule-Based Automated Nifty Trading</title>
-
-<meta name="description"
-content="NiftyFlow AutoPilot is a rule-based automated Nifty trading system focused on disciplined execution and controlled risk. Try free for 3 months.">
-
-<meta name="keywords" content="automated Nifty trading, rule-based trading system, automated trading, Nifty 50, algorithmic trading, trading automation">
-
-<meta name="author" content="NiftyFlow">
-
-<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
-
-<!-- Open Graph Tags -->
-<meta property="og:type" content="website">
-<meta property="og:title" content="NiftyFlow AutoPilot - Rule-Based Automated Nifty Trading">
-<meta property="og:description" content="Experience rule-based automated Nifty trading with discipline. 3-month free trial. No emotional trading, just consistent execution.">
-<meta property="og:image" content="assets/images/logo.svg">
-<meta property="og:url" content="">
-
-<!-- Twitter Tags -->
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="NiftyFlow AutoPilot - Rule-Based Automated Nifty Trading">
-<meta name="twitter:description" content="Experience rule-based automated Nifty trading with discipline. 3-month free trial.">
-<meta name="twitter:image" content="assets/images/logo.svg">
-
-<!-- Canonical -->
-<link rel="canonical" href="">
-
-<!-- Preconnect to external resources -->
-<link rel="preconnect" href="https://wa.me">
-<link rel="preconnect" href="https://www.instagram.com">
-
-<!-- Favicon -->
-<link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
-
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NiftyFlow — Algo Execution for Every Trader</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Mono:wght@300;400;500&family=Instrument+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link rel="icon" type="image/svg+xml" href="assets/images/logogolden.svg">
 <style>
-* { box-sizing: border-box; }
-
-/* GLOBAL */
-body {
-  margin: 0;
-  padding-top: 72px;
-  font-family: "Inter","Segoe UI",Roboto,Arial,sans-serif;
-  background: radial-gradient(ellipse at top,#2b1c5c 0%,#140a2e 45%,#08040f 100%);
-  color: #eae7ff;
-  line-height: 1.6;
-}
-
-.container {
-  max-width: 1150px;
-  margin: auto;
-  padding: 24px;
-}
-
-/* HEADER */
-.header {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  background: rgba(10,6,25,0.9);
-  backdrop-filter: blur(6px);
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-  z-index: 1000;
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.logo span {
-  font-size: 1.4rem;
-  font-weight: 800;
-  color: #c7b9ff;
-}
-
-/* HERO */
-.hero {
-  padding: 90px 0 60px;
-  text-align: center;
-}
-
-.hero h1 {
-  font-size: 3rem;
-  font-weight: 900;
-  margin-bottom: 20px;
-  color: #ffffff;
-}
-
-.hero p {
-  font-size: 1.15rem;
-  max-width: 850px;
-  margin: 0 auto 30px;
-  color: #cfc8ff;
-}
-
-/* CTA */
-.cta {
-  display: inline-block;
-  background: #4ade80;
-  color: #04210f;
-  padding: 16px 38px;
-  border-radius: 12px;
-  font-size: 1.1rem;
-  font-weight: 800;
-  text-decoration: none;
-  box-shadow: 0 10px 30px rgba(74,222,128,0.35);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.cta:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 40px rgba(74,222,128,0.45);
-}
-
-.email {
-  margin-top: 16px;
-  font-size: 0.95rem;
-  color: #b9b3e6;
-}
-
-/* SCROLL HINT */
-.scroll-hint {
-  margin-top: 42px;
-  font-size: 0.95rem;
-  color: #b3abdd;
-}
-
-/* SECTIONS */
-section {
-  padding: 80px 0;
-  transform: translateZ(0);
-}
-
-h2 {
-  text-align: center;
-  font-size: 2.3rem;
-  margin-bottom: 16px;
-  color: #ffffff;
-}
-
-.sub {
-  text-align: center;
-  max-width: 800px;
-  margin: 0 auto 42px;
-  color: #bcb6eb;
-}
-
-/* SINGLE LINE, NO SCROLL */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 26px;
-}
-
-/* CARDS */
-.card {
-  background: rgba(255,255,255,0.06);
-  padding: 28px;
-  border-radius: 16px;
-  border: 1px solid rgba(255,255,255,0.08);
-  min-width: 0;
-}
-
-.card.info {
-  border-left: 4px solid #3b82f6;
-}
-
-.card.metrics {
-  border-left: 4px solid #8b5cf6;
-}
-
-.card.process {
-  border-left: 4px solid #06b6d4;
-}
-
-.card.pricing {
-  border-left: 4px solid #ec4899;
-}
-
-.card.success {
-  border-left: 4px solid #10b981;
-}
-
-.card.warning {
-  border-left: 4px solid #f59e0b;
-}
-
-/* BACK TO TOP */
-#topBtn {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  background: #6d5efc;
-  color: white;
-  border: none;
-  padding: 12px 14px;
-  border-radius: 50%;
-  cursor: pointer;
-  font-size: 13px;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-  will-change: opacity;
-  min-width: 44px;
-  min-height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-#topBtn.show {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-/* WHATSAPP FLOATING BUTTON */
-.whatsapp-btn {
-  position: fixed;
-  bottom: 150px;
-  right: 24px;
-  background: #25d366;
-  color: white;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  text-decoration: none;
-  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  z-index: 999;
-  font-size: 28px;
-  line-height: 1;
-}
-
-.whatsapp-btn:hover {
-  transform: scale(1.1);
-  box-shadow: 0 6px 16px rgba(37, 211, 102, 0.6);
-}
-
-/* INSTAGRAM FLOATING BUTTON */
-.instagram-btn {
-  position: fixed;
-  bottom: 220px;
-  right: 24px;
-  background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-  color: white;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  text-decoration: none;
-  box-shadow: 0 4px 12px rgba(224, 148, 51, 0.4);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  z-index: 999;
-  font-size: 26px;
-  line-height: 1;
-}
-
-.instagram-btn:hover {
-  transform: scale(1.1);
-  box-shadow: 0 6px 16px rgba(224, 148, 51, 0.6);
-}
-
-/* EMAIL FLOATING BUTTON */
-.email-btn {
-  position: fixed;
-  bottom: 90px;
-  right: 24px;
-  background: #3b82f6;
-  color: white;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  text-decoration: none;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  z-index: 999;
-  font-size: 24px;
-  line-height: 1;
-}
-
-.email-btn:hover {
-  transform: scale(1.1);
-  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.6);
-}
-
-@media (max-width: 768px) {
-  .whatsapp-btn {
-    bottom: 130px;
-    right: 16px;
-    width: 50px;
-    height: 50px;
-    font-size: 24px;
+  :root {
+    --ink: #0a0a0f;
+    --white: #fafaf8;
+    --cream: #f4f1ea;
+    --silver: #e8e4dc;
+    --mist: #c8c4bc;
+    --slate: #8a8680;
+    --gold: #b8960c;
+    --gold-light: #d4af37;
+    --gold-pale: #f0e8c8;
+    --red-alert: #c0392b;
+    --green-signal: #1a6b3a;
+    --green-light: #e8f5ee;
+    --shadow-soft: 0 4px 32px rgba(10,10,15,0.08);
+    --shadow-card: 0 2px 16px rgba(10,10,15,0.06), 0 8px 48px rgba(10,10,15,0.06);
   }
-  
-  .instagram-btn {
-    bottom: 190px;
-    right: 16px;
-    width: 50px;
-    height: 50px;
-    font-size: 22px;
-  }
-  
-  .email-btn {
-    bottom: 70px;
-    right: 16px;
-    width: 50px;
-    height: 50px;
-    font-size: 20px;
-  }
-}
 
-/* FOOTER */
-footer {
-  padding: 32px;
-  text-align: center;
-  font-size: 0.85rem;
-  color: #9b94c7;
-  border-top: 1px solid rgba(255,255,255,0.06);
-}
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-@media (max-width: 768px) {
+  html { scroll-behavior: smooth; font-size: 16px; }
+
   body {
-    padding-top: 60px;
+    font-family: 'Instrument Sans', sans-serif;
+    background: var(--white);
+    color: var(--ink);
+    overflow-x: hidden;
+    cursor: crosshair;
   }
-  
-  .hero h1 { 
-    font-size: 2.3rem; 
-    margin-bottom: 16px;
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.2rem 5%;
+    background: rgba(250,250,248,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--silver);
   }
-  
-  .hero p {
-    font-size: 1rem;
-    margin-bottom: 24px;
-  }
-  
-  h2 {
-    font-size: 1.8rem;
-    margin-bottom: 12px;
-  }
-  
-  .sub {
-    margin-bottom: 32px;
-    font-size: 0.95rem;
-  }
-  
-  .grid {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-  
-  .card {
-    padding: 20px;
-    border-radius: 12px;
-    text-align: center;
-  }
-  
-  .metric {
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
     font-size: 1.5rem;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    text-decoration: none;
   }
-  
-  .cta {
-    padding: 14px 32px;
-    font-size: 1rem;
-    width: 100%;
-    text-align: center;
+  .nav-logo span { color: var(--gold); }
+  .nav-tagline {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    color: var(--slate);
+    text-transform: uppercase;
   }
-  
-  section {
-    padding: 60px 0;
+  .nav-links {
+    display: flex; gap: 2rem; list-style: none;
   }
-  
-  .container {
-    padding: 16px;
+  .nav-links a {
+    font-size: 0.82rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--slate);
+    text-decoration: none;
+    transition: color 0.2s;
   }
-  
-  .logo span:last-child {
-    font-size: 9px !important;
-    margin-left: 6px !important;
+  .nav-links a:hover { color: var(--ink); }
+  .nav-cta {
+    background: var(--ink);
+    color: var(--white) !important;
+    padding: 0.5rem 1.2rem;
+    border-radius: 2px;
+    transition: background 0.2s !important;
   }
-  
-  #topBtn {
-    padding: 10px 12px;
-    font-size: 12px;
-    bottom: 16px;
-    right: 16px;
+  .nav-cta:hover { background: var(--gold) !important; color: var(--ink) !important; }
+
+  .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
+  .hamburger span { display: block; width: 22px; height: 2px; background: var(--ink); transition: all 0.3s; }
+
+  /* ── TICKER ── */
+<!--   .ticker-bar {
+    position: fixed; top: 65px; left: 0; right: 0; z-index: 99;
+    background: var(--ink);
+    padding: 0.4rem 0;
+    overflow: hidden;
   }
-  
-  footer {
-    padding: 24px 16px;
-    font-size: 0.75rem;
+  .ticker-track {
+    display: flex; 
+	gap: 3rem;
+    white-space: nowrap;
+	width: max-content;
+    animation: tickerScroll 28s linear infinite;
   }
+  .ticker-item {
+    flex-shrink: 0;
+	font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    color: var(--mist);
+  }
+  .ticker-item .up { color: #4ade80; }
+  .ticker-item .down { color: #f87171; }
+  @keyframes tickerScroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  } -->
+
+/* ── UPDATED TICKER ── */
+.ticker-bar {
+  position: fixed; 
+  top: 65px; 
+  left: 0; 
+  right: 0; 
+  z-index: 999; /* Higher z-index */
+  background: #0a0a0a; /* Dark solid fallback for var(--ink) */
+  height: 40px; /* Explicit height to prevent squashing */
+  display: flex;
+  align-items: center; /* Vertically centers the text */
+  overflow: hidden;
+  border-bottom: 1px solid #333; /* Visual separator */
 }
 
-@media (max-width: 480px) {
-  .hero {
-    padding: 100px 0 80px;
-  }
-  
-  .hero h1 {
-    font-size: 1.8rem;
-  }
-  
-  .hero p {
-    font-size: 0.95rem;
-    max-width: 100%;
-  }
-  
-  h2 {
-    font-size: 1.5rem;
-  }
-  
-  .metric {
-    font-size: 1.3rem;
-  }
-  
-  .card {
-    padding: 16px;
-    font-size: 0.9rem;
-  }
-  
-  .email {
-    font-size: 0.9rem;
-  }
-  
-  .scroll-hint {
-    font-size: 0.9rem;
-  }
-  
-  .cta {
-    padding: 12px 28px;
-    font-size: 0.95rem;
-    border-radius: 8px;
-  }
-  
-  section {
-    padding: 50px 0;
-  }
-  
-  .header {
-    height: auto;
-    padding: 12px 0;
-  }
+.ticker-track {
+  display: flex; 
+  width: max-content;
+  animation: tickerScroll 25s linear infinite;
 }
+
+.ticker-item {
+  flex-shrink: 0;
+  padding: 0 2rem; /* Consistent spacing */
+  font-family: 'DM Mono', monospace;
+  font-size: 0.85rem; /* Increased from 0.68rem for visibility */
+  color: #e0e0e0; /* Bright fallback for var(--mist) */
+  white-space: nowrap;
+}
+
+.up { color: #4ade80 !important; }
+.down { color: #f87171 !important; }
+
+@keyframes tickerScroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    padding: 160px 5% 80px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+    position: relative;
+    background: var(--white);
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 70% at 80% 50%, rgba(184,150,12,0.05) 0%, transparent 70%),
+      repeating-linear-gradient(0deg, transparent, transparent 79px, var(--silver) 79px, var(--silver) 80px),
+      repeating-linear-gradient(90deg, transparent, transparent 79px, var(--silver) 79px, var(--silver) 80px);
+    pointer-events: none;
+  }
+  .hero-left { position: relative; z-index: 1; }
+  .hero-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1.4rem;
+    display: flex; align-items: center; gap: 0.8rem;
+  }
+  .hero-eyebrow::before {
+    content: '';
+    display: inline-block;
+    width: 32px; height: 1px;
+    background: var(--gold);
+  }
+  .hero-h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.6rem, 5vw, 4.2rem);
+    font-weight: 900;
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    color: var(--ink);
+    margin-bottom: 1.6rem;
+  }
+  .hero-h1 em {
+    font-style: italic;
+    color: var(--gold);
+  }
+  .hero-sub {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: var(--slate);
+    max-width: 440px;
+    margin-bottom: 2.4rem;
+    font-weight: 300;
+  }
+  .hero-sub strong { color: var(--ink); font-weight: 500; }
+  .hero-cta-row { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; }
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: var(--ink);
+    color: var(--white);
+    padding: 0.85rem 1.8rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 2px;
+    transition: background 0.2s, transform 0.15s;
+    border: none; cursor: pointer;
+  }
+  .btn-primary:hover { background: var(--gold); color: var(--ink); transform: translateY(-1px); }
+  .btn-ghost {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: transparent;
+    color: var(--ink);
+    padding: 0.85rem 1.8rem;
+    font-size: 0.82rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 2px;
+    border: 1px solid var(--silver);
+    transition: border-color 0.2s, background 0.2s;
+    cursor: pointer;
+  }
+  .btn-ghost:hover { border-color: var(--ink); background: var(--cream); }
+  .trust-badges {
+    display: flex; gap: 1.6rem; margin-top: 3rem; flex-wrap: wrap;
+  }
+  .trust-badge {
+    display: flex; align-items: center; gap: 0.5rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--slate);
+  }
+  .trust-badge .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--green-signal);
+    box-shadow: 0 0 0 3px rgba(26,107,58,0.15);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 3px rgba(26,107,58,0.15); }
+    50% { box-shadow: 0 0 0 6px rgba(26,107,58,0.08); }
+  }
+  .hero-right { position: relative; z-index: 1; }
+  .hero-card {
+    background: var(--white);
+    border: 1px solid var(--silver);
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: var(--shadow-card);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--gold-light));
+  }
+  .card-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 1.4rem;
+  }
+  .card-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--slate);
+  }
+  .live-badge {
+    display: flex; align-items: center; gap: 0.4rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--green-signal);
+    background: var(--green-light);
+    padding: 0.25rem 0.6rem;
+    border-radius: 20px;
+  }
+  .live-badge::before {
+    content: '';
+    width: 5px; height: 5px;
+    background: var(--green-signal);
+    border-radius: 50%;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  .mini-chart { margin-bottom: 1.4rem; }
+  .mini-chart svg { width: 100%; height: 80px; overflow: visible; }
+  .stat-row {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1rem; margin-bottom: 1.4rem;
+  }
+  .stat-box {
+    background: var(--cream);
+    border-radius: 4px;
+    padding: 0.8rem;
+    text-align: center;
+  }
+  .stat-val {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .stat-val.up { color: var(--green-signal); }
+  .stat-val.neutral { color: var(--gold); }
+  .stat-lbl {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--slate);
+    margin-top: 0.2rem;
+  }
+  .signal-log {
+    border-top: 1px solid var(--silver);
+    padding-top: 1rem;
+  }
+  .signal-entry {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0.4rem 0;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    border-bottom: 1px dashed var(--silver);
+  }
+  .signal-entry:last-child { border-bottom: none; }
+  .sig-time { color: var(--slate); }
+  .sig-action { letter-spacing: 0.08em; }
+  .sig-action.buy { color: var(--green-signal); }
+  .sig-action.sell { color: var(--red-alert); }
+  .sig-pnl { font-weight: 500; }
+  .sig-pnl.pos { color: var(--green-signal); }
+
+  /* ── SECTION SHARED ── */
+  section { padding: 100px 5%; }
+  .section-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.8rem;
+  }
+  .section-h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    color: var(--ink);
+    margin-bottom: 1.2rem;
+  }
+  .section-lead {
+    font-size: 1rem;
+    line-height: 1.75;
+    color: var(--slate);
+    max-width: 540px;
+    font-weight: 300;
+  }
+
+  /* ── SECTION 2: PSYCHOLOGY GAP ── */
+  .psych-section {
+    background: var(--ink);
+    color: var(--white);
+    position: relative;
+    overflow: hidden;
+  }
+  .psych-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 50% 60% at 10% 80%, rgba(184,150,12,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 50% at 90% 20%, rgba(184,150,12,0.07) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .psych-section .section-eyebrow { color: var(--gold-light); }
+  .psych-section .section-h2 { color: var(--white); }
+  .psych-section .section-lead { color: var(--mist); }
+  .psych-grid {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 0;
+    margin: 4rem 0;
+    position: relative;
+    z-index: 1;
+  }
+  .psych-col {
+    padding: 2.4rem;
+    border-radius: 6px;
+  }
+  .psych-col.chaos {
+    background: rgba(192,57,43,0.08);
+    border: 1px solid rgba(192,57,43,0.2);
+  }
+  .psych-col.precision {
+    background: rgba(26,107,58,0.08);
+    border: 1px solid rgba(26,107,58,0.2);
+  }
+  .psych-divider {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 0 2rem;
+    gap: 0.5rem;
+    position: relative;
+  }
+  .psych-divider::before {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0;
+    left: 50%;
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, rgba(250,250,248,0.15), transparent);
+  }
+  .vs-circle {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    border: 1px solid rgba(250,250,248,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 0.9rem;
+    font-style: italic;
+    color: var(--mist);
+    background: var(--ink);
+    position: relative; z-index: 1;
+  }
+  .psych-col-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 1.6rem;
+    display: flex; align-items: center; gap: 0.6rem;
+  }
+  .label-chaos { color: #e06c5a; }
+  .label-precision { color: #4ade80; }
+  .psych-items { display: flex; flex-direction: column; gap: 1rem; }
+  .psych-item {
+    display: flex; align-items: flex-start; gap: 0.8rem;
+    font-size: 0.9rem; line-height: 1.5;
+  }
+  .psych-item-icon {
+    width: 28px; height: 28px;
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    font-size: 0.85rem;
+  }
+  .icon-chaos { background: rgba(192,57,43,0.15); }
+  .icon-prec { background: rgba(26,107,58,0.15); }
+  .psych-item-text strong { display: block; color: var(--white); font-weight: 500; font-size: 0.85rem; }
+  .psych-item-text span { color: var(--mist); font-size: 0.78rem; font-weight: 300; }
+  .discipline-engine {
+    margin-top: 4rem;
+    background: rgba(184,150,12,0.05);
+    border: 1px solid rgba(184,150,12,0.2);
+    border-radius: 6px;
+    padding: 2.4rem;
+    position: relative; z-index: 1;
+  }
+  .engine-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--gold-light);
+    margin-bottom: 0.5rem;
+  }
+  .engine-sub {
+    font-size: 0.85rem;
+    color: var(--mist);
+    margin-bottom: 2rem;
+    font-weight: 300;
+  }
+  .engine-flow {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+  .engine-step {
+    flex: 1;
+    min-width: 120px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 4px;
+    padding: 1rem 0.8rem;
+    text-align: center;
+    position: relative;
+  }
+  .engine-step-icon { font-size: 1.4rem; margin-bottom: 0.4rem; display: block; }
+  .engine-step-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    margin-bottom: 0.3rem;
+  }
+  .engine-step-desc { font-size: 0.7rem; color: var(--mist); line-height: 1.4; }
+  .engine-arrow {
+    color: var(--gold);
+    font-size: 1rem;
+    padding: 0 0.4rem;
+    flex-shrink: 0;
+  }
+
+  /* ── SECTION 3: DASHBOARD ── */
+  .dashboard-section { background: var(--cream); }
+  .dashboard-container {
+    background: var(--white);
+    border: 1px solid var(--silver);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: var(--shadow-card);
+    margin-top: 3rem;
+  }
+  .dash-topbar {
+    background: var(--ink);
+    padding: 0.7rem 1.4rem;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .dash-dots { display: flex; gap: 6px; }
+  .dash-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .d-red { background: #ff5f57; }
+  .d-yellow { background: #febc2e; }
+  .d-green { background: #28c840; }
+  .dash-title-bar {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--mist);
+    text-align: center;
+  }
+  .dash-status {
+    display: flex; align-items: center; gap: 0.4rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    color: #4ade80;
+  }
+  .dash-status::before {
+    content: ''; width: 5px; height: 5px;
+    background: #4ade80;
+    border-radius: 50%;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  .dash-body {
+    display: grid;
+    grid-template-columns: 220px 1fr 240px;
+    min-height: 420px;
+  }
+  .dash-sidebar {
+    border-right: 1px solid var(--silver);
+    padding: 1.2rem;
+  }
+  .dash-sidebar-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--slate);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--silver);
+  }
+  .dash-metric {
+    padding: 0.8rem;
+    border-radius: 4px;
+    margin-bottom: 0.6rem;
+    background: var(--cream);
+  }
+  .dash-metric-lbl {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--slate);
+    margin-bottom: 0.25rem;
+  }
+  .dash-metric-val {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .dash-metric-val.pos { color: var(--green-signal); }
+  .dash-metric-sub {
+    font-size: 0.62rem; color: var(--slate); margin-top: 0.1rem;
+  }
+  .dash-main { padding: 1.2rem; }
+  .dash-chart-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 1rem;
+  }
+  .dash-instrument {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .dash-price-tag {
+    text-align: right;
+  }
+  .dash-price {
+    font-family: 'DM Mono', monospace;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .dash-change {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--green-signal);
+  }
+  .dash-chart-area { position: relative; margin-bottom: 1rem; }
+  .dash-chart-area svg { width: 100%; height: 180px; }
+  .ema-legend {
+    display: flex; gap: 1.2rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    margin-bottom: 1rem;
+  }
+  .ema-item { display: flex; align-items: center; gap: 0.4rem; }
+  .ema-dot { width: 14px; height: 2px; border-radius: 1px; }
+  .ema-9 { background: #d4af37; }
+  .ema-21 { background: #6495ed; }
+  .ema-50 { background: #e06c5a; }
+  .dash-signals {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem;
+  }
+  .dash-signal-card {
+    border: 1px solid var(--silver);
+    border-radius: 4px;
+    padding: 0.7rem;
+    text-align: center;
+  }
+  .dsc-lbl {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--slate);
+    margin-bottom: 0.3rem;
+  }
+  .dsc-val {
+    font-weight: 600; font-size: 0.85rem; color: var(--ink);
+  }
+  .dsc-val.buy { color: var(--green-signal); }
+  .dsc-val.sell { color: var(--red-alert); }
+  .dash-right {
+    border-left: 1px solid var(--silver);
+    padding: 1.2rem;
+    display: flex; flex-direction: column; gap: 0.8rem;
+  }
+  .dash-right-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--slate);
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--silver);
+  }
+  .trade-log-item {
+    padding: 0.6rem;
+    border-radius: 4px;
+    border: 1px solid var(--silver);
+    font-family: 'DM Mono', monospace;
+  }
+  .tli-header { display: flex; justify-content: space-between; margin-bottom: 0.3rem; }
+  .tli-symbol { font-size: 0.68rem; font-weight: 500; color: var(--ink); }
+  .tli-type { font-size: 0.58rem; letter-spacing: 0.1em; padding: 0.15rem 0.4rem; border-radius: 2px; }
+  .tli-type.buy { background: var(--green-light); color: var(--green-signal); }
+  .tli-type.sell { background: #fdecea; color: var(--red-alert); }
+  .tli-detail { font-size: 0.6rem; color: var(--slate); }
+  .tli-pnl { font-size: 0.7rem; font-weight: 500; }
+  .tli-pnl.pos { color: var(--green-signal); }
+  .feature-tags {
+    display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 2rem;
+  }
+  .feat-tag {
+    display: flex; align-items: center; gap: 0.4rem;
+    background: var(--cream);
+    border: 1px solid var(--silver);
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+    color: var(--slate);
+  }
+  .feat-tag::before {
+    content: '✦';
+    color: var(--gold);
+    font-size: 0.5rem;
+  }
+
+  /* ── SECTION 4: STACK & CONTACT ── */
+  .stack-section { background: var(--white); }
+  .stack-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    margin-top: 3rem;
+    align-items: start;
+  }
+  .stack-icons {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem;
+    margin-bottom: 2rem;
+  }
+  .stack-icon-card {
+    border: 1px solid var(--silver);
+    border-radius: 6px;
+    padding: 1.4rem 1rem;
+    text-align: center;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .stack-icon-card:hover {
+    border-color: var(--gold);
+    box-shadow: 0 4px 20px rgba(184,150,12,0.1);
+  }
+  .stack-icon-svg { font-size: 2rem; margin-bottom: 0.6rem; display: block; }
+  .stack-icon-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .stack-icon-desc { font-size: 0.68rem; color: var(--slate); margin-top: 0.2rem; }
+  .stack-extras { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+  .stack-pill {
+    background: var(--cream);
+    border: 1px solid var(--silver);
+    padding: 0.35rem 0.8rem;
+    border-radius: 20px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.08em;
+    color: var(--slate);
+  }
+  /* Contact Card */
+  .contact-card {
+    background: var(--ink);
+    color: var(--white);
+    border-radius: 8px;
+    padding: 2.4rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .contact-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--gold-light));
+  }
+  .contact-card::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; right: -60px;
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(184,150,12,0.1) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .contact-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    margin-bottom: 0.8rem;
+  }
+  .contact-h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    font-weight: 900;
+    line-height: 1.15;
+    margin-bottom: 0.8rem;
+  }
+  .contact-sub {
+    font-size: 0.85rem;
+    color: var(--mist);
+    font-weight: 300;
+    line-height: 1.6;
+    margin-bottom: 1.8rem;
+  }
+  .contact-btns { display: flex; flex-direction: column; gap: 0.8rem; }
+  .contact-btn {
+    display: flex; align-items: center; justify-content: center; gap: 0.7rem;
+    padding: 0.9rem 1.4rem;
+    border-radius: 4px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    transition: transform 0.15s, opacity 0.2s;
+  }
+  .contact-btn:hover { transform: translateY(-1px); opacity: 0.92; }
+  .btn-wa {
+    background: #25D366;
+    color: #fff;
+  }
+  .btn-email {
+    background: transparent;
+    color: var(--white);
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  .confidentiality-note {
+    display: flex; align-items: flex-start; gap: 0.6rem;
+    margin-top: 1.4rem;
+    padding: 0.9rem;
+    background: rgba(184,150,12,0.08);
+    border: 1px solid rgba(184,150,12,0.2);
+    border-radius: 4px;
+    font-size: 0.72rem;
+    color: var(--mist);
+    line-height: 1.5;
+  }
+  .conf-icon { color: var(--gold-light); flex-shrink: 0; font-size: 0.9rem; margin-top: 0.05rem; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--ink);
+    color: var(--mist);
+    padding: 3rem 5%;
+    display: flex; justify-content: space-between; align-items: flex-end;
+    flex-wrap: wrap; gap: 1.5rem;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .footer-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    font-weight: 900;
+    color: var(--white);
+  }
+  .footer-logo span { color: var(--gold); }
+  .footer-tagline {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--slate);
+    margin-top: 0.3rem;
+  }
+  .footer-copy {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.08em;
+    text-align: right;
+    color: var(--slate);
+  }
+
+  /* ── FLOATING CONTACT ── */
+  .float-contact {
+    position: fixed;
+    bottom: 1.8rem; right: 1.8rem;
+    z-index: 200;
+    display: flex; flex-direction: column; align-items: flex-end; gap: 0.7rem;
+  }
+  .float-btn {
+    display: flex; align-items: center; gap: 0.6rem;
+    padding: 0.75rem 1.2rem;
+    border-radius: 30px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    transition: transform 0.2s, box-shadow 0.2s;
+    white-space: nowrap;
+  }
+  .float-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.2); }
+  .float-wa { background: #25D366; color: #fff; }
+  .float-email { background: var(--ink); color: var(--white); }
+
+  /* ── SCROLL FADE-IN ── */
+  .fade-in { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── MOBILE ── */
+  @media (max-width: 900px) {
+    .nav-links { display: none; }
+    .hamburger { display: flex; }
+    .nav-cta-desktop { display: none; }
+    .hero { grid-template-columns: 1fr; padding-top: 140px; }
+    .hero-right { display: none; }
+    .psych-grid { grid-template-columns: 1fr; }
+    .psych-divider { flex-direction: row; padding: 1rem 0; }
+    .psych-divider::before { width: 100%; height: 1px; top: 50%; left: 0; }
+    .dash-body { grid-template-columns: 1fr; }
+    .dash-sidebar, .dash-right { display: none; }
+    .stack-grid { grid-template-columns: 1fr; }
+    .float-contact { bottom: 1rem; right: 1rem; }
+    .float-btn span { display: none; }
+    .float-btn { padding: 0.85rem; border-radius: 50%; }
+  }
+  @media (max-width: 600px) {
+    nav { padding: 1rem 4%; }
+    section { padding: 70px 4%; }
+    .hero { padding: 130px 4% 60px; }
+    .stat-row { grid-template-columns: repeat(3, 1fr); }
+    .stack-icons { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 400px) {
+    .stack-icons { grid-template-columns: 1fr 1fr; }
+    .engine-flow { flex-direction: column; gap: 0.5rem; }
+    .engine-arrow { transform: rotate(90deg); }
+  }
+
+  /* Mobile nav drawer */
+  .mobile-menu {
+    display: none;
+    position: fixed;
+    top: 65px; left: 0; right: 0;
+    background: var(--white);
+    border-bottom: 1px solid var(--silver);
+    padding: 1.5rem 5%;
+    z-index: 99;
+    flex-direction: column; gap: 1.2rem;
+  }
+  .mobile-menu.open { display: flex; }
+  .mobile-menu a {
+    font-size: 0.9rem; font-weight: 500;
+    text-decoration: none; color: var(--ink);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0.4rem 0;
+    border-bottom: 1px solid var(--silver);
+  }
 </style>
 </head>
-
 <body>
 
-<!-- HEADER -->
-<div class="header">
-  <div class="container">
-    <div class="logo">
-      <img src="assets/images/logo.svg" alt="NiftyFlow logo" style="width:32px;height:32px;">
-      <span>NiftyFlow</span>
-      <span style="font-size:13px;color:#a89ff5;margin-left:12px;">
-        Simple &bull; Steady &bull; Automated
-      </span>
+<!-- NAV -->
+<nav>
+  <div>
+    <a class="nav-logo" href="#">Nifty<span>Flow</span></a>
+    <div class="nav-tagline">Algo Trading Agency</div>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#why">Why Algo</a></li>
+    <li><a href="#dashboard">Autopilot</a></li>
+    <li><a href="#stack">Stack</a></li>
+    <li><a href="#contact" class="nav-cta">Start a Project</a></li>
+  </ul>
+  <div class="hamburger" onclick="toggleMenu()" id="hamburger">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#why" onclick="toggleMenu()">Why Algo</a>
+  <a href="#dashboard" onclick="toggleMenu()">Nifty Autopilot</a>
+  <a href="#stack" onclick="toggleMenu()">Tech Stack</a>
+  <a href="#contact" onclick="toggleMenu()">Start a Project</a>
+</div>
+
+<!-- TICKER -->
+
+<!-- <div class="ticker-bar">
+  <div class="ticker-track" id="ticker"> -->
+    <!-- Group 1 -->
+<!--     <div class="ticker-group">
+      <span class="ticker-item">NIFTY 50 <span class="up">24,712.40 ▲ +0.38%</span></span>
+      <span class="ticker-item">BANKNIFTY <span class="up">52,845.60 ▲ +0.52%</span></span>
+      <span class="ticker-item">SENSEX <span class="up">81,241.80 ▲ +0.27%</span></span>
+      <span class="ticker-item">MIDCAP <span class="down">10,482.30 ▼ -0.14%</span></span>
+      <span class="ticker-item">USDINR <span class="down">83.62 ▼ -0.08%</span></span>
+      <span class="ticker-item">EMA9 CROSS SIGNAL <span class="up">ACTIVE ●</span></span>
+      <span class="ticker-item">API LATENCY <span class="up">18ms ●</span></span>
+    </div> -->
+    <!-- Group 2 (Exact Duplicate) -->
+<!--     <div class="ticker-group">
+      <span class="ticker-item">NIFTY 50 <span class="up">24,712.40 ▲ +0.38%</span></span>
+      <span class="ticker-item">BANKNIFTY <span class="up">52,845.60 ▲ +0.52%</span></span>
+      <span class="ticker-item">SENSEX <span class="up">81,241.80 ▲ +0.27%</span></span>
+      <span class="ticker-item">MIDCAP <span class="down">10,482.30 ▼ -0.14%</span></span>
+      <span class="ticker-item">USDINR <span class="down">83.62 ▼ -0.08%</span></span>
+      <span class="ticker-item">EMA9 CROSS SIGNAL <span class="up">ACTIVE ●</span></span>
+      <span class="ticker-item">API LATENCY <span class="up">18ms ●</span></span>
     </div>
   </div>
-</div>
+</div> -->
+
+<!-- TICKER -->
+
 
 <!-- HERO -->
-<div class="hero">
-  <div class="container">
-    <h1>Automate Your Investment.</h1>
-	<h1>Grow Without Stress.</h1>
-
-    <p>
-      <strong>NiftyFlow AutoPilot</strong> is an automated, rule-based investing system designed to help your money grow in a disciplined way
-      <strong>- without constant monitoring or emotional decisions</strong>.
+<section class="hero" id="home">
+  <div class="hero-left fade-in">
+    <div class="hero-eyebrow">Logic Over Luck. Code Over Chaos.</div>
+    <h1 class="hero-h1">Algo Execution for<br><em>Every Trader.</em></h1>
+    <p class="hero-sub">
+      Expert <strong>Python-based automation</strong> for broker APIs — Zerodha, Upstox, AngelOne.
+      We build the systems that trade so your emotions don't have to.
     </p>
-
-    <a class="cta"
-       href="https://wa.me/918087616404?text=Hi%20I%20want%20to%20start%20the%203-month%20free%20trial%20of%20NiftyFlow%20AutoPilot"
-       target="_blank">
-      Start 3-Month Free Trial
-    </a>
-
-    <div class="email">
-      Email: <strong>niftyflow.service@gmail.com</strong>
+    <div class="hero-cta-row">
+      <a href="#contact" class="btn-primary">
+        ▶&nbsp; Deploy Your Algo
+      </a>
+      <a href="#dashboard" class="btn-ghost">
+        View Autopilot →
+      </a>
     </div>
-
-    <div class="scroll-hint">
-      Scroll down to understand how it works
+    <div class="trust-badges">
+      <div class="trust-badge"><span class="dot"></span>Broker API Certified</div>
+      <div class="trust-badge"><span class="dot"></span>Sub-50ms Execution</div>
+      <div class="trust-badge"><span class="dot"></span>IP Confidential</div>
     </div>
   </div>
-</div>
-
-<!-- TRUST -->
-<section>
-  <div class="container">
-    <h2>Why People Trust NiftyFlow</h2>
-    <p class="sub">
-      No tips. No capital pooling. Every trade executes transparently in your own broker account.
-    </p>
-
-    <div class="grid">
-      <div class="card info">You retain full control of your funds</div>
-      <div class="card info">Automated decisions, not emotional ones</div>
-      <div class="card info">Every order and exit is visible</div>
-      <div class="card info">3-month free trial before any payment</div>
-    </div>
-  </div>
-</section>
-
-<!-- PERFORMANCE -->
-<section>
-  <div class="container">
-    <h2>How It Has Performed</h2>
-    <p class="sub">
-      Designed to prioritize capital protection first, returns second.
-    </p>
-
-    <div class="grid">
-      <div class="card metrics">
-        <div class="metric">10% - 25% CAGR</div>
-        Typical yearly return range*
+  <div class="hero-right fade-in">
+    <div class="hero-card">
+      <div class="card-header">
+        <div class="card-title">Nifty Autopilot — Preview</div>
+        <div class="live-badge">System Live</div>
       </div>
-      <div class="card metrics">
-        <div class="metric">&lt; 10%</div>
-        Observed maximum drawdown*
+      <div class="mini-chart">
+        <svg viewBox="0 0 420 80" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="chartGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" style="stop-color:#1a6b3a;stop-opacity:0.15"/>
+              <stop offset="100%" style="stop-color:#1a6b3a;stop-opacity:0"/>
+            </linearGradient>
+          </defs>
+          <path d="M0,60 L30,55 L60,50 L90,45 L120,48 L150,38 L180,42 L210,30 L240,25 L270,20 L300,15 L330,22 L360,18 L390,12 L420,10 L420,80 L0,80Z" fill="url(#chartGrad)"/>
+          <path d="M0,60 L30,55 L60,50 L90,45 L120,48 L150,38 L180,42 L210,30 L240,25 L270,20 L300,15 L330,22 L360,18 L390,12 L420,10" fill="none" stroke="#1a6b3a" stroke-width="2"/>
+          <!-- EMA9 -->
+          <path d="M0,58 L30,53 L60,49 L90,46 L120,46 L150,40 L180,41 L210,32 L240,27 L270,22 L300,17 L330,21 L360,17 L390,13 L420,11" fill="none" stroke="#d4af37" stroke-width="1.5" stroke-dasharray="4,2" opacity="0.8"/>
+          <!-- Buy signal -->
+          <polygon points="150,44 145,52 155,52" fill="#1a6b3a" opacity="0.9"/>
+          <!-- Sell signal -->
+          <polygon points="330,28 325,20 335,20" fill="#c0392b" opacity="0.9"/>
+        </svg>
       </div>
-      <div class="card metrics">
-        <div class="metric">Rule-Based</div>
-        Entries, exits and risk management
+      <div class="stat-row">
+        <div class="stat-box">
+          <div class="stat-val up">+2.34%</div>
+          <div class="stat-lbl">Today P&L</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val neutral">7</div>
+          <div class="stat-lbl">Trades</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val up">71%</div>
+          <div class="stat-lbl">Win Rate</div>
+        </div>
       </div>
-      <div class="card metrics">
-        <div class="metric">Consistency</div>
-        Focus on consistent growth, not chasing highs
+      <div class="signal-log">
+        <div class="signal-entry">
+          <span class="sig-time">09:32</span>
+          <span class="sig-action buy">BUY CE 24700</span>
+          <span class="sig-pnl pos">+₹1,240</span>
+        </div>
+        <div class="signal-entry">
+          <span class="sig-time">10:15</span>
+          <span class="sig-action sell">SELL CE 24700</span>
+          <span class="sig-pnl pos">+₹860</span>
+        </div>
+        <div class="signal-entry">
+          <span class="sig-time">11:48</span>
+          <span class="sig-action buy">BUY PE 24600</span>
+          <span class="sig-pnl pos">+₹2,100</span>
+        </div>
       </div>
-    </div>
-
-    <p class="sub" style="font-size:0.9rem;">
-      Results depend on market conditions and position sizing. Individual outcomes may vary.
-    </p>
-  </div>
-</section>
-
-<!-- HOW -->
-<section>
-  <div class="container">
-    <h2>How AutoPilot Works</h2>
-    <p class="sub">
-      Simple setup. Transparent execution.
-    </p>
-
-    <div class="grid">
-      <div class="card process">Connect your <strong>Zerodha</strong> broker account securely via API</div>
-      <div class="card process">Automation executes trades based on rules</div>
-      <div class="card process">Monitor trades and reports anytime</div>
-      <div class="card process">Continue only if it suits you</div>
-    </div>
-
-    <p class="sub" style="font-size:0.9rem; margin-top: 24px; color: #a09bc9;">
-      <strong>Note:</strong> Currently supports <strong>Zerodha</strong> broker. More brokers coming soon.
-    </p>
-  </div>
-</section>
-
-<!-- PRICING -->
-<section>
-  <div class="container">
-    <h2>Pricing After Free Trial</h2>
-    <p class="sub">
-      Only if you choose to continue after the 3-month free trial.
-    </p>
-
-    <div class="grid">
-      <div class="card pricing">
-        <div class="metric">&#8377;1000</div>
-        Monthly subscription
-      </div>
-      <div class="card pricing">
-        <div class="metric">10%</div>
-        Profit sharing (only on profits)
-      </div>
-      <div class="card pricing">
-        No lock-in period
-      </div>
-      <div class="card pricing">
-        Cancel anytime
-      </div>
-    </div>
-	<p class="sub" style="font-size: 0.9rem; margin-top: 32px; color: #c9c0e6;">
-		<strong>How It Works</strong><br>
-		<strong>With Profit :</strong> Earn 15000 profit, Pay : 1000 + 1500 (10%) = 2500,  You keep 12500<br>
-		<strong>With Loss :</strong> Lose 3000, Pay : 1000 subscription fee only
-	</p>
-  </div>
-</section>
-
-<!-- WHO IT WORKS FOR -->
-<section>
-  <div class="container">
-    <h2>Who NiftyFlow Works For</h2>
-    <p class="sub">
-      The ideal person for this system.
-    </p>
-
-    <div class="grid">
-      <div class="card success">People who want discipline over emotion</div>
-      <div class="card success">Those comfortable with 10-25% yearly returns</div>
-      <div class="card success">People who prefer rule-based decisions</div>
-      <div class="card success">People with steady capital to deploy</div>
     </div>
   </div>
 </section>
 
-<!-- WHO IT DOES NOT WORK FOR -->
-<section>
-  <div class="container">
-    <h2>Who This Is NOT For</h2>
-    <p class="sub">
-      Clarity avoids disappointment.
-    </p>
+<!-- SECTION 2: PSYCHOLOGY GAP -->
+<section class="psych-section" id="why">
+  <div class="section-eyebrow fade-in">The Psychology Gap</div>
+  <h2 class="section-h2 fade-in">Why 90% of Traders Fail<br><em style="font-style:italic;color:var(--gold-light)">— And How We Fix It.</em></h2>
+  <p class="section-lead fade-in" style="color:var(--mist)">
+    The market doesn't beat traders. Traders beat themselves. Fear, greed, and hesitation kill more accounts than any black swan event ever could.
+  </p>
+  <div class="psych-grid fade-in">
+    <div class="psych-col chaos">
+      <div class="psych-col-label label-chaos">
+        ✖ Manual Chaos
+      </div>
+      <div class="psych-items">
+        <div class="psych-item">
+          <div class="psych-item-icon icon-chaos">😰</div>
+          <div class="psych-item-text">
+            <strong>Fear of Loss</strong>
+            <span>Exits too early, misses full target. Cuts winners short.</span>
+          </div>
+        </div>
+        <div class="psych-item">
+          <div class="psych-item-icon icon-chaos">💸</div>
+          <div class="psych-item-text">
+            <strong>Greed Override</strong>
+            <span>Holds losers hoping for recovery. Blows stop-loss rules.</span>
+          </div>
+        </div>
+        <div class="psych-item">
+          <div class="psych-item-icon icon-chaos">⏳</div>
+          <div class="psych-item-text">
+            <strong>Hesitation Lag</strong>
+            <span>Signal fires. Human freezes. Entry missed. Opportunity gone.</span>
+          </div>
+        </div>
+        <div class="psych-item">
+          <div class="psych-item-icon icon-chaos">🎲</div>
+          <div class="psych-item-text">
+            <strong>Revenge Trading</strong>
+            <span>After a loss, doubles down emotionally. Wipes the week in one session.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="psych-divider">
+      <div class="vs-circle">vs</div>
+    </div>
+    <div class="psych-col precision">
+      <div class="psych-col-label label-precision">
+        ✔ Algo Precision
+      </div>
+      <div class="psych-items">
+        <div class="psych-item">
+          <div class="psych-item-icon icon-prec">🧠</div>
+          <div class="psych-item-text">
+            <strong>Logic-First Exits</strong>
+            <span>Target and stop-loss pre-coded. Algo exits at the defined price. Always.</span>
+          </div>
+        </div>
+        <div class="psych-item">
+          <div class="psych-item-icon icon-prec">📐</div>
+          <div class="psych-item-text">
+            <strong>Iron Discipline</strong>
+            <span>Every rule followed 100% of the time. No exceptions. No overrides.</span>
+          </div>
+        </div>
+        <div class="psych-item">
+          <div class="psych-item-icon icon-prec">⚡</div>
+          <div class="psych-item-text">
+            <strong>Zero Latency Entry</strong>
+            <span>Signal fires. Order hits the exchange in under 50ms. Optimal fill price.</span>
+          </div>
+        </div>
+        <div class="psych-item">
+          <div class="psych-item-icon icon-prec">🛡️</div>
+          <div class="psych-item-text">
+            <strong>Position Limits Enforced</strong>
+            <span>Max daily loss rules baked in. System pauses trading automatically.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-    <div class="grid">
-      <div class="card warning">People expecting guaranteed returns</div>
-      <div class="card warning">Those looking for trading tips or signals</div>
-      <div class="card warning">Users who want to override automation</div>
-      <div class="card warning">People chasing 100%+ returns annually</div>
+  <div class="discipline-engine fade-in">
+    <div class="engine-title">The Discipline Engine™</div>
+    <div class="engine-sub">Our Python scripts act as an emotional firewall — converting your strategy's rules into machine instructions that execute flawlessly.</div>
+    <div class="engine-flow">
+      <div class="engine-step">
+        <span class="engine-step-icon">📡</span>
+        <div class="engine-step-name">Market Data</div>
+        <div class="engine-step-desc">Live OHLC via WebSocket feed</div>
+      </div>
+      <div class="engine-arrow">→</div>
+      <div class="engine-step">
+        <span class="engine-step-icon">📊</span>
+        <div class="engine-step-name">Signal Engine</div>
+        <div class="engine-step-desc">EMA crossovers, patterns, indicators</div>
+      </div>
+      <div class="engine-arrow">→</div>
+      <div class="engine-step">
+        <span class="engine-step-icon">🧮</span>
+        <div class="engine-step-name">Risk Filter</div>
+        <div class="engine-step-desc">Position size, max loss, drawdown</div>
+      </div>
+      <div class="engine-arrow">→</div>
+      <div class="engine-step">
+        <span class="engine-step-icon">📤</span>
+        <div class="engine-step-name">Order Router</div>
+        <div class="engine-step-desc">Broker API — market or limit order</div>
+      </div>
+      <div class="engine-arrow">→</div>
+      <div class="engine-step">
+        <span class="engine-step-icon">📈</span>
+        <div class="engine-step-name">Log & Monitor</div>
+        <div class="engine-step-desc">Trade log, PnL dashboard, alerts</div>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- FINAL CTA -->
-<section>
-  <div class="container" style="text-align:center">
-    <h2>Experience It for 3 Months - Free</h2>
-    <p class="sub">
-      Observe real trades, real drawdowns, real behaviour - then decide.
-    </p>
-
-    <a class="cta"
-       href="https://wa.me/918087616404?text=Hi%20I%20want%20to%20start%20the%203-month%20free%20trial%20of%20NiftyFlow%20AutoPilot"
-       target="_blank">
-      Start 3-Month Free Trial
-    </a>
+<!-- SECTION 3: NIFTY AUTOPILOT DASHBOARD -->
+<section class="dashboard-section" id="dashboard">
+  <div class="section-eyebrow fade-in">Our Benchmark System</div>
+  <h2 class="section-h2 fade-in">Nifty Autopilot</h2>
+  <p class="section-lead fade-in">
+    A production-grade algo running EMA-based logic on NIFTY options — live entry, exit, and risk management, fully automated via broker API integration.
+  </p>
+  <div class="dashboard-container fade-in">
+    <!-- Top bar -->
+    <div class="dash-topbar">
+      <div class="dash-dots">
+        <span class="dash-dot d-red"></span>
+        <span class="dash-dot d-yellow"></span>
+        <span class="dash-dot d-green"></span>
+      </div>
+      <div class="dash-title-bar">NiftyFlow — Autopilot Terminal v2.4</div>
+      <div class="dash-status">SYSTEM ACTIVE</div>
+    </div>
+    <!-- Body -->
+    <div class="dash-body">
+      <!-- Sidebar -->
+      <div class="dash-sidebar">
+        <div class="dash-sidebar-title">Session Metrics</div>
+        <div class="dash-metric">
+          <div class="dash-metric-lbl">Today's P&L</div>
+          <div class="dash-metric-val pos">+₹4,820</div>
+          <div class="dash-metric-sub">Net after charges</div>
+        </div>
+        <div class="dash-metric">
+          <div class="dash-metric-lbl">Win Rate</div>
+          <div class="dash-metric-val">71.4%</div>
+          <div class="dash-metric-sub">Last 30 days</div>
+        </div>
+        <div class="dash-metric">
+          <div class="dash-metric-lbl">Avg RR Ratio</div>
+          <div class="dash-metric-val">1 : 2.3</div>
+          <div class="dash-metric-sub">Risk to Reward</div>
+        </div>
+        <div class="dash-metric">
+          <div class="dash-metric-lbl">Max Drawdown</div>
+          <div class="dash-metric-val">-4.2%</div>
+          <div class="dash-metric-sub">Monthly cap: -8%</div>
+        </div>
+        <div class="dash-metric">
+          <div class="dash-metric-lbl">API Latency</div>
+          <div class="dash-metric-val pos">18 ms</div>
+          <div class="dash-metric-sub">Zerodha Kite</div>
+        </div>
+      </div>
+      <!-- Main chart -->
+      <div class="dash-main">
+        <div class="dash-chart-header">
+          <div class="dash-instrument">NIFTY 24700 CE</div>
+          <div class="dash-price-tag">
+            <div class="dash-price">₹ 187.50</div>
+            <div class="dash-change">▲ +12.30 (+7.02%)</div>
+          </div>
+        </div>
+        <div class="ema-legend">
+          <div class="ema-item"><div class="ema-dot ema-9"></div><span style="font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--slate)">EMA 9</span></div>
+          <div class="ema-item"><div class="ema-dot ema-21"></div><span style="font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--slate)">EMA 21</span></div>
+          <div class="ema-item"><div class="ema-dot ema-50"></div><span style="font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--slate)">EMA 50</span></div>
+        </div>
+        <div class="dash-chart-area">
+          <svg viewBox="0 0 500 180" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="mainGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" style="stop-color:#1a6b3a;stop-opacity:0.12"/>
+                <stop offset="100%" style="stop-color:#1a6b3a;stop-opacity:0"/>
+              </linearGradient>
+            </defs>
+            <!-- Grid lines -->
+            <line x1="0" y1="40" x2="500" y2="40" stroke="#e8e4dc" stroke-width="1"/>
+            <line x1="0" y1="80" x2="500" y2="80" stroke="#e8e4dc" stroke-width="1"/>
+            <line x1="0" y1="120" x2="500" y2="120" stroke="#e8e4dc" stroke-width="1"/>
+            <line x1="0" y1="160" x2="500" y2="160" stroke="#e8e4dc" stroke-width="1"/>
+            <!-- Price candles (simplified bars) -->
+            <rect x="10" y="120" width="8" height="30" fill="#c0392b" opacity="0.7"/>
+            <rect x="30" y="110" width="8" height="25" fill="#c0392b" opacity="0.7"/>
+            <rect x="50" y="95" width="8" height="30" fill="#1a6b3a" opacity="0.7"/>
+            <rect x="70" y="80" width="8" height="28" fill="#1a6b3a" opacity="0.7"/>
+            <rect x="90" y="85" width="8" height="20" fill="#c0392b" opacity="0.7"/>
+            <rect x="110" y="70" width="8" height="30" fill="#1a6b3a" opacity="0.7"/>
+            <rect x="130" y="60" width="8" height="22" fill="#1a6b3a" opacity="0.7"/>
+            <rect x="150" y="50" width="8" height="28" fill="#1a6b3a" opacity="0.7"/>
+            <rect x="170" y="55" width="8" height="18" fill="#c0392b" opacity="0.7"/>
+            <rect x="190" y="45" width="8" height="25" fill="#1a6b3a" opacity="0.7"/>
+            <rect x="210" y="35" width="8" height="22" fill="#1a6b3a" opacity="0.7"/>
+            <rect x="230" y="40" width="8" height="18" fill="#c0392b" opacity="0.7"/>
+            <rect x="250" y="30" width="8" height="20" fill="#1a6b3a" opacity="0.7"/>
+            <rect x="270" y="25" width="8" height="16" fill="#1a6b3a" opacity="0.7"/>
+            <rect x="290" y="20" width="8" height="22" fill="#1a6b3a" opacity="0.7"/>
+            <rect x="310" y="28" width="8" height="18" fill="#c0392b" opacity="0.7"/>
+            <rect x="330" y="22" width="8" height="20" fill="#1a6b3a" opacity="0.7"/>
+            <rect x="350" y="15" width="8" height="18" fill="#1a6b3a" opacity="0.7"/>
+            <rect x="370" y="12" width="8" height="20" fill="#1a6b3a" opacity="0.7"/>
+            <rect x="390" y="8" width="8" height="16" fill="#1a6b3a" opacity="0.7"/>
+            <rect x="410" y="10" width="8" height="14" fill="#c0392b" opacity="0.7"/>
+            <rect x="430" y="6" width="8" height="18" fill="#1a6b3a" opacity="0.7"/>
+            <rect x="450" y="4" width="8" height="15" fill="#1a6b3a" opacity="0.7"/>
+            <!-- Area fill -->
+            <path d="M14,130 L34,122 L54,110 L74,94 L94,88 L114,85 L134,74 L154,64 L174,59 L194,58 L214,50 L234,44 L254,40 L274,32 L294,30 L314,35 L334,30 L354,24 L374,20 L394,16 L414,14 L434,14 L454,12 L454,180 L14,180Z" fill="url(#mainGrad)"/>
+            <!-- Price line -->
+            <path d="M14,130 L34,122 L54,110 L74,94 L94,88 L114,85 L134,74 L154,64 L174,59 L194,58 L214,50 L234,44 L254,40 L274,32 L294,30 L314,35 L334,30 L354,24 L374,20 L394,16 L414,14 L434,14 L454,12" fill="none" stroke="#1a6b3a" stroke-width="2"/>
+            <!-- EMA 9 -->
+            <path d="M14,128 L34,120 L54,108 L74,92 L94,86 L114,83 L134,72 L154,62 L174,57 L194,56 L214,49 L234,43 L254,39 L274,31 L294,29 L314,33 L334,29 L354,23 L374,18 L394,14 L414,12 L434,12 L454,10" fill="none" stroke="#d4af37" stroke-width="1.5" stroke-dasharray="4,2" opacity="0.9"/>
+            <!-- EMA 21 -->
+            <path d="M14,140 L34,132 L54,120 L74,106 L94,98 L114,92 L134,82 L154,72 L174,67 L194,64 L214,56 L234,50 L254,45 L274,38 L294,34 L314,38 L334,34 L354,28 L374,24 L394,20 L414,18 L434,18 L454,15" fill="none" stroke="#6495ed" stroke-width="1.5" stroke-dasharray="4,2" opacity="0.8"/>
+            <!-- BUY signal arrow -->
+            <polygon points="134,68 129,80 139,80" fill="#1a6b3a"/>
+            <text x="134" y="90" text-anchor="middle" font-family="DM Mono" font-size="7" fill="#1a6b3a">BUY</text>
+            <!-- SELL signal arrow -->
+            <polygon points="314,40 309,28 319,28" fill="#c0392b"/>
+            <text x="314" y="50" text-anchor="middle" font-family="DM Mono" font-size="7" fill="#c0392b">SELL</text>
+          </svg>
+        </div>
+        <div class="dash-signals">
+          <div class="dash-signal-card">
+            <div class="dsc-lbl">Signal</div>
+            <div class="dsc-val buy">EMA Cross ↑</div>
+          </div>
+          <div class="dash-signal-card">
+            <div class="dsc-lbl">Position</div>
+            <div class="dsc-val buy">LONG CE</div>
+          </div>
+          <div class="dash-signal-card">
+            <div class="dsc-lbl">Target</div>
+            <div class="dsc-val">₹ 210.00</div>
+          </div>
+          <div class="dash-signal-card">
+            <div class="dsc-lbl">Stop Loss</div>
+            <div class="dsc-val sell">₹ 165.00</div>
+          </div>
+          <div class="dash-signal-card">
+            <div class="dsc-lbl">Qty</div>
+            <div class="dsc-val">50 lots</div>
+          </div>
+          <div class="dash-signal-card">
+            <div class="dsc-lbl">Broker</div>
+            <div class="dsc-val">Zerodha</div>
+          </div>
+        </div>
+      </div>
+      <!-- Right panel -->
+      <div class="dash-right">
+        <div class="dash-right-title">Trade Log — Today</div>
+        <div class="trade-log-item">
+          <div class="tli-header">
+            <span class="tli-symbol">NIFTY 24600 CE</span>
+            <span class="tli-type buy">BUY</span>
+          </div>
+          <div class="tli-detail">09:32 · Entry ₹142.0</div>
+          <div class="tli-pnl pos">+₹2,100</div>
+        </div>
+        <div class="trade-log-item">
+          <div class="tli-header">
+            <span class="tli-symbol">NIFTY 24600 CE</span>
+            <span class="tli-type sell">SELL</span>
+          </div>
+          <div class="tli-detail">10:18 · Exit ₹184.0</div>
+          <div class="tli-pnl pos">Booked</div>
+        </div>
+        <div class="trade-log-item">
+          <div class="tli-header">
+            <span class="tli-symbol">NIFTY 24700 PE</span>
+            <span class="tli-type buy">BUY</span>
+          </div>
+          <div class="tli-detail">11:05 · Entry ₹88.0</div>
+          <div class="tli-pnl pos">+₹960</div>
+        </div>
+        <div class="trade-log-item">
+          <div class="tli-header">
+            <span class="tli-symbol">NIFTY 24700 CE</span>
+            <span class="tli-type buy">BUY</span>
+          </div>
+          <div class="tli-detail">12:42 · Entry ₹161.5</div>
+          <div class="tli-pnl pos">+₹1,760</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="feature-tags fade-in">
+    <span class="feat-tag">EMA-Based Logic</span>
+    <span class="feat-tag">Automated Options Buy/Sell</span>
+    <span class="feat-tag">Zerodha Kite API</span>
+    <span class="feat-tag">Upstox API</span>
+    <span class="feat-tag">AngelOne SmartAPI</span>
+    <span class="feat-tag">WebSocket Live Feed</span>
+    <span class="feat-tag">Auto Stop-Loss</span>
+    <span class="feat-tag">Max-Loss Circuit Breaker</span>
+    <span class="feat-tag">Trade Log & Reporting</span>
   </div>
 </section>
 
+<!-- SECTION 4: STACK & CONTACT -->
+<section class="stack-section" id="stack">
+  <div class="section-eyebrow fade-in">Technical Foundation</div>
+  <h2 class="section-h2 fade-in">Built on a<br>Production-Grade Stack.</h2>
+  <div class="stack-grid">
+    <div class="fade-in">
+      <div class="stack-icons">
+        <div class="stack-icon-card">
+          <span class="stack-icon-svg">🐍</span>
+          <div class="stack-icon-name">Python</div>
+          <div class="stack-icon-desc">Core engine & signal logic</div>
+        </div>
+        <div class="stack-icon-card">
+          <span class="stack-icon-svg">⚡</span>
+          <div class="stack-icon-name">FastAPI</div>
+          <div class="stack-icon-desc">High-perf async REST layer</div>
+        </div>
+        <div class="stack-icon-card">
+          <span class="stack-icon-svg">🔌</span>
+          <div class="stack-icon-name">WebSocket</div>
+          <div class="stack-icon-desc">Real-time tick data stream</div>
+        </div>
+        <div class="stack-icon-card">
+          <span class="stack-icon-svg">📊</span>
+          <div class="stack-icon-name">Pandas</div>
+          <div class="stack-icon-desc">OHLC & indicator compute</div>
+        </div>
+        <div class="stack-icon-card">
+          <span class="stack-icon-svg">🗄️</span>
+          <div class="stack-icon-name">PostgreSQL</div>
+          <div class="stack-icon-desc">Trade log & analytics DB</div>
+        </div>
+        <div class="stack-icon-card">
+          <span class="stack-icon-svg">☁️</span>
+          <div class="stack-icon-name">Cloud VPS</div>
+          <div class="stack-icon-desc">Always-on, low-latency host</div>
+        </div>
+      </div>
+      <div class="stack-extras">
+        <span class="stack-pill">Zerodha Kite API</span>
+        <span class="stack-pill">Upstox API</span>
+        <span class="stack-pill">AngelOne SmartAPI</span>
+        <span class="stack-pill">Shoonya API</span>
+        <span class="stack-pill">NumPy</span>
+        <span class="stack-pill">TA-Lib</span>
+        <span class="stack-pill">Redis Queue</span>
+        <span class="stack-pill">Docker</span>
+        <span class="stack-pill">Telegram Alerts</span>
+        <span class="stack-pill">Grafana</span>
+      </div>
+    </div>
+    <!-- Contact Card -->
+    <div class="contact-card fade-in" id="contact">
+      <div class="contact-eyebrow">Direct Inquiry</div>
+      <h3 class="contact-h3">Ready to automate<br>your edge?</h3>
+      <p class="contact-sub">
+        Tell us your strategy. We handle the engineering. Your logic, our code — deployed and running in days, not months.
+      </p>
+      <div class="contact-btns">
+        <a class="contact-btn btn-wa" href="https://wa.me/918087616404?text=Hi%20NiftyFlow%2C%20I%27d%20like%20to%20discuss%20an%20algo%20trading%20project." target="_blank">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+          Direct Chat — WhatsApp
+        </a>
+        <a class="contact-btn btn-email" href="mailto:niftyflow.service@gmail.com?subject=Algo%20Project%20Inquiry">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 7 10-7"/></svg>
+          Email Inquiry
+        </a>
+      </div>
+      <div class="confidentiality-note">
+        <span class="conf-icon">🔒</span>
+        <span>Your strategy's IP is protected by strict confidentiality. We sign NDAs before any technical discussion begins.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
 <footer>
-  Disclaimer: Automated trading involves market risk. Past performance is not indicative of future results.
+  <div>
+    <div class="footer-logo">Nifty<span>Flow</span></div>
+    <div class="footer-tagline">Logic Over Luck. Code Over Chaos.</div>
+  </div>
+  <div class="footer-copy">
+    © 2025 NiftyFlow Algo Trading Agency<br>
+    All strategies, IP & client data remain confidential.
+  </div>
 </footer>
 
-<button id="topBtn" onclick="window.scrollTo({top:0, behavior:'smooth'})">Top</button>
-
-<a href="https://www.instagram.com/niftyflow.in/" 
-   target="_blank" 
-   class="instagram-btn" 
-   title="Follow us on Instagram">
-  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37"></path>
-    <circle cx="17.5" cy="6.5" r="1.5"></circle>
-  </svg>
-</a>
-
-<a href="https://wa.me/918087616404?text=Hi%20I%20want%20to%20start%20the%203-month%20free%20trial%20of%20NiftyFlow%20AutoPilot" 
-   target="_blank" 
-   class="whatsapp-btn" 
-   title="Contact us on WhatsApp">
-  <img src="assets/images/whatsapp.svg" alt="WhatsApp" width="28" height="28">
-</a>
-
-<a href="mailto:niftyflow.service@gmail.com" 
-   class="email-btn" 
-   title="Email us">
-  &#x2709;
-</a>
+<!-- FLOATING CONTACT BUTTONS -->
+<div class="float-contact">
+  <a class="float-btn float-wa" href="https://wa.me/918087616404?text=Hi%20NiftyFlow%21" target="_blank">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+    <span>WhatsApp Chat</span>
+  </a>
+  <a class="float-btn float-email" href="mailto:niftyflow.service@gmail.com" target="_blank">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 7 10-7"/></svg>
+    <span>Email Inquiry</span>
+  </a>
+</div>
 
 <script>
-// Schema.org Structured Data
-const schemaData = {
-  "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  "name": "NiftyFlow AutoPilot",
-  "description": "Rule-based automated Nifty trading system focused on disciplined execution and controlled risk",
-  "applicationCategory": "FinanceApplication",
-  "offers": {
-    "@type": "Offer",
-    "price": "1000",
-    "priceCurrency": "INR"
-  },
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.8",
-    "ratingCount": "100"
+  // Intersection Observer for fade-in
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+
+  // Mobile menu
+  function toggleMenu() {
+    const menu = document.getElementById('mobileMenu');
+    menu.classList.toggle('open');
   }
-};
 
-document.head.appendChild(
-  Object.assign(document.createElement('script'), {
-    type: 'application/ld+json',
-    textContent: JSON.stringify(schemaData)
-  })
-);
-
-const topBtn = document.getElementById("topBtn");
-window.addEventListener("scroll", () => {
-  if (window.scrollY > 400) topBtn.classList.add("show");
-  else topBtn.classList.remove("show");
-}, { passive: true });
+  // Animate ticker numbers slightly
+  function randomizeTickerValues() {
+    const items = document.querySelectorAll('.ticker-item .up, .ticker-item .down');
+    items.forEach(item => {
+      const text = item.textContent;
+      if (!text.includes('ACTIVE') && !text.includes('ms')) {
+        const isUp = item.classList.contains('up');
+        const match = text.match(/[\d,]+\.\d+/);
+        if (match) {
+          const base = parseFloat(match[0].replace(/,/g, ''));
+          const delta = (Math.random() - 0.5) * 2;
+          const newVal = (base + delta).toFixed(2);
+          const formatted = newVal.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+          const pct = ((delta / base) * 100).toFixed(2);
+          const sign = delta >= 0 ? '▲ +' : '▼ ';
+          item.textContent = `${formatted} ${sign}${Math.abs(pct)}%`;
+        }
+      }
+    });
+  }
+  setInterval(randomizeTickerValues, 3000);
 </script>
-
 </body>
 </html>

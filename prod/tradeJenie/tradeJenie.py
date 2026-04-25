@@ -926,7 +926,9 @@ def _monitor_hedged_position_until_next_candle(
 
                         # 5. EXECUTE ROBUST ENTRY
                         new_qty, new_avg, new_h_avg = execute_robust_entry(temp_trade_symbols, config, user, skip_hedge_override=skip_h_entry, reason="Rollover re-entry in same direction.")
-
+                        if config['HEDGE_ROLLOVER_TYPE'] == 'SEMI' and expiry_match == "SAME" and not qty_changed:
+                            new_h_avg = exit_h_avg  # Force same hedge price if semi and same expiry and qty not changed
+                            
                         if not is_valid_trade_data(new_qty, new_avg, new_h_avg, hedge_required=True):
                             err_msg = f"⚠️ {key} | FAILED Entry: {opt_symbol} or {hedge_opt_symbol} Qty or Price is 0."
                             logging.error(err_msg)

@@ -4,13 +4,22 @@ import os
 #Current GCP database path
 # DB_PATH = '/home/harshilkhatri2808/prod/tradeJenie/Trading.db'
 # PATH = '/home/harshilkhatri2808/prod/tradeJenie'
-
+#GCP
 #PROD database path
 PROD_DB_PATH = '/home/harshilkhatri2808/prod/tradeJenie/Trading.db'
-PROD_PATH = '/home/harshilkhatri2808/uat/tradeJenie'
+PROD_PATH = '/home/harshilkhatri2808/prod/tradeJenie'
 #UAT database path
 UAT_DB_PATH = '/home/harshilkhatri2808/uat/tradeJenie/Trading.db'
 UAT_PATH = '/home/harshilkhatri2808/uat/tradeJenie'
+
+# #Local
+# #PROD database path
+# PROD_DB_PATH = 'E:/NonChakApps/Apps/Jenie/websitejenie/prod/Trading.db'
+# PROD_PATH = 'E:/NonChakApps/Apps/Jenie/tradejenie/uat/tradeJenie'
+# #UAT database path
+# UAT_DB_PATH = 'E:/NonChakApps/Apps/Jenie/websitejenie/uat/Trading.db'
+# UAT_PATH = 'E:/NonChakApps/Apps/Jenie/tradejenie/uat/tradeJenie'
+
 
 # Default active environment paths
 DB_PATH = ""
